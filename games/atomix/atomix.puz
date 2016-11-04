@@ -452,3 +452,208 @@ LEVELS
 #....H*.#
 #.......#
 #########
+
+
+===================================================
+
+title Atomix demake
+author Recher
+homepage recher.wordpress.com
+
+verbose_logging
+again_interval 1.1
+
+run_rules_on_level_start
+
+========
+OBJECTS
+========
+
+Background
+black
+
+BackgroundModelBlockPropagate
+black
+
+Wall
+lightgray
+
+WallSeparateFromModel
+lightgray
+
+ModelStartPropagate
+red
+
+Model
+darkgray
+
+Hydrogen
+transparent gray
+00000
+01110
+01110
+01110
+00000
+
+Carbon
+transparent blue
+00000
+01110
+01110
+01110
+00000
+
+Oxygen
+transparent red
+00000
+01110
+01110
+01110
+00000
+
+SelectedAtom
+transparent yellow
+10101
+00000
+10001
+00000
+10101
+
+Player
+transparent orange
+10101
+00000
+10001
+00000
+10101
+
+UniqueAtomStartCheck
+transparent red
+00000
+00000
+00100
+00000
+00000
+
+CopyToFourDirs
+transparent red
+00000
+00100
+01010
+00100
+00000
+
+ZoneCheck
+purple
+
+CheckedAtom
+pink
+
+=======
+LEGEND
+=======
+
+. = Background
+, = BackgroundModelBlockPropagate
+# = Wall
+? = Background and ModelStartPropagate and Model
+! = WallSeparateFromModel
+P = Player
+H = Hydrogen
+C = Carbon and UniqueAtomStartCheck
+O = Oxygen
+* = Player
+
+Atom = Hydrogen or Carbon or Oxygen
+Obstacle = WallSeparateFromModel or Wall or Atom
+
+ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
+
+
+
+=======
+SOUNDS
+=======
+
+
+================
+COLLISIONLAYERS
+================
+
+Background
+
+Model, BackgroundModelBlockPropagate, ModelBlockPropagate, ZoneCheck
+
+ModelStartPropagate
+
+CheckedAtom
+
+Wall,  Hydrogen, Carbon, Oxygen
+
+Player, WallSeparateFromModel
+
+SelectedAtom
+
+UniqueAtomStartCheck
+
+CopyToFourDirs
+
+======
+RULES
+======
+
+( --- Model propagation --- )
+(Useful only at level start)
+
+[ ModelStartPropagate | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate | Model no ModelBlockPropagate ]
+
+[ ModelStartPropagate ] [ Model | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ Model | Model no ModelBlockPropagate ]
+
+[ ModelStartPropagate ] -> [ Model ]
+
+(not here ?)
+
+[ CheckedAtom ] -> [ ]
+
+( --- Atom grabbing by Player --- )
+
+[ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
+[ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
+
+[ > Atom | Obstacle ] -> cancel
+
+[ Action Player SelectedAtom ] -> [ Player no SelectedAtom ]
+[ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
+
+()
+
+(test pour être sûr qu'il prend en premier le truc en haut à gauche)
+([ Oxygen ] [ Model ] -> [ ] [ Model Carbon ])
+
+[ UniqueAtomStartCheck ] -> [ UniqueAtomStartCheck CopyToFourDirs ]
+
+RIGHT [ UniqueAtomStartCheck Model CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model CopyToFourDirs |  ] -> [ UniqueAtomStartCheck Model | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | CopyToFourDirs ZoneCheck ]
+
+RIGHT [ UniqueAtomStartCheck Model | ... | CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToFourDirs |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToFourDirs ZoneCheck ]
+
+==============
+WINCONDITIONS
+==============
+
+
+
+=======
+LEVELS
+=======
+
+O##############
+#,?H....,.....#
+#,HCHHHH,.....#
+#,.H....,.....#
+!!!!!!!!!!!!!!!
+#.............#
+#.......H.H...#
+#......HC.....#
+#.......H*....#
+#.............#
+###############
