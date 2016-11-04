@@ -1,462 +1,4 @@
 title Atomix demake
-author Réchèr
-homepage recher.wordpress.com
-
-verbose_logging
-again_interval 1.1
-
-========
-OBJECTS
-========
-
-Background
-GREEN
-
-Target
-DarkBlue
-
-Wall
-BROWN
-
-Player
-Blue
-
-Crate
-Orange
-
-MovingPlayer
-red
-
-NextTurnMoveRight
-yellow
-
-NowMoveRight
-pink
-
-=======
-LEGEND
-=======
-
-. = Background
-# = Wall
-P = Player
-* = Crate
-@ = Crate and Target
-O = Target
-Thing = Player or Wall or Crate
-
-=======
-SOUNDS
-=======
-
-================
-COLLISIONLAYERS
-================
-
-Background
-Target
-Player, Wall, Crate
-MovingPlayer, NextTurnMoveRight, NowMoveRight
-
-
-======
-RULES
-======
-
-(hahaha)
-
-RIGHT [ NextTurnMoveRight | no Thing ] -> [ NowMoveRight | no Thing ]
-
-
-RIGHT [ > Player | no Thing ] -> [ > Player > NextTurnMoveRight | ]
-
-RIGHT [ Player NowMoveRight | no Thing ] -> [ > Player > NextTurnMoveRight | ]
-
-RIGHT [ NextTurnMoveRight | Thing ] -> [ | Thing ]
-
-[ NextTurnMoveRight ] -> [ NextTurnMoveRight ] again
-
-
-==============
-WINCONDITIONS
-==============
-
-All Target on Crate
-
-=======
-LEVELS
-=======
-
-#########
-#.......#
-#.....@.#
-#.P.*.O.#
-#.......#
-#.......#
-#########
-
-
-
-==================================================================
-
-
-title Atomix demake
-author Recher
-homepage recher.wordpress.com
-
-verbose_logging
-again_interval 1.1
-
-========
-OBJECTS
-========
-
-Background
-black
-
-BackgroundModelBlockPropagate
-black
-
-Wall
-lightgray
-
-WallSeparateFromModel
-lightgray
-
-ModelStartPropagate
-red
-
-Model
-darkgray
-
-Hydrogen
-transparent gray
-00000
-01110
-01110
-01110
-00000
-
-Carbon
-transparent blue
-00000
-01110
-01110
-01110
-00000
-
-Oxygen
-transparent red
-00000
-01110
-01110
-01110
-00000
-
-SelectedAtom
-transparent yellow
-10101
-00000
-10001
-00000
-10101
-
-Player
-transparent orange
-10101
-00000
-10001
-00000
-10101
-
-
-=======
-LEGEND
-=======
-
-. = Background
-, = BackgroundModelBlockPropagate
-# = Wall
-? = Background and ModelStartPropagate and Model
-! = WallSeparateFromModel
-P = Player
-H = Hydrogen
-C = Carbon
-O = Oxygen
-
-Atom = Hydrogen or Carbon or Oxygen
-Obstacle = WallSeparateFromModel or Wall or Atom
-
-ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
-
-
-* = Player
-
-
-=======
-SOUNDS
-=======
-
-
-================
-COLLISIONLAYERS
-================
-
-Background
-
-Model, BackgroundModelBlockPropagate, ModelBlockPropagate
-
-ModelStartPropagate
-
-Wall,  Hydrogen, Carbon, Oxygen
-
-Player, WallSeparateFromModel
-
-SelectedAtom
-
-
-======
-RULES
-======
-
-(Model propagation)
-
-[ ModelStartPropagate | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate | Model no ModelBlockPropagate ]
-
-[ ModelStartPropagate ] [ Model | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ Model | Model no ModelBlockPropagate ]
-
-[ ModelStartPropagate ] -> [ Model ]
-
-
-(Atom grabbing by Player)
-
-[ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
-
-[ > Atom | Obstacle ] -> cancel
-
-[ Action Player SelectedAtom ] -> [ Player no SelectedAtom ]
-[ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
-
-==============
-WINCONDITIONS
-==============
-
-
-
-=======
-LEVELS
-=======
-
-#########
-#,?H.,..#
-#,HCH,..#
-#,.H.,..#
-!!!!!!!!!
-#.......#
-#....H.H#
-#...HC..#
-#....H*.#
-#.......#
-#########
-
-
-===================================================
-
-title Atomix demake
-author Recher
-homepage recher.wordpress.com
-
-verbose_logging
-again_interval 1.1
-
-run_rules_on_level_start
-
-========
-OBJECTS
-========
-
-Background
-black
-
-BackgroundModelBlockPropagate
-black
-
-Wall
-lightgray
-
-WallSeparateFromModel
-lightgray
-
-ModelStartPropagate
-red
-
-Model
-darkgray
-
-Hydrogen
-transparent gray
-00000
-01110
-01110
-01110
-00000
-
-Carbon
-transparent blue
-00000
-01110
-01110
-01110
-00000
-
-Oxygen
-transparent red
-00000
-01110
-01110
-01110
-00000
-
-SelectedAtom
-transparent yellow
-10101
-00000
-10001
-00000
-10101
-
-Player
-transparent orange
-10101
-00000
-10001
-00000
-10101
-
-UniqueAtomStartCheck
-transparent red
-00000
-00000
-00100
-00000
-00000
-
-CheckedAtom
-pink
-
-=======
-LEGEND
-=======
-
-. = Background
-, = BackgroundModelBlockPropagate
-# = Wall
-? = Background and ModelStartPropagate and Model
-! = WallSeparateFromModel
-P = Player
-H = Hydrogen
-C = Carbon and UniqueAtomStartCheck
-O = Oxygen
-* = Player
-
-Atom = Hydrogen or Carbon or Oxygen
-Obstacle = WallSeparateFromModel or Wall or Atom
-
-ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
-
-
-
-=======
-SOUNDS
-=======
-
-
-================
-COLLISIONLAYERS
-================
-
-Background
-
-Model, BackgroundModelBlockPropagate, ModelBlockPropagate
-
-ModelStartPropagate
-
-CheckedAtom
-
-Wall,  Hydrogen, Carbon, Oxygen
-
-Player, WallSeparateFromModel
-
-SelectedAtom
-
-UniqueAtomStartCheck
-
-======
-RULES
-======
-
-( --- Model propagation --- )
-(Useful only at level start)
-
-[ ModelStartPropagate | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate | Model no ModelBlockPropagate ]
-
-[ ModelStartPropagate ] [ Model | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ Model | Model no ModelBlockPropagate ]
-
-[ ModelStartPropagate ] -> [ Model ]
-
-(not here ?)
-
-[ CheckedAtom ] -> [ ]
-
-( --- Atom grabbing by Player --- )
-
-[ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
-[ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
-
-[ > Atom | Obstacle ] -> cancel
-
-[ Action Player SelectedAtom ] -> [ Player no SelectedAtom ]
-[ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
-
-()
-
-late [ UniqueAtomStartCheck ] -> [ UniqueAtomStartCheck CheckedAtom ]
-
-horizontal late [ CheckedAtom Model no Atom | no CheckedAtom Model no Atom ] horizontal [ CheckedAtom no Model no Atom | no CheckedAtom no Model no Atom ] -> [ CheckedAtom Model no Atom | CheckedAtom Model no Atom ] [ CheckedAtom no Model no Atom | CheckedAtom no Model no Atom ]
-+ horizontal late [ CheckedAtom Model Hydrogen | no CheckedAtom Model no Atom ] horizontal [ CheckedAtom no Model Hydrogen | no CheckedAtom no Model no Atom ] -> [ CheckedAtom Model Hydrogen | CheckedAtom Model no Atom ] [ CheckedAtom no Model Hydrogen | CheckedAtom no Model no Atom ]
-+ horizontal late [ CheckedAtom Model Oxygen | no CheckedAtom Model Hydrogen ] horizontal [ CheckedAtom no Model Oxygen | no CheckedAtom no Model Hydrogen ] -> [ CheckedAtom Model Oxygen | CheckedAtom Model Hydrogen ] [ CheckedAtom no Model Oxygen | CheckedAtom no Model Hydrogen ]
-+ horizontal late [ CheckedAtom Model Carbon | no CheckedAtom Model Hydrogen ] horizontal [ CheckedAtom no Model Carbon | no CheckedAtom no Model Hydrogen ] -> [ CheckedAtom Model Carbon | CheckedAtom Model Hydrogen ] [ CheckedAtom no Model Carbon | CheckedAtom no Model Hydrogen ]
-+ vertical late [ CheckedAtom Model no Atom | no CheckedAtom Model no Atom ] vertical [ CheckedAtom no Model no Atom | no CheckedAtom no Model no Atom ] -> [ CheckedAtom Model no Atom | CheckedAtom Model no Atom ] [ CheckedAtom no Model no Atom | CheckedAtom no Model no Atom ]
-+ vertical late [ CheckedAtom Model Hydrogen | no CheckedAtom Model no Atom ] vertical [ CheckedAtom no Model Hydrogen | no CheckedAtom no Model no Atom ] -> [ CheckedAtom Model Hydrogen | CheckedAtom Model no Atom ] [ CheckedAtom no Model Hydrogen | CheckedAtom no Model no Atom ]
-+ vertical late [ CheckedAtom Model Oxygen | no CheckedAtom Model Hydrogen ] vertical [ CheckedAtom no Model Oxygen | no CheckedAtom no Model Hydrogen ] -> [ CheckedAtom Model Oxygen | CheckedAtom Model Hydrogen ] [ CheckedAtom no Model Oxygen | CheckedAtom no Model Hydrogen ]
-+ vertical late [ CheckedAtom Model Carbon | no CheckedAtom Model Hydrogen ] vertical [ CheckedAtom no Model Carbon | no CheckedAtom no Model Hydrogen ] -> [ CheckedAtom Model Carbon | CheckedAtom Model Hydrogen ] [ CheckedAtom no Model Carbon | CheckedAtom no Model Hydrogen ]
-
-==============
-WINCONDITIONS
-==============
-
-
-
-=======
-LEVELS
-=======
-
-#########
-#,?H.,..#
-#,HCH,..#
-#,.H.,..#
-!!!!!!!!!
-#.......#
-#....H.H#
-#...HC..#
-#....H*.#
-#.......#
-#########
-
-
-===================================================
-
-title Atomix demake
 author Recher
 homepage recher.wordpress.com
 
@@ -543,6 +85,12 @@ transparent red
 00100
 00000
 
+CopyToRight
+transparent
+
+CopyToUp
+transparent
+
 ZoneCheck
 purple
 
@@ -556,7 +104,7 @@ LEGEND
 . = Background
 , = BackgroundModelBlockPropagate
 # = Wall
-? = Background and ModelStartPropagate and Model
+? = Background and ModelStartPropagate and Model and CopyToRight
 ! = WallSeparateFromModel
 P = Player
 H = Hydrogen
@@ -598,6 +146,8 @@ UniqueAtomStartCheck
 
 CopyToFourDirs
 
+CopyToRight, CopyToUp
+
 ======
 RULES
 ======
@@ -619,22 +169,37 @@ RULES
 
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
 [ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
+[ > UniqueAtomStartCheck ][ZoneCheck] -> [ > UniqueAtomStartCheck ][ > ZoneCheck]
 
 [ > Atom | Obstacle ] -> cancel
 
 [ Action Player SelectedAtom ] -> [ Player no SelectedAtom ]
 [ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
 
-()
+
+
+( --- ZoneCheck initialisation --- )
 
 (test pour être sûr qu'il prend en premier le truc en haut à gauche)
 ([ Oxygen ] [ Model ] -> [ ] [ Model Carbon ])
 
-[ UniqueAtomStartCheck ] -> [ UniqueAtomStartCheck CopyToFourDirs ]
+[CopyToRight][ UniqueAtomStartCheck ] -> [CopyToRight][ UniqueAtomStartCheck CopyToFourDirs ]
+[CopyToRight][ CopyToFourDirs no Model ] -> [CopyToRight][ CopyToFourDirs no Model ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck Model CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model CopyToFourDirs |  ] -> [ UniqueAtomStartCheck Model | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | CopyToFourDirs ZoneCheck ]
+RIGHT [CopyToRight][ UniqueAtomStartCheck Model CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model CopyToFourDirs |  ] -> [CopyToRight][ UniqueAtomStartCheck Model | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | CopyToFourDirs ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck Model | ... | CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToFourDirs |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToFourDirs ZoneCheck ]
+RIGHT [CopyToRight][ UniqueAtomStartCheck Model | ... | CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToFourDirs |  ] -> [CopyToRight][ UniqueAtomStartCheck Model | ... |  | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToFourDirs ZoneCheck ]
+
+[ CopyToFourDirs ] -> [ ]
+[ CopyToRight ] -> [ CopyToUp ]
+[CopyToUp][ UniqueAtomStartCheck ] -> [CopyToUp][ UniqueAtomStartCheck CopyToFourDirs ]
+
+UP [CopyToUp][ UniqueAtomStartCheck Model CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model CopyToFourDirs |  ] -> [CopyToUp][ UniqueAtomStartCheck Model | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | CopyToFourDirs ZoneCheck ]
+
+UP [CopyToUp][ UniqueAtomStartCheck Model | ... | CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToFourDirs |  ] -> [CopyToUp][ UniqueAtomStartCheck Model | ... |  | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToFourDirs ZoneCheck ]
+
+[ CopyToUp ] -> [ ]
+[ CopyToFourDirs ] -> [ ]
 
 ==============
 WINCONDITIONS
