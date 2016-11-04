@@ -77,25 +77,46 @@ transparent red
 00000
 00000
 
-CopyToFourDirs
-transparent red
-00000
-00100
-01010
-00100
-00000
-
 CopyToRight
-transparent
+transparent red yellow
+00000
+00000
+00210
+00000
+00000
 
 CopyToUp
+transparent
+
+CopyToDown
+transparent
+
+CopyToLeft
+transparent
+
+ZoneCheckToInitiate
 transparent
 
 ZoneCheck
 purple
 
-CheckedAtom
+ZoneCheckVertical
+transparent
+
+ZoneCheckHorizontal
+transparent
+
+CheckedAtomOK
 pink
+
+CheckedAtomFail
+transparent
+
+CurrentlyChecking
+red
+
+CheckOneByOne
+transparent
 
 =======
 LEGEND
@@ -104,7 +125,8 @@ LEGEND
 . = Background
 , = BackgroundModelBlockPropagate
 # = Wall
-? = Background and ModelStartPropagate and Model and CopyToRight
++ = Wall and CheckOneByOne
+? = Background and ModelStartPropagate and Model and ZoneCheckToInitiate
 ! = WallSeparateFromModel
 P = Player
 H = Hydrogen
@@ -117,7 +139,7 @@ Obstacle = WallSeparateFromModel or Wall or Atom
 
 ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
 
-
+CheckedAtom = CheckedAtomFail or CheckedAtomOK
 
 =======
 SOUNDS
@@ -130,11 +152,16 @@ COLLISIONLAYERS
 
 Background
 
-Model, BackgroundModelBlockPropagate, ModelBlockPropagate, ZoneCheck
+Model, BackgroundModelBlockPropagate, ModelBlockPropagate
+
+ZoneCheckHorizontal
+ZoneCheckVertical
+ZoneCheck
 
 ModelStartPropagate
-
-CheckedAtom
+CurrentlyChecking
+CheckOneByOne
+CheckedAtomFail, CheckedAtomOK
 
 Wall,  Hydrogen, Carbon, Oxygen
 
@@ -144,9 +171,12 @@ SelectedAtom
 
 UniqueAtomStartCheck
 
-CopyToFourDirs
+ZoneCheckToInitiate
 
-CopyToRight, CopyToUp
+CopyToRight
+CopyToUp
+CopyToDown
+CopyToLeft
 
 ======
 RULES
@@ -183,23 +213,47 @@ RULES
 (test pour être sûr qu'il prend en premier le truc en haut à gauche)
 ([ Oxygen ] [ Model ] -> [ ] [ Model Carbon ])
 
-[CopyToRight][ UniqueAtomStartCheck ] -> [CopyToRight][ UniqueAtomStartCheck CopyToFourDirs ]
-[CopyToRight][ CopyToFourDirs no Model ] -> [CopyToRight][ CopyToFourDirs no Model ZoneCheck ]
+[ ZoneCheckToInitiate ][ UniqueAtomStartCheck ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
+[ ZoneCheckToInitiate ][ UniqueAtomStartCheck no Model ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck no Model ZoneCheck ]
 
-RIGHT [CopyToRight][ UniqueAtomStartCheck Model CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model CopyToFourDirs |  ] -> [CopyToRight][ UniqueAtomStartCheck Model | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | CopyToFourDirs ZoneCheck ]
+RIGHT [ UniqueAtomStartCheck Model CopyToRight | Model ] [ UniqueAtomStartCheck no Model CopyToRight |  ] -> [ UniqueAtomStartCheck Model | CopyToRight Model ] [ UniqueAtomStartCheck no Model | CopyToRight ZoneCheck ZoneCheckVertical ]
 
-RIGHT [CopyToRight][ UniqueAtomStartCheck Model | ... | CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToFourDirs |  ] -> [CopyToRight][ UniqueAtomStartCheck Model | ... |  | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToFourDirs ZoneCheck ]
+RIGHT [ UniqueAtomStartCheck Model | ... | CopyToRight | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToRight |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToRight Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToRight ZoneCheck ZoneCheckVertical ]
 
-[ CopyToFourDirs ] -> [ ]
-[ CopyToRight ] -> [ CopyToUp ]
-[CopyToUp][ UniqueAtomStartCheck ] -> [CopyToUp][ UniqueAtomStartCheck CopyToFourDirs ]
+LEFT [ UniqueAtomStartCheck Model CopyToLeft | Model ] [ UniqueAtomStartCheck no Model CopyToLeft |  ] -> [ UniqueAtomStartCheck Model | CopyToLeft Model ] [ UniqueAtomStartCheck no Model | CopyToLeft ZoneCheck ZoneCheckVertical ]
 
-UP [CopyToUp][ UniqueAtomStartCheck Model CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model CopyToFourDirs |  ] -> [CopyToUp][ UniqueAtomStartCheck Model | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | CopyToFourDirs ZoneCheck ]
+LEFT [ UniqueAtomStartCheck Model | ... | CopyToLeft | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToLeft |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToLeft Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToLeft ZoneCheck ZoneCheckVertical ]
 
-UP [CopyToUp][ UniqueAtomStartCheck Model | ... | CopyToFourDirs | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToFourDirs |  ] -> [CopyToUp][ UniqueAtomStartCheck Model | ... |  | CopyToFourDirs Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToFourDirs ZoneCheck ]
+UP [ UniqueAtomStartCheck Model CopyToUp | Model ] [ UniqueAtomStartCheck no Model CopyToUp |  ] -> [ UniqueAtomStartCheck Model | CopyToUp Model ] [ UniqueAtomStartCheck no Model | CopyToUp ZoneCheck ZoneCheckHorizontal ]
 
+UP [ UniqueAtomStartCheck Model | ... | CopyToUp | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToUp |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToUp Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToUp ZoneCheck ZoneCheckHorizontal ]
+
+DOWN [ UniqueAtomStartCheck Model CopyToDown | Model ] [ UniqueAtomStartCheck no Model CopyToDown |  ] -> [ UniqueAtomStartCheck Model | CopyToDown Model ] [ UniqueAtomStartCheck no Model | CopyToDown ZoneCheck ZoneCheckHorizontal ]
+
+DOWN [ UniqueAtomStartCheck Model | ... | CopyToDown | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToDown |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToDown Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToDown ZoneCheck ZoneCheckHorizontal ]
+
+[ ZoneCheckToInitiate ] -> [ ]
 [ CopyToUp ] -> [ ]
-[ CopyToFourDirs ] -> [ ]
+[ CopyToRight ] -> [ ]
+[ CopyToDown ] -> [ ]
+[ CopyToLeft ] -> [ ]
+
+VERTICAL [ ZoneCheckVertical | ... | no ZoneCheckVertical ] -> [ ZoneCheckVertical | ... | ZoneCheckVertical ]
+HORIZONTAL [ ZoneCheckHorizontal | ... | no ZoneCheckHorizontal ] -> [ ZoneCheckHorizontal | ... | ZoneCheckHorizontal ]
+
+[ ZoneCheckVertical ZoneCheckHorizontal ] -> [ ZoneCheck ]
+[ ZoneCheckVertical ] -> [ ]
+[ ZoneCheckHorizontal ] -> [ ]
+
+( --- Check equality between Model and ZoneCheck --- )
+
+(PuzzleScript, why you no have variables ?)
+late [ CheckOneByOne no CurrentlyChecking ][ Model no CheckedAtom ][ ZoneCheck no CheckedAtom ] -> [ CheckOneByOne CurrentlyChecking ][ Model CurrentlyChecking no CheckedAtom ][ ZoneCheck CurrentlyChecking no CheckedAtom ]
++ late [ Model CurrentlyChecking no Atom ][ ZoneCheck CurrentlyChecking no Atom ] -> [ Model CurrentlyChecking no Atom CheckedAtomOK ][ ZoneCheck CurrentlyChecking no Atom CheckedAtomOK ]
++ late [ Model CurrentlyChecking Carbon ][ ZoneCheck CurrentlyChecking Carbon ] -> [ Model CurrentlyChecking Carbon CheckedAtomOK ][ ZoneCheck CurrentlyChecking Carbon CheckedAtomOK ]
++ late [ Model CurrentlyChecking Hydrogen ][ ZoneCheck CurrentlyChecking Hydrogen ] -> [ Model CurrentlyChecking Hydrogen CheckedAtomOK ][ ZoneCheck CurrentlyChecking Hydrogen CheckedAtomOK ]
++ late [ Model CurrentlyChecking no CheckedAtomOK ][ ZoneCheck CurrentlyChecking no CheckedAtomOK ] -> [ Model CurrentlyChecking CheckedAtomFail ][ ZoneCheck CurrentlyChecking CheckedAtomFail ]
++ late [ CurrentlyChecking ] -> [ ]
 
 ==============
 WINCONDITIONS
@@ -211,14 +265,14 @@ WINCONDITIONS
 LEVELS
 =======
 
-O##############
-#,?H....,.....#
-#,HCHHHH,.....#
-#,.H....,.....#
-!!!!!!!!!!!!!!!
-#.............#
-#.......H.H...#
-#......HC.....#
-#.......H*....#
-#.............#
-###############
++#################
+#,?H....,.....####
+#,HCHHHH,.....####
+#,.H....,.....####
+!!!!!!!!!!!!!!!!!!
+#.............####
+#.......H.H...####
+#......HC.....####
+#.......H*....####
+#.HHH.........####
+##################
