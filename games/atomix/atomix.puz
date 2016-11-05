@@ -82,12 +82,16 @@ transparent red
 00000
 
 CopyToRight
+transparent
+
+(TODO: debug. remove
 transparent red yellow
 00000
 00000
 00210
 00000
 00000
+)
 
 CopyToUp
 transparent
@@ -98,17 +102,9 @@ transparent
 CopyToLeft
 transparent
 
-ZoneCheckToInitiate
-transparent
-
 ZoneCheck
 purple
-
-ZoneCheckVertical
-transparent
-
-ZoneCheckHorizontal
-transparent
+(TODO : rename to CheckZone)
 
 CheckedAtomOK
 pink
@@ -375,8 +371,6 @@ Background
 ModelZone
 ArenaZone
 
-ZoneCheckHorizontal
-ZoneCheckVertical
 ZoneCheck
 
 CurrentlyChecking
@@ -414,14 +408,10 @@ Wall, Hydrogen, Carbon, Oxygen
 AtomTagged
 AtomCheckedOK
 
-
 Player
-
 SelectedAtom
 
 UniqueAtomStartCheck
-
-ZoneCheckToInitiate
 
 CopyToRight
 CopyToUp
@@ -446,6 +436,7 @@ PropagateHorizontal
 RULES
 ======
 
+
 ( --- Detects the ArenaZone ---)
 
 ( Global tags does not exist at the beginning of the game,)
@@ -462,6 +453,7 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ PropagateHorizontal PropagateVertical ] -> [ ArenaZone ]
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
+
 
 ( --- Detects the ModelZone ---)
 
@@ -483,7 +475,8 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 (TODO : raise exception if ModelZone and ArenaZone overlaps)
 
-( --- Search for a unique atom in the ModelZone --- )
+
+( --- Searches for a unique atom in the ModelZone --- )
 
 (Initiate a loop on all the Atoms and Link of the ModelZone)
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ ModelZone Atom ] -> [ GlobalTagPosition ][ ModelZone Atom LoopIterationToDo ]
@@ -561,15 +554,14 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 + [ GlobalTagSearchUniqueFail ] -> [ ]
 
 
-(not here ?)
+( --- Handles player and atom/links moves --- )
 
+(TODO : not here ?)
 [ CheckedAtomOK ] -> [ ]
 
 [ > Player | no ArenaZone ] -> cancel
 
 [ > Player PlayerTagInitDone ] -> [ > Player > PlayerTagInitDone ]
-
-( --- Atom grabbing by Player --- )
 
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
 [ > Player > SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
@@ -578,47 +570,45 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 [ > Atom | Obstacle ] -> cancel
 
+
+( --- Grabs or releases selected atom --- )
+
 [ Action Player SelectedAtom ] -> [ Player no SelectedAtom ]
 [ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
 
 
-( --- ZoneCheck initialisation --- )
+( --- Initiates ZoneCheck --- )
+
 (TODO : adds the GlobalTagRecalculateCheckZone if the unique atom moved)
 
 [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
 [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck ModelZone CopyToRight | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToRight ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToRight ZoneCheck ]
+RIGHT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToRight | ModelZone ][ ArenaZone CopyToRight |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToRight ModelZone ][ ArenaZone | CopyToRight ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck ModelZone | ... | CopyToRight | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToRight ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToRight ZoneCheck ]
+LEFT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToLeft | ModelZone ][ ArenaZone CopyToLeft |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToLeft ModelZone ][ ArenaZone | CopyToLeft ZoneCheck ]
 
-LEFT [ UniqueAtomStartCheck ModelZone CopyToLeft | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToLeft ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToLeft ZoneCheck ]
+UP [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToUp | ModelZone ][ ArenaZone CopyToUp |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToUp ModelZone ][ ArenaZone | CopyToUp ZoneCheck ]
 
-LEFT [ UniqueAtomStartCheck ModelZone | ... | CopyToLeft | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToLeft ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToLeft ZoneCheck ]
+DOWN [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToDown | ModelZone ][ ArenaZone CopyToDown |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToDown ModelZone ][ ArenaZone | CopyToDown ZoneCheck ]
 
-UP [ UniqueAtomStartCheck ModelZone CopyToUp | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToUp ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToUp ZoneCheck ]
-
-UP [ UniqueAtomStartCheck ModelZone | ... | CopyToUp | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToUp ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToUp ZoneCheck ]
-
-DOWN [ UniqueAtomStartCheck ModelZone CopyToDown | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToDown ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToDown ZoneCheck ]
-
-DOWN [ UniqueAtomStartCheck ModelZone | ... | CopyToDown | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToDown ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToDown ZoneCheck ]
-
-[ ZoneCheckToInitiate ] -> [ ]
 [ CopyToUp ] -> [ ]
 [ CopyToRight ] -> [ ]
 [ CopyToDown ] -> [ ]
 [ CopyToLeft ] -> [ ]
 
-VERTICAL [ ZoneCheckVertical | ... | no ZoneCheckVertical ] -> [ ZoneCheckVertical | ... | ZoneCheckVertical ]
-HORIZONTAL [ ZoneCheckHorizontal | ... | no ZoneCheckHorizontal ] -> [ ZoneCheckHorizontal | ... | ZoneCheckHorizontal ]
+[ GlobalTagRecalculateCheckZone ][ ZoneCheck ] -> [ GlobalTagRecalculateCheckZone ][ ZoneCheck PropagateVertical PropagateHorizontal ]
 
-[ ZoneCheckVertical ZoneCheckHorizontal ] -> [ ZoneCheck ]
-[ ZoneCheckVertical ] -> [ ]
-[ ZoneCheckHorizontal ] -> [ ]
+(TODO : explain this. Group with line above. Same with other procedures.)
+VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
+HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
+[ PropagateHorizontal PropagateVertical ] -> [ ZoneCheck ]
+[ PropagateVertical ] -> [ ]
+[ PropagateHorizontal ] -> [ ]
 
+[ GlobalTagRecalculateCheckZone ] -> [ ]
 
-( --- Check equality between ModelZone and ZoneCheck --- )
+( --- Checks equality between ModelZone and ZoneCheck --- )
 
 (PuzzleScript, why you no have variables ?)
 late [ CheckOneByOne no CurrentlyChecking ][ ModelZone no CheckedAtomOK no CheckedFail ][ ZoneCheck no CheckedAtomOK no CheckedFail ] -> [ CheckOneByOne CurrentlyChecking ][ ModelZone CurrentlyChecking no CheckedAtomOK no CheckedFail ][ ZoneCheck CurrentlyChecking no CheckedAtomOK no CheckedFail ]
@@ -641,7 +631,7 @@ LEVELS
 =======
 
 ##################
-#.?H..........####
+#..H..........####
 #.BCDABA......####
 #..H..........####
 ##################
@@ -655,7 +645,7 @@ LEVELS
 
 
 ##################
-#.?H..........####
+#..H..........####
 #.HAABCA......####
 #..H..........####
 ##################
@@ -665,3 +655,22 @@ LEVELS
 #.......H*....####
 #.AAA.........####
 ##################
+
+
+
+##################
+#.HHAC........####
+#.HAAB........####
+#.............####
+##################
+#.............####
+#.......H.A...####
+#......BC.....####
+#.......H*....####
+#.AAA.........####
+##################
+
+
+(TODO : test with no unique atom)
+
+(TODO : test with zone overlapping)
