@@ -2,6 +2,10 @@ title Atomix demake
 author Recher
 homepage recher.wordpress.com
 
+(condition : il faut au moins un mur)
+(TODO : expliquer comment faire le modèle)
+(TODO : expliquer qu'il faut une marge sur les bords, pour que le rectangle de la ZoneCheck puisse avoir la place de se déplacer)
+
 verbose_logging
 again_interval 1.1
 
@@ -109,13 +113,35 @@ transparent
 CheckedAtomOK
 pink
 
-CheckedAtomFail
+CheckedFail
 transparent
 
 CurrentlyChecking
 red
 
 CheckOneByOne
+transparent
+
+LinkLeft
+transparent #eeeeee
+00000
+00000
+11100
+00000
+00000
+
+LinkRight
+transparent #eeeeee
+00000
+00000
+00111
+00000
+00000
+
+CheckedLinkLeftOk
+transparent
+
+CheckedLinkRightOk
 transparent
 
 =======
@@ -125,21 +151,21 @@ LEGEND
 . = Background
 , = BackgroundModelBlockPropagate
 # = Wall
-+ = Wall and CheckOneByOne
 ? = Background and ModelStartPropagate and Model and ZoneCheckToInitiate
 ! = WallSeparateFromModel
-P = Player
-H = Hydrogen
-C = Carbon and UniqueAtomStartCheck
-O = Oxygen
 * = Player
 
+A = Hydrogen and LinkLeft
+B = Hydrogen and LinkRight
+C = Carbon and LinkLeft and LinkRight and UniqueAtomStartCheck
+H = Hydrogen
+O = Oxygen
+
 Atom = Hydrogen or Carbon or Oxygen
+Link = LinkLeft or LinkRight
 Obstacle = WallSeparateFromModel or Wall or Atom
 
 ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
-
-CheckedAtom = CheckedAtomFail or CheckedAtomOK
 
 =======
 SOUNDS
@@ -161,7 +187,13 @@ ZoneCheck
 ModelStartPropagate
 CurrentlyChecking
 CheckOneByOne
-CheckedAtomFail, CheckedAtomOK
+CheckedFail
+CheckedAtomOK
+CheckedLinkLeftOk
+CheckedLinkRightOk
+
+LinkLeft
+LinkRight
 
 Wall,  Hydrogen, Carbon, Oxygen
 
@@ -189,15 +221,17 @@ RULES
 
 [ ModelStartPropagate ] [ Model | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ Model | Model no ModelBlockPropagate ]
 
-[ ModelStartPropagate ] -> [ Model ]
+[ ModelStartPropagate ][ Wall ] -> [ Model ][ CheckOneByOne ]
 
 (not here ?)
 
-[ CheckedAtom ] -> [ ]
+[ CheckedAtomOK ] -> [ ]
+
 
 ( --- Atom grabbing by Player --- )
 
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
+[ > Player > SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
 [ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
 [ > UniqueAtomStartCheck ][ZoneCheck] -> [ > UniqueAtomStartCheck ][ > ZoneCheck]
 
@@ -205,7 +239,6 @@ RULES
 
 [ Action Player SelectedAtom ] -> [ Player no SelectedAtom ]
 [ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
-
 
 
 ( --- ZoneCheck initialisation --- )
@@ -245,15 +278,18 @@ HORIZONTAL [ ZoneCheckHorizontal | ... | no ZoneCheckHorizontal ] -> [ ZoneCheck
 [ ZoneCheckVertical ] -> [ ]
 [ ZoneCheckHorizontal ] -> [ ]
 
+
 ( --- Check equality between Model and ZoneCheck --- )
 
 (PuzzleScript, why you no have variables ?)
-late [ CheckOneByOne no CurrentlyChecking ][ Model no CheckedAtom ][ ZoneCheck no CheckedAtom ] -> [ CheckOneByOne CurrentlyChecking ][ Model CurrentlyChecking no CheckedAtom ][ ZoneCheck CurrentlyChecking no CheckedAtom ]
+late [ CheckOneByOne no CurrentlyChecking ][ Model no CheckedAtomOK no CheckedFail ][ ZoneCheck no CheckedAtomOK no CheckedFail ] -> [ CheckOneByOne CurrentlyChecking ][ Model CurrentlyChecking no CheckedAtomOK no CheckedFail ][ ZoneCheck CurrentlyChecking no CheckedAtomOK no CheckedFail ]
 + late [ Model CurrentlyChecking no Atom ][ ZoneCheck CurrentlyChecking no Atom ] -> [ Model CurrentlyChecking no Atom CheckedAtomOK ][ ZoneCheck CurrentlyChecking no Atom CheckedAtomOK ]
 + late [ Model CurrentlyChecking Carbon ][ ZoneCheck CurrentlyChecking Carbon ] -> [ Model CurrentlyChecking Carbon CheckedAtomOK ][ ZoneCheck CurrentlyChecking Carbon CheckedAtomOK ]
 + late [ Model CurrentlyChecking Hydrogen ][ ZoneCheck CurrentlyChecking Hydrogen ] -> [ Model CurrentlyChecking Hydrogen CheckedAtomOK ][ ZoneCheck CurrentlyChecking Hydrogen CheckedAtomOK ]
-+ late [ Model CurrentlyChecking no CheckedAtomOK ][ ZoneCheck CurrentlyChecking no CheckedAtomOK ] -> [ Model CurrentlyChecking CheckedAtomFail ][ ZoneCheck CurrentlyChecking CheckedAtomFail ]
++ late [ Model CurrentlyChecking no CheckedAtomOK ][ ZoneCheck CurrentlyChecking no CheckedAtomOK ] -> [ Model CurrentlyChecking CheckedFail ][ ZoneCheck CurrentlyChecking CheckedFail ]
 + late [ CurrentlyChecking ] -> [ ]
+
+late [ CheckedFail] -> [ ]
 
 ==============
 WINCONDITIONS
@@ -265,14 +301,15 @@ WINCONDITIONS
 LEVELS
 =======
 
-+#################
+##################
 #,?H....,.....####
-#,HCHHHH,.....####
+#,BCAAAA,.....####
 #,.H....,.....####
 !!!!!!!!!!!!!!!!!!
 #.............####
-#.......H.H...####
-#......HC.....####
+#.......H.A...####
+#......BC.....####
 #.......H*....####
-#.HHH.........####
+#.AAA.........####
 ##################
+
