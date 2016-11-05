@@ -309,7 +309,8 @@ transparent
 
 
 GlobalTagPosition
-transparent
+#FF00FF
+(transparent)
 
 GlobalTagFoundUniqueAtom
 transparent
@@ -326,6 +327,7 @@ transparent
 LoopIterationCurrent
 transparent
 
+(TODO : replace with PlayerTagMustDoInit and reverse everything, so that the Player will not have to move with its PlayerTagInitDone)
 PlayerTagInitDone
 transparent
 
@@ -344,9 +346,7 @@ LEGEND
 , = BackgroundModelBlockPropagate
 # = Wall
 ? = Background and ModelStartPropagate and ModelZone and ZoneCheckToInitiate
-! = WallSeparateFromModel
-(TODO : auto-find a place for the GlobalTagPosition)
-% = WallSeparateFromModel and GlobalTagPosition
+! = Wall and WallSeparateFromModel
 * = Player
 
 A = Hydrogen and LinkLeftSimple
@@ -477,16 +477,29 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 [ Player no PlayerTagInitDone ][ Atom no ArenaZone ] -> [ Player no PlayerTagInitDone ][ Atom ModelZone ]
 [ Player no PlayerTagInitDone ][ Link no ArenaZone ] -> [ Player no PlayerTagInitDone ][ Link ModelZone ]
-[ Player no PlayerTagInitDone ] -> [ Player PlayerTagInitDone ]
+[ Player no PlayerTagInitDone ][ ModelZone ] -> [ Player no PlayerTagInitDone ][ ModelZone PropagateVertical PropagateHorizontal ]
+
+(TODO : explain this)
+VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
+HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
+[ PropagateHorizontal PropagateVertical ] -> [ ModelZone ]
+[ PropagateVertical ] -> [ ]
+[ PropagateHorizontal ] -> [ ]
+
+(--- Puts the GlobalTag anywhere in a "no-zone")
+
+[ Player no PlayerTagInitDone ][no ArenaZone no ModelZone ] -> [ Player PlayerTagInitDone ][ GlobalTagPosition ]
+
+(TODO : raise exception if ModelZone and ArenaZone overlaps)
 
 ( --- ModelZone propagation --- )
 (Useful only at level start)
 
-[ ModelStartPropagate | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate | ModelZone no ModelBlockPropagate ]
+([ ModelStartPropagate | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate | ModelZone no ModelBlockPropagate ]
 
 [ ModelStartPropagate ] [ ModelZone | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ ModelZone | ModelZone no ModelBlockPropagate ]
 
-[ ModelStartPropagate ][ Wall ] -> [ ModelZone ][ Wall CheckOneByOne ]
+[ ModelStartPropagate ][ Wall ] -> [ ModelZone ][ Wall CheckOneByOne ])
 
 ( --- Search for a unique atom in the ModelZone --- )
 
@@ -651,7 +664,7 @@ LEVELS
 #,?H....,.....####
 #,BCDABA,.....####
 #,.H....,.....####
-%!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!
 #.............####
 ###.....H.A...####
 #.#....BC.....####
@@ -665,7 +678,7 @@ LEVELS
 #,?H....,.....####
 #,HAABCA,.....####
 #,.H....,.....####
-%!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!
 #.............####
 #.......H.A...####
 #......BC.....####
