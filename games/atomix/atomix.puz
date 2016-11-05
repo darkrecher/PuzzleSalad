@@ -30,8 +30,11 @@ lightgray
 ModelStartPropagate
 red
 
-Model
+ModelZone
 darkgray
+
+ArenaZone
+#686018
 
 Hydrogen
 transparent gray
@@ -330,7 +333,7 @@ LEGEND
 . = Background
 , = BackgroundModelBlockPropagate
 # = Wall
-? = Background and ModelStartPropagate and Model and ZoneCheckToInitiate
+? = Background and ModelStartPropagate and ModelZone and ZoneCheckToInitiate
 ! = WallSeparateFromModel
 (TODO : auto-find a place for the GlobalTagPosition)
 % = WallSeparateFromModel and GlobalTagPosition
@@ -370,7 +373,7 @@ COLLISIONLAYERS
 
 Background
 
-Model, BackgroundModelBlockPropagate, ModelBlockPropagate
+ModelZone, ArenaZone, BackgroundModelBlockPropagate, ModelBlockPropagate
 
 ZoneCheckHorizontal
 ZoneCheckVertical
@@ -438,20 +441,24 @@ LoopIterationCurrent
 RULES
 ======
 
-( --- Model propagation --- )
+( --- Detects the ArenaZone ---)
+
+[ Player ] -> [ Player ArenaZone ]
+
+( --- ModelZone propagation --- )
 (Useful only at level start)
 
-[ ModelStartPropagate | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate | Model no ModelBlockPropagate ]
+[ ModelStartPropagate | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate | ModelZone no ModelBlockPropagate ]
 
-[ ModelStartPropagate ] [ Model | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ Model | Model no ModelBlockPropagate ]
+[ ModelStartPropagate ] [ ModelZone | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ ModelZone | ModelZone no ModelBlockPropagate ]
 
-[ ModelStartPropagate ][ Wall ] -> [ Model ][ Wall CheckOneByOne ]
+[ ModelStartPropagate ][ Wall ] -> [ ModelZone ][ Wall CheckOneByOne ]
 
 ( --- Search for a unique atom in the ModelZone --- )
 
 (Initiate a loop on all the Atoms and Link of the ModelZone)
-[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ Model Atom ] -> [ GlobalTagPosition ][ Model Atom LoopIterationToDo ]
-[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ Model Link ] -> [ GlobalTagPosition ][ Model Link LoopIterationToDo ]
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ ModelZone Atom ] -> [ GlobalTagPosition ][ ModelZone Atom LoopIterationToDo ]
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ ModelZone Link ] -> [ GlobalTagPosition ][ ModelZone Link LoopIterationToDo ]
 
 (Starts one loop iteration, while no unique atom is found.)
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagLoopIteration ][ LoopIterationToDo ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ]
@@ -486,19 +493,35 @@ RULES
 + [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple ] -> [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple LinkDownTagged ]
 + [ LoopIterationCurrent no LinkDown ][ no LinkDown ] -> [ LoopIterationCurrent no LinkDown ][ no LinkDown LinkDownTagged ]
 
+(etc. with diagonal links)
++ [ LoopIterationCurrent LinkUpRightSimple ][ LinkUpRightSimple ] -> [ LoopIterationCurrent LinkUpRightSimple ][ LinkUpRightSimple LinkUpRightTagged ]
++ [ LoopIterationCurrent no LinkUpRight ][ no LinkUpRight ] -> [ LoopIterationCurrent no LinkUpRight ][ no LinkUpRight LinkUpRightTagged ]
+
+(etc.)
++ [ LoopIterationCurrent LinkDownRightSimple ][ LinkDownRightSimple ] -> [ LoopIterationCurrent LinkDownRightSimple ][ LinkDownRightSimple LinkDownRightTagged ]
++ [ LoopIterationCurrent no LinkDownRight ][ no LinkDownRight ] -> [ LoopIterationCurrent no LinkDownRight ][ no LinkDownRight LinkDownRightTagged ]
+
+(etc.)
++ [ LoopIterationCurrent LinkDownLeftSimple ][ LinkDownLeftSimple ] -> [ LoopIterationCurrent LinkDownLeftSimple ][ LinkDownLeftSimple LinkDownLeftTagged ]
++ [ LoopIterationCurrent no LinkDownLeft ][ no LinkDownLeft ] -> [ LoopIterationCurrent no LinkDownLeft ][ no LinkDownLeft LinkDownLeftTagged ]
+
+(etc.)
++ [ LoopIterationCurrent LinkUpLeftSimple ][ LinkUpLeftSimple ] -> [ LoopIterationCurrent LinkUpLeftSimple ][ LinkUpLeftSimple LinkUpLeftTagged ]
++ [ LoopIterationCurrent no LinkUpLeft ][ no LinkUpLeft ] -> [ LoopIterationCurrent no LinkUpLeft ][ no LinkUpLeft LinkUpLeftTagged ]
+
 (If another Atom in the ModelZone has all its characteristics tagged, it means the current Atom is not Unique.)
 (This loop iteration is a fail.)
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent Model AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ Model AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged ]
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
 
-(If this loop iteration is not a fail, declares the unique atoms.)
+(If this loop iteration is not a fail, declares the current atom as unique.)
 (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
 (So that the position of the unique atom is known in both zones.)
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
 
 (Declares that a unique atom has been found.)
 + [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ] -> [ GlobalTagPosition GlobalTagFoundUniqueAtom ]
 
-(End of loop iteration. Cleans all tags, loop objects and fail tag.)
+(End of loop iteration. Cleans all : tags, loop objects, fail tag.)
 + [ AtomTagged ] -> [ ]
 + [ LinkLeftTagged ] -> [ ]
 + [ LinkRightTagged ] -> [ ]
@@ -519,7 +542,7 @@ RULES
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
 [ > Player > SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
 [ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
-[ > UniqueAtomStartCheck ][ZoneCheck] -> [ > UniqueAtomStartCheck ][ > ZoneCheck]
+[ > UniqueAtomStartCheck ][ ZoneCheck ] -> [ > UniqueAtomStartCheck ][ > ZoneCheck]
 
 [ > Atom | Obstacle ] -> cancel
 
@@ -530,26 +553,26 @@ RULES
 ( --- ZoneCheck initialisation --- )
 
 (test pour être sûr qu'il prend en premier le truc en haut à gauche)
-([ Oxygen ] [ Model ] -> [ ] [ Model Carbon ])
+([ Oxygen ] [ ModelZone ] -> [ ] [ ModelZone Carbon ])
 
 [ ZoneCheckToInitiate ][ UniqueAtomStartCheck ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
-[ ZoneCheckToInitiate ][ UniqueAtomStartCheck no Model ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck no Model ZoneCheck ]
+[ ZoneCheckToInitiate ][ UniqueAtomStartCheck no ModelZone ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck no ModelZone ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck Model CopyToRight | Model ] [ UniqueAtomStartCheck no Model CopyToRight |  ] -> [ UniqueAtomStartCheck Model | CopyToRight Model ] [ UniqueAtomStartCheck no Model | CopyToRight ZoneCheck ZoneCheckVertical ]
+RIGHT [ UniqueAtomStartCheck ModelZone CopyToRight | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToRight ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToRight ZoneCheck ZoneCheckVertical ]
 
-RIGHT [ UniqueAtomStartCheck Model | ... | CopyToRight | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToRight |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToRight Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToRight ZoneCheck ZoneCheckVertical ]
+RIGHT [ UniqueAtomStartCheck ModelZone | ... | CopyToRight | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToRight ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToRight ZoneCheck ZoneCheckVertical ]
 
-LEFT [ UniqueAtomStartCheck Model CopyToLeft | Model ] [ UniqueAtomStartCheck no Model CopyToLeft |  ] -> [ UniqueAtomStartCheck Model | CopyToLeft Model ] [ UniqueAtomStartCheck no Model | CopyToLeft ZoneCheck ZoneCheckVertical ]
+LEFT [ UniqueAtomStartCheck ModelZone CopyToLeft | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToLeft ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToLeft ZoneCheck ZoneCheckVertical ]
 
-LEFT [ UniqueAtomStartCheck Model | ... | CopyToLeft | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToLeft |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToLeft Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToLeft ZoneCheck ZoneCheckVertical ]
+LEFT [ UniqueAtomStartCheck ModelZone | ... | CopyToLeft | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToLeft ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToLeft ZoneCheck ZoneCheckVertical ]
 
-UP [ UniqueAtomStartCheck Model CopyToUp | Model ] [ UniqueAtomStartCheck no Model CopyToUp |  ] -> [ UniqueAtomStartCheck Model | CopyToUp Model ] [ UniqueAtomStartCheck no Model | CopyToUp ZoneCheck ZoneCheckHorizontal ]
+UP [ UniqueAtomStartCheck ModelZone CopyToUp | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToUp ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToUp ZoneCheck ZoneCheckHorizontal ]
 
-UP [ UniqueAtomStartCheck Model | ... | CopyToUp | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToUp |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToUp Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToUp ZoneCheck ZoneCheckHorizontal ]
+UP [ UniqueAtomStartCheck ModelZone | ... | CopyToUp | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToUp ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToUp ZoneCheck ZoneCheckHorizontal ]
 
-DOWN [ UniqueAtomStartCheck Model CopyToDown | Model ] [ UniqueAtomStartCheck no Model CopyToDown |  ] -> [ UniqueAtomStartCheck Model | CopyToDown Model ] [ UniqueAtomStartCheck no Model | CopyToDown ZoneCheck ZoneCheckHorizontal ]
+DOWN [ UniqueAtomStartCheck ModelZone CopyToDown | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToDown ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToDown ZoneCheck ZoneCheckHorizontal ]
 
-DOWN [ UniqueAtomStartCheck Model | ... | CopyToDown | Model ] [ UniqueAtomStartCheck no Model | ... | CopyToDown |  ] -> [ UniqueAtomStartCheck Model | ... |  | CopyToDown Model ] [ UniqueAtomStartCheck no Model | ... |  | CopyToDown ZoneCheck ZoneCheckHorizontal ]
+DOWN [ UniqueAtomStartCheck ModelZone | ... | CopyToDown | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToDown ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToDown ZoneCheck ZoneCheckHorizontal ]
 
 [ ZoneCheckToInitiate ] -> [ ]
 [ CopyToUp ] -> [ ]
@@ -565,14 +588,14 @@ HORIZONTAL [ ZoneCheckHorizontal | ... | no ZoneCheckHorizontal ] -> [ ZoneCheck
 [ ZoneCheckHorizontal ] -> [ ]
 
 
-( --- Check equality between Model and ZoneCheck --- )
+( --- Check equality between ModelZone and ZoneCheck --- )
 
 (PuzzleScript, why you no have variables ?)
-late [ CheckOneByOne no CurrentlyChecking ][ Model no CheckedAtomOK no CheckedFail ][ ZoneCheck no CheckedAtomOK no CheckedFail ] -> [ CheckOneByOne CurrentlyChecking ][ Model CurrentlyChecking no CheckedAtomOK no CheckedFail ][ ZoneCheck CurrentlyChecking no CheckedAtomOK no CheckedFail ]
-+ late [ Model CurrentlyChecking no Atom ][ ZoneCheck CurrentlyChecking no Atom ] -> [ Model CurrentlyChecking no Atom CheckedAtomOK ][ ZoneCheck CurrentlyChecking no Atom CheckedAtomOK ]
-+ late [ Model CurrentlyChecking Carbon ][ ZoneCheck CurrentlyChecking Carbon ] -> [ Model CurrentlyChecking Carbon CheckedAtomOK ][ ZoneCheck CurrentlyChecking Carbon CheckedAtomOK ]
-+ late [ Model CurrentlyChecking Hydrogen ][ ZoneCheck CurrentlyChecking Hydrogen ] -> [ Model CurrentlyChecking Hydrogen CheckedAtomOK ][ ZoneCheck CurrentlyChecking Hydrogen CheckedAtomOK ]
-+ late [ Model CurrentlyChecking no CheckedAtomOK ][ ZoneCheck CurrentlyChecking no CheckedAtomOK ] -> [ Model CurrentlyChecking CheckedFail ][ ZoneCheck CurrentlyChecking CheckedFail ]
+late [ CheckOneByOne no CurrentlyChecking ][ ModelZone no CheckedAtomOK no CheckedFail ][ ZoneCheck no CheckedAtomOK no CheckedFail ] -> [ CheckOneByOne CurrentlyChecking ][ ModelZone CurrentlyChecking no CheckedAtomOK no CheckedFail ][ ZoneCheck CurrentlyChecking no CheckedAtomOK no CheckedFail ]
++ late [ ModelZone CurrentlyChecking no Atom ][ ZoneCheck CurrentlyChecking no Atom ] -> [ ModelZone CurrentlyChecking no Atom CheckedAtomOK ][ ZoneCheck CurrentlyChecking no Atom CheckedAtomOK ]
++ late [ ModelZone CurrentlyChecking Carbon ][ ZoneCheck CurrentlyChecking Carbon ] -> [ ModelZone CurrentlyChecking Carbon CheckedAtomOK ][ ZoneCheck CurrentlyChecking Carbon CheckedAtomOK ]
++ late [ ModelZone CurrentlyChecking Hydrogen ][ ZoneCheck CurrentlyChecking Hydrogen ] -> [ ModelZone CurrentlyChecking Hydrogen CheckedAtomOK ][ ZoneCheck CurrentlyChecking Hydrogen CheckedAtomOK ]
++ late [ ModelZone CurrentlyChecking no CheckedAtomOK ][ ZoneCheck CurrentlyChecking no CheckedAtomOK ] -> [ ModelZone CurrentlyChecking CheckedFail ][ ZoneCheck CurrentlyChecking CheckedFail ]
 + late [ CurrentlyChecking ] -> [ ]
 
 late [ CheckedFail] -> [ ]
