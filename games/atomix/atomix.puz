@@ -418,6 +418,8 @@ Obstacle = Wall or Atom or Link
 
 GlobalTagSlide = GlobalTagSlideLeft or GlobalTagSlideRight or GlobalTagSlideUp or GlobalTagSlideDown
 
+LinkTagged = LinkLeftTagged or LinkRightTagged or LinkUpTagged or LinkDownTagged or LinkUpRightTagged or LinkDownRightTagged or LinkDownLeftTagged or LinkUpLeftTagged
+
 =======
 SOUNDS
 =======
@@ -645,15 +647,7 @@ startLoop
 
     (End of loop iteration. Cleans all : tags, loop objects, fail tag.)
     [ AtomTagged ] -> [ ]
-    (TODO : generify all these link tags)
-    [ LinkLeftTagged ] -> [ ]
-    [ LinkRightTagged ] -> [ ]
-    [ LinkUpTagged ] -> [ ]
-    [ LinkDownTagged ] -> [ ]
-    [ LinkUpRightTagged ] -> [ ]
-    [ LinkDownRightTagged ] -> [ ]
-    [ LinkDownLeftTagged ] -> [ ]
-    [ LinkUpLeftTagged ] -> [ ]
+    [ LinkTagged ] -> [ ]
     [ LoopIterationCurrent ] -> [ ]
     [ GlobalTagLoopIteration ] -> [ ]
     [ GlobalTagSearchUniqueFail ] -> [ ]
