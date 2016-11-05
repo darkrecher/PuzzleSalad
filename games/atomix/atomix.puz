@@ -325,6 +325,12 @@ pink
 PropagateDiagonalHalfWay
 transparent
 
+GlobalTagSlideRight
+transparent
+
+GlobalTagBumpedInObstacle
+transparent
+
 =======
 LEGEND
 =======
@@ -354,7 +360,7 @@ LinkDownLeft = LinkDownLeftSimple
 LinkUpLeft = LinkUpLeftSimple
 Link = LinkLeft or LinkRight or LinkUp or LinkDown or LinkUpRight or LinkDownRight or LinkDownLeft or LinkUpLeft
 
-Obstacle = Wall or Atom
+Obstacle = Wall or Atom or Link
 
 =======
 SOUNDS
@@ -421,6 +427,8 @@ GlobalTagLoopIteration
 GlobalTagRecalculateCheckZone
 GlobalTagCheckZoneComplete
 GlobalTagCheckFailed
+GlobalTagSlideRight
+GlobalTagBumpedInObstacle
 
 LoopIterationToDo
 LoopIterationCurrent
@@ -570,18 +578,27 @@ endLoop
 
 ( --- Handles player and atom/links moves --- )
 
+[ GlobalTagBumpedInObstacle ] -> [ ]
+
 [ > Player | no ArenaZone ] -> cancel
+
+[ GlobalTagSlideRight ][ Player ] -> [ GlobalTagSlideRight ][ RIGHT Player ]
 
 (TODO : "again" rule when player moves an atom. do not check model equality while moving)
 [ > Player PlayerTagInitDone ] -> [ > Player > PlayerTagInitDone ]
 
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
-[ > Player > SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
-[ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
+[ > Player SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
+[ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player SelectedAtom > UniqueAtomStartCheck ]
+[ GlobalTagPosition ][ RIGHT Player RIGHT SelectedAtom ] -> [ GlobalTagPosition GlobalTagSlideRight ][ RIGHT Player RIGHT SelectedAtom ]
 [ GlobalTagPosition ][ > UniqueAtomStartCheck ] -> [ GlobalTagPosition GlobalTagRecalculateCheckZone ][ > UniqueAtomStartCheck ]
 
-[ > Atom | Obstacle ] -> cancel
+[ GlobalTagPosition ][ > Atom | Obstacle ] -> [ GlobalTagPosition GlobalTagBumpedInObstacle ][ > Atom | Obstacle ]
+[ GlobalTagPosition ][ > Link | Obstacle ] -> [ GlobalTagPosition GlobalTagBumpedInObstacle ][ > Link | Obstacle ]
 
+[ GlobalTagBumpedInObstacle GlobalTagSlideRight ] -> [ GlobalTagBumpedInObstacle ]
+[ GlobalTagBumpedInObstacle ] -> cancel
+[ GlobalTagSlideRight ] -> again
 
 ( --- Grabs or releases selected atom --- )
 
