@@ -248,11 +248,68 @@ transparent
 LinkDownCheckedOK
 transparent
 
+LinkUpRightSimple
+transparent #eeeeee
+00001
+00010
+00100
+00000
+00000
+
+LinkUpRightTagged
+transparent
+
+LinkUpRightCheckedOK
+transparent
+
+LinkDownRightSimple
+transparent #eeeeee
+00000
+00000
+00100
+00010
+00001
+
+LinkDownRightTagged
+transparent
+
+LinkDownRightCheckedOK
+transparent
+
+LinkDownLeftSimple
+transparent #eeeeee
+00000
+00000
+00100
+01000
+10000
+
+LinkDownLeftTagged
+transparent
+
+LinkDownLeftCheckedOK
+transparent
+
+LinkUpLeftSimple
+transparent #eeeeee
+10000
+01000
+00100
+00000
+00000
+
+LinkUpLeftTagged
+transparent
+
+LinkUpLeftCheckedOK
+transparent
+
+
 GlobalTagPosition
 transparent
 
 GlobalTagFoundUniqueAtom
-green
+transparent
 
 GlobalTagSearchUniqueFail
 transparent
@@ -281,18 +338,22 @@ LEGEND
 
 A = Hydrogen and LinkLeftSimple
 B = Hydrogen and LinkRightSimple
-C = Carbon and LinkLeftSimple and LinkRightSimple
-(TODO : debug)
-Z = Carbon and LinkLeftSimple and LinkRightSimple and UniqueAtomStartCheck
+C = Hydrogen and LinkUpSimple
+D = Hydrogen and LinkDownSimple
 H = Hydrogen
 O = Oxygen
+Z = Carbon and LinkLeftSimple and LinkRightSimple
 
 Atom = Hydrogen or Carbon or Oxygen
 LinkLeft = LinkLeftSimple or LinkLeftDouble or LinkLeftTriple
 LinkRight = LinkRightSimple or LinkRightDouble or LinkRightTriple
 LinkUp = LinkUpSimple or LinkUpDouble or LinkUpTriple
 LinkDown = LinkDownSimple or LinkDownDouble or LinkDownTriple
-Link = LinkLeft or LinkRight or LinkUp or LinkDown
+LinkUpRight = LinkUpRightSimple
+LinkDownRight = LinkDownRightSimple
+LinkDownLeft = LinkDownLeftSimple
+LinkUpLeft = LinkUpLeftSimple
+Link = LinkLeft or LinkRight or LinkUp or LinkDown or LinkUpRight or LinkDownRight or LinkDownLeft or LinkUpLeft
 
 Obstacle = WallSeparateFromModel or Wall or Atom
 
@@ -334,6 +395,19 @@ LinkDownSimple, LinkDownDouble, LinkDownTriple
 LinkDownTagged
 LinkDownCheckedOK
 
+LinkUpRightSimple
+LinkUpRightTagged
+LinkUpRightCheckedOK
+LinkDownRightSimple
+LinkDownRightTagged
+LinkDownRightCheckedOK
+LinkDownLeftSimple
+LinkDownLeftTagged
+LinkDownLeftCheckedOK
+LinkUpLeftSimple
+LinkUpLeftTagged
+LinkUpLeftCheckedOK
+
 Wall, Hydrogen, Carbon, Oxygen
 AtomTagged
 AtomCheckedOK
@@ -373,36 +447,63 @@ RULES
 
 [ ModelStartPropagate ][ Wall ] -> [ Model ][ Wall CheckOneByOne ]
 
+( --- Search for a unique atom in the ModelZone --- )
+
+(Initiate a loop on all the Atoms and Link of the ModelZone)
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ Model Atom ] -> [ GlobalTagPosition ][ Model Atom LoopIterationToDo ]
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ Model Link ] -> [ GlobalTagPosition ][ Model Link LoopIterationToDo ]
 
-(on tagge tous les atomes, y compris ceux de la zone Arena)
-
+(Starts one loop iteration, while no unique atom is found.)
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagLoopIteration ][ LoopIterationToDo ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ]
 
+(Tags all the atoms that are the same as the current one, in the ModelZone and the ArenaZone. (including the 'no Atom' case))
 + [ LoopIterationCurrent Hydrogen ][ Hydrogen ] -> [ LoopIterationCurrent Hydrogen ][ Hydrogen AtomTagged ]
 + [ LoopIterationCurrent Carbon ][ Carbon ] -> [ LoopIterationCurrent Carbon ][ Carbon AtomTagged ]
 + [ LoopIterationCurrent Oxygen ][ Oxygen ] -> [ LoopIterationCurrent Oxygen ][ Oxygen AtomTagged ]
 + [ LoopIterationCurrent no Atom ][ no Atom ] -> [ LoopIterationCurrent no Atom ][ no Atom AtomTagged ]
 
+(Tags all the LinkLeft that are the same as the current one, in the ModelZone and the ArenaZone. (including the 'no LinkLeft' case))
 + [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple ] -> [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple LinkLeftTagged ]
 + [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble ] -> [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble LinkLeftTagged ]
 + [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple ] -> [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple LinkLeftTagged ]
 + [ LoopIterationCurrent no LinkLeft ][ no LinkLeft ] -> [ LoopIterationCurrent no LinkLeft ][ no LinkLeft LinkLeftTagged ]
 
+(Tags all the LinkRight, etc.)
 + [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple ] -> [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple LinkRightTagged ]
 + [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble ] -> [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble LinkRightTagged ]
 + [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple ] -> [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple LinkRightTagged ]
 + [ LoopIterationCurrent no LinkRight ][ no LinkRight ] -> [ LoopIterationCurrent no LinkRight ][ no LinkRight LinkRightTagged ]
 
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent Model AtomTagged LinkLeftTagged LinkRightTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ Model AtomTagged LinkLeftTagged LinkRightTagged ]
+(etc.)
++ [ LoopIterationCurrent LinkUpSimple ][ LinkUpSimple ] -> [ LoopIterationCurrent LinkUpSimple ][ LinkUpSimple LinkUpTagged ]
++ [ LoopIterationCurrent LinkUpDouble ][ LinkUpDouble ] -> [ LoopIterationCurrent LinkUpDouble ][ LinkUpDouble LinkUpTagged ]
++ [ LoopIterationCurrent LinkUpTriple ][ LinkUpTriple ] -> [ LoopIterationCurrent LinkUpTriple ][ LinkUpTriple LinkUpTagged ]
++ [ LoopIterationCurrent no LinkUp ][ no LinkUp ] -> [ LoopIterationCurrent no LinkUp ][ no LinkUp LinkUpTagged ]
 
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
+(etc.)
++ [ LoopIterationCurrent LinkDownSimple ][ LinkDownSimple ] -> [ LoopIterationCurrent LinkDownSimple ][ LinkDownSimple LinkDownTagged ]
++ [ LoopIterationCurrent LinkDownDouble ][ LinkDownDouble ] -> [ LoopIterationCurrent LinkDownDouble ][ LinkDownDouble LinkDownTagged ]
++ [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple ] -> [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple LinkDownTagged ]
++ [ LoopIterationCurrent no LinkDown ][ no LinkDown ] -> [ LoopIterationCurrent no LinkDown ][ no LinkDown LinkDownTagged ]
+
+(If another Atom in the ModelZone has all its characteristics tagged, it means the current Atom is not Unique.)
+(This loop iteration is a fail.)
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent Model AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ Model AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged ]
+
+(If this loop iteration is not a fail, declares the unique atoms.)
+(The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
+(So that the position of the unique atom is known in both zones.)
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
+
+(Declares that a unique atom has been found.)
 + [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ] -> [ GlobalTagPosition GlobalTagFoundUniqueAtom ]
 
+(End of loop iteration. Cleans all tags, loop objects and fail tag.)
 + [ AtomTagged ] -> [ ]
 + [ LinkLeftTagged ] -> [ ]
 + [ LinkRightTagged ] -> [ ]
++ [ LinkUpTagged ] -> [ ]
++ [ LinkDownTagged ] -> [ ]
 + [ LoopIterationCurrent ] -> [ ]
 + [ GlobalTagLoopIteration ] -> [ ]
 + [ GlobalTagSearchUniqueFail ] -> [ ]
@@ -488,7 +589,7 @@ LEVELS
 
 ##################
 #,?H....,.....####
-#,BCAAAA,.....####
+#,BCDABA,.....####
 #,.H....,.....####
 %!!!!!!!!!!!!!!!!!
 #.............####
