@@ -2,6 +2,43 @@ title Atomix demake
 author Recher
 homepage recher.wordpress.com
 
+(HOW TO MAKE LEVELS)
+
+(Condition 1 : a level must have two zones : )
+( - the "arena" zone, which contains the player and the atoms to move)
+( - the "model" zone, which shows the final pattern to make with the atoms to win)
+(The game automatically detects the two zones from the Player initial position. The "arena" zone is where the Player is.)
+(The arena zone and the model zone MUST be separated by a vertical or horizontal line of wall that passes through the whole level.)
+()
+(If this condition is not fullfilled, an error message will be written at the beginning of the level, and the Player will disappear)
+
+(Condition 2 : a level must have at least one unique element)
+(An "element" = the atom and the links on one single square)
+(In order to perform the pattern comparrison between the model and the arena, the game must have a unique element from where to start.)
+(This element is automatically detected at the beginning of the level. But there MUST have one at least.)
+(Example of a model with no unique element)
+(         )
+(  H--H   )
+(         )
+(         )
+(  H--H   )
+(         )
+(There are 4 elements : two of them are consisted of a Hydrogen with a link on the left,)
+(the two others are a Hydrogen with a link on the right. There is no unique element. This model is not usable.)
+(Example of a model with many unique element)
+(         )
+(  H--H   )
+(  |      )
+(  |      )
+(  H--H   )
+(         )
+(There are 4 elements : two of them are consisted of a Hydrogen with a link on the left, one is a Hydrogen with a link on the right and a link to the up, one last is a Hydrogen with a link on the right and a link to the bottom)
+(This model has 2 unique elements. It is usable. It would still be usable even with only one unique element.)
+()
+(If this condition is not fullfilled, an error message will be written at the beginning of the level, and the Player will disappear)
+
+
+
 (condition : il faut au moins un mur)
 (TODO : expliquer comment faire le modèle)
 
@@ -49,6 +86,8 @@ transparent red
 01110
 01110
 00000
+
+(TODO : add other atoms)
 
 AtomTagged
 transparent
@@ -337,6 +376,9 @@ transparent
 GlobalTagMustCheckPattern
 transparent
 
+GlobalTagModelZoneExists
+transparent
+
 =======
 LEGEND
 =======
@@ -437,6 +479,7 @@ GlobalTagCheckZoneUncomplete
 GlobalTagCheckFailed
 GlobalTagSlideLeft, GlobalTagSlideRight, GlobalTagSlideUp, GlobalTagSlideDown
 GlobalTagMustCheckPattern
+GlobalTagModelZoneExists
 
 LoopIterationToDo
 LoopIterationCurrent
@@ -486,23 +529,31 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ Player PlayerTagMustDoInit ][ Link no ArenaZone ] -> [ Player PlayerTagMustDoInit ][ Link ModelZone ]
 [ Player PlayerTagMustDoInit ][ ModelZone ] -> [ Player PlayerTagMustDoInit ][ ModelZone PropagateVertical PropagateHorizontal ]
 
-(TODO : explain this)
+(TODO : explain this.)
 VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
 HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
 [ PropagateHorizontal PropagateVertical ] -> [ ModelZone ]
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
+(TODO : explain also this, which is different from the other propagations)
+[ Player PlayerTagMustDoInit ][ ModelZone |  | ... | ModelZone ] -> [ Player PlayerTagMustDoInit ][ ModelZone | ModelZone | ... | ModelZone ]
+
+(Raises exception if the two zones overlaps)
+[ Player PlayerTagMustDoInit ][ ArenaZone ModelZone ] -> [ ][ ArenaZone ModelZone ] message ERROR : zone overlapping. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level
 
 
 (--- Puts the GlobalTag anywhere in a "nothing-zone" --- )
 
-(Adds also the global tag to recalculate the CheckZone a first time.)
+(Adds also the global tag to recalculate the CheckZone a first time, and to do a first pattern check, just for fun.)
+[ Player PlayerTagMustDoInit ][no ArenaZone no ModelZone ] -> [ Player ][ GlobalTags GlobalTagRecalculateCheckZone GlobalTagMustCheckPattern ]
 
-(TODO : strange behavior if we add GlobalTagMustCheckPattern.)
-(The rules that add LoopIterationToDo for pattern checks works strangely, if the unique atom is near a border)
-[ Player PlayerTagMustDoInit ][no ArenaZone no ModelZone ] -> [ Player ][ GlobalTags GlobalTagRecalculateCheckZone ]
+(Raises exception if the global tag was not created.)
+(It never happens when there is a line of wall, because this line is not a model zone nor an arean zone.)
+[ Player PlayerTagMustDoInit ] -> [ ] message ERROR : no line of wall. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level
 
-(TODO : raise exception if ModelZone and ArenaZone overlaps)
+(Raises exception if there is no ModelZone)
+[ GlobalTags ][ ModelZone ] -> [ GlobalTags GlobalTagModelZoneExists ][ ModelZone ]
+[ GlobalTags no GlobalTagModelZoneExists ][ Player ] -> [ GlobalTags ][ ] message ERROR : no model zone. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level
 
 
 ( --- Searches for a unique atom in the ModelZone --- )
@@ -564,27 +615,39 @@ startLoop
 
     (If another Atom in the ModelZone has all its characteristics tagged, it means the current Atom is not Unique.)
     (This loop iteration is a fail.)
-    [ GlobalTags no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [     GlobalTags no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
+    [ GlobalTags no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTags no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
 
     (If this loop iteration is not a fail, declares the current atom as unique.)
     (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
     (So that the position of the unique atom is known in both zones.)
-    [ GlobalTags no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [     GlobalTags ][ UniqueAtomStartCheck ]
+    [ GlobalTags no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTags ][ UniqueAtomStartCheck ]
 
     (Declares that a unique atom has been found.)
-    [ GlobalTags no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ] -> [ GlobalTags GlobalTagFoundUniqueAtom ]
+    [ GlobalTags no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ LoopIterationCurrent ] -> [ GlobalTags GlobalTagFoundUniqueAtom ][ LoopIterationCurrent ]
 
     (End of loop iteration. Cleans all : tags, loop objects, fail tag.)
     [ AtomTagged ] -> [ ]
+    (TODO : generify all these link tags)
     [ LinkLeftTagged ] -> [ ]
     [ LinkRightTagged ] -> [ ]
     [ LinkUpTagged ] -> [ ]
     [ LinkDownTagged ] -> [ ]
+    [ LinkUpRightTagged ] -> [ ]
+    [ LinkDownRightTagged ] -> [ ]
+    [ LinkDownLeftTagged ] -> [ ]
+    [ LinkUpLeftTagged ] -> [ ]
     [ LoopIterationCurrent ] -> [ ]
     [ GlobalTagLoopIteration ] -> [ ]
     [ GlobalTagSearchUniqueFail ] -> [ ]
 
 endLoop
+
+(Raise exception if no unique atom is found.)
+[ GlobalTags no GlobalTagFoundUniqueAtom ][ Player ] -> [ GlobalTags no GlobalTagFoundUniqueAtom ][ ] message ERROR : no unique element (atom+links). A level must have at least one unique element.
+
+(Cleans all the loop elements that may be left after the search of a unique atom)
+[ LoopIterationToDo ] -> [ ]
+
 
 ( --- Handles player and atom/links moves --- )
 
@@ -767,6 +830,41 @@ WINCONDITIONS
 LEVELS
 =======
 
+(Test to validate the detection of zones overlapping)
+(#######)
+(#....A#)
+(#.#####)
+(#.#.AB#)
+(#B#...#)
+(###*..#)
+(###...#)
+(###...#)
+(#######)
+
+(Test to validate the detection of lack of model zone)
+(#######)
+(#....A#)
+(#.#####)
+(#.#.AB#)
+(#B....#)
+(###*..#)
+(###...#)
+(###...#)
+(#######)
+
+(Test to validate the detection of lack of global tag)
+(..A#..)
+(..##.*)
+(..#...)
+(B.##AB)
+
+(Test to validate the detection of lack of unique element)
+(#######)
+(#..#.*#)
+(#AB#AA#)
+(#AB#BB#)
+(#######)
+
 #######
 #.BF..#
 #...E.#
@@ -831,8 +929,3 @@ LEVELS
 #.......H*....####
 #.AAA.........####
 ##################
-
-
-(TODO : test with no unique atom)
-
-(TODO : test with zone overlapping)
