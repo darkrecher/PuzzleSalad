@@ -74,6 +74,8 @@ transparent orange
 10101
 
 UniqueAtomStartCheck
+(debug = red point. release = transparent)
+(transparent)
 transparent red
 00000
 00000
@@ -83,15 +85,6 @@ transparent red
 
 CopyToRight
 transparent
-
-(TODO: debug. remove
-transparent red yellow
-00000
-00000
-00210
-00000
-00000
-)
 
 CopyToUp
 transparent
@@ -103,20 +96,10 @@ CopyToLeft
 transparent
 
 ZoneCheck
+(debug = purple. release = transparent)
+(transparent)
 purple
 (TODO : rename to CheckZone)
-
-CheckedAtomOK
-pink
-
-CheckedFail
-transparent
-
-CurrentlyChecking
-red
-
-CheckOneByOne
-transparent
 
 LinkLeftSimple
 transparent #eeeeee
@@ -296,8 +279,10 @@ transparent
 
 
 GlobalTagPosition
+(debug = #FF00FF. release = transparent)
 #FF00FF
 (transparent)
+(TODO : rename to GlobalTag)
 
 GlobalTagFoundUniqueAtom
 transparent
@@ -309,6 +294,12 @@ GlobalTagLoopIteration
 transparent
 
 GlobalTagRecalculateCheckZone
+transparent
+
+GlobalTagCheckZoneComplete
+transparent
+
+GlobalTagCheckFailed
 transparent
 
 LoopIterationToDo
@@ -327,6 +318,10 @@ transparent
 PropagateHorizontal
 transparent
 
+CurrentCheckedOK
+(debug = pink. release = transparent)
+pink
+(transparent)
 
 =======
 LEGEND
@@ -373,10 +368,7 @@ ArenaZone
 
 ZoneCheck
 
-CurrentlyChecking
-CheckOneByOne
-CheckedFail
-CheckedAtomOK
+CurrentCheckedOK
 
 LinkLeftSimple, LinkLeftDouble, LinkLeftTriple
 LinkLeftTagged
@@ -423,6 +415,8 @@ GlobalTagFoundUniqueAtom
 GlobalTagSearchUniqueFail
 GlobalTagLoopIteration
 GlobalTagRecalculateCheckZone
+GlobalTagCheckZoneComplete
+GlobalTagCheckFailed
 
 LoopIterationToDo
 LoopIterationCurrent
@@ -431,6 +425,7 @@ PlayerTagInitDone
 
 PropagateVertical
 PropagateHorizontal
+
 
 ======
 RULES
@@ -468,7 +463,9 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
 
+
 (--- Puts the GlobalTag anywhere in a "nothing-zone" --- )
+
 (Adds also the global tag to recalculate the CheckZone a first time.)
 
 [ Player no PlayerTagInitDone ][no ArenaZone no ModelZone ] -> [ Player PlayerTagInitDone ][ GlobalTagPosition GlobalTagRecalculateCheckZone ]
@@ -556,9 +553,6 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 ( --- Handles player and atom/links moves --- )
 
-(TODO : not here ?)
-[ CheckedAtomOK ] -> [ ]
-
 [ > Player | no ArenaZone ] -> cancel
 
 [ > Player PlayerTagInitDone ] -> [ > Player > PlayerTagInitDone ]
@@ -580,6 +574,7 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 ( --- Initiates ZoneCheck --- )
 
 (TODO : adds the GlobalTagRecalculateCheckZone if the unique atom moved)
+(TODO : all this must be late)
 
 [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
 [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ZoneCheck ]
@@ -606,19 +601,47 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
 
+(TODO : counts the ZoneCheck elements. If same quantity as ModelZone, the equality checks can be made)
+[ GlobalTagPosition ]  -> [ GlobalTagPosition GlobalTagCheckZoneComplete ]
+
 [ GlobalTagRecalculateCheckZone ] -> [ ]
+
 
 ( --- Checks equality between ModelZone and ZoneCheck --- )
 
-(PuzzleScript, why you no have variables ?)
-late [ CheckOneByOne no CurrentlyChecking ][ ModelZone no CheckedAtomOK no CheckedFail ][ ZoneCheck no CheckedAtomOK no CheckedFail ] -> [ CheckOneByOne CurrentlyChecking ][ ModelZone CurrentlyChecking no CheckedAtomOK no CheckedFail ][ ZoneCheck CurrentlyChecking no CheckedAtomOK no CheckedFail ]
-+ late [ ModelZone CurrentlyChecking no Atom ][ ZoneCheck CurrentlyChecking no Atom ] -> [ ModelZone CurrentlyChecking no Atom CheckedAtomOK ][ ZoneCheck CurrentlyChecking no Atom CheckedAtomOK ]
-+ late [ ModelZone CurrentlyChecking Carbon ][ ZoneCheck CurrentlyChecking Carbon ] -> [ ModelZone CurrentlyChecking Carbon CheckedAtomOK ][ ZoneCheck CurrentlyChecking Carbon CheckedAtomOK ]
-+ late [ ModelZone CurrentlyChecking Hydrogen ][ ZoneCheck CurrentlyChecking Hydrogen ] -> [ ModelZone CurrentlyChecking Hydrogen CheckedAtomOK ][ ZoneCheck CurrentlyChecking Hydrogen CheckedAtomOK ]
-+ late [ ModelZone CurrentlyChecking no CheckedAtomOK ][ ZoneCheck CurrentlyChecking no CheckedAtomOK ] -> [ ModelZone CurrentlyChecking CheckedFail ][ ZoneCheck CurrentlyChecking CheckedFail ]
-+ late [ CurrentlyChecking ] -> [ ]
+(Debug only. Comment on release)
+[ CurrentCheckedOK ] -> [ ]
 
-late [ CheckedFail] -> [ ]
+(Loops on every square of the ModelZone and ZoneCheck)
+late [ GlobalTagCheckZoneComplete ][ ModelZone ] -> [ GlobalTagCheckZoneComplete ][ ModelZone LoopIterationToDo ]
+late [ GlobalTagCheckZoneComplete ][ ZoneCheck ] -> [ GlobalTagCheckZoneComplete ][ ZoneCheck LoopIterationToDo ]
+
+(Starts one loop iteration, on ModelZone and ZoneCheck at the same time.)
+late [ GlobalTagPosition no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopIterationToDo ModelZone ][ LoopIterationToDo ZoneCheck ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ModelZone ][ LoopIterationCurrent ZoneCheck ]
+
+(PuzzleScript, why you no have variables ?)
++ late [ LoopIterationCurrent ModelZone no Atom ][ LoopIterationCurrent ZoneCheck no Atom ] -> [ LoopIterationCurrent ModelZone no Atom CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck no Atom ]
++ late [ LoopIterationCurrent ModelZone Hydrogen ][ LoopIterationCurrent ZoneCheck Hydrogen ] -> [ LoopIterationCurrent ModelZone Hydrogen CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck Hydrogen ]
++ late [ LoopIterationCurrent ModelZone Carbon ][ LoopIterationCurrent ZoneCheck Carbon ] -> [ LoopIterationCurrent ModelZone Carbon CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck Carbon ]
++ late [ LoopIterationCurrent ModelZone Oxygen ][ LoopIterationCurrent ZoneCheck Oxygen ] -> [ LoopIterationCurrent ModelZone Oxygen CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck Oxygen ]
++ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
+
++ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+
+(TODO : check links.)
+
+(Debug only. Comment on release)
++ late [ GlobalTagPosition no GlobalTagCheckFailed ][ LoopIterationCurrent ] -> [ GlobalTagPosition ][ LoopIterationCurrent CurrentCheckedOK ]
+
++ late [ LoopIterationCurrent ] -> [ ]
++ late [ GlobalTagLoopIteration ] -> [ ]
+
+(TODO : win if no GlobalTagCheckFailed)
+
+late [ GlobalTagCheckFailed] -> [ ]
+late [ LoopIterationToDo] -> [ ]
+late [ GlobalTagCheckZoneComplete] -> [ ]
+
 
 ==============
 WINCONDITIONS
