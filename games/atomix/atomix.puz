@@ -7,7 +7,7 @@ homepage recher.wordpress.com
 (TODO : expliquer qu'il faut une marge sur les bords, pour que le rectangle de la CheckZone puisse avoir la place de se déplacer)
 
 verbose_logging
-again_interval 1.1
+again_interval 0.6
 
 run_rules_on_level_start
 
@@ -281,7 +281,7 @@ GlobalTagPosition
 (debug = #FF00FF. release = transparent)
 #FF00FF
 (transparent)
-(TODO : rename to GlobalTag)
+(TODO : rename to GlobalTag)
 
 GlobalTagFoundUniqueAtom
 transparent
@@ -325,10 +325,19 @@ pink
 PropagateDiagonalHalfWay
 transparent
 
+GlobalTagSlideLeft
+transparent
+
 GlobalTagSlideRight
 transparent
 
-GlobalTagBumpedInObstacle
+GlobalTagSlideUp
+transparent
+
+GlobalTagSlideDown
+transparent
+
+GlobalTagMustCheckPattern
 transparent
 
 =======
@@ -361,6 +370,8 @@ LinkUpLeft = LinkUpLeftSimple
 Link = LinkLeft or LinkRight or LinkUp or LinkDown or LinkUpRight or LinkDownRight or LinkDownLeft or LinkUpLeft
 
 Obstacle = Wall or Atom or Link
+
+GlobalTagSlide = GlobalTagSlideLeft or GlobalTagSlideRight or GlobalTagSlideUp or GlobalTagSlideDown
 
 =======
 SOUNDS
@@ -427,8 +438,8 @@ GlobalTagLoopIteration
 GlobalTagRecalculateCheckZone
 GlobalTagCheckZoneComplete
 GlobalTagCheckFailed
-GlobalTagSlideRight
-GlobalTagBumpedInObstacle
+GlobalTagSlideLeft, GlobalTagSlideRight, GlobalTagSlideUp, GlobalTagSlideDown
+GlobalTagMustCheckPattern
 
 LoopIterationToDo
 LoopIterationCurrent
@@ -492,7 +503,7 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 [ Player no PlayerTagInitDone ][no ArenaZone no ModelZone ] -> [ Player PlayerTagInitDone ][ GlobalTagPosition GlobalTagRecalculateCheckZone ]
 
-(TODO : raise exception if ModelZone and ArenaZone overlaps)
+(TODO : raise exception if ModelZone and ArenaZone overlaps)
 
 
 ( --- Searches for a unique atom in the ModelZone --- )
@@ -557,7 +568,7 @@ startLoop
     [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [     GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
 
     (If this loop iteration is not a fail, declares the current atom as unique.)
-    (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
+    (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
     (So that the position of the unique atom is known in both zones.)
     [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [     GlobalTagPosition ][ UniqueAtomStartCheck ]
 
@@ -578,11 +589,16 @@ endLoop
 
 ( --- Handles player and atom/links moves --- )
 
-[ GlobalTagBumpedInObstacle ] -> [ ]
-
 [ > Player | no ArenaZone ] -> cancel
 
-[ GlobalTagSlideRight ][ Player ] -> [ GlobalTagSlideRight ][ RIGHT Player ]
+LEFT [ GlobalTagSlideLeft ][ Player | no Obstacle ] -> [ GlobalTagSlideLeft ][ LEFT Player | ]
+LEFT [ GlobalTagPosition GlobalTagSlideLeft ][ Player | Obstacle ] -> [ GlobalTagPosition GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+RIGHT [ GlobalTagSlideRight ][ Player | no Obstacle ] -> [ GlobalTagSlideRight ][ RIGHT Player | ]
+RIGHT [ GlobalTagPosition GlobalTagSlideRight ][ Player | Obstacle ] -> [ GlobalTagPosition GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+UP [ GlobalTagSlideUp ][ Player | no Obstacle ] -> [ GlobalTagSlideUp ][ UP Player | ]
+UP [ GlobalTagPosition GlobalTagSlideUp ][ Player | Obstacle ] -> [ GlobalTagPosition GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+DOWN [ GlobalTagSlideDown ][ Player | no Obstacle ] -> [ GlobalTagSlideDown ][ DOWN Player | ]
+DOWN [ GlobalTagPosition GlobalTagSlideDown ][ Player | Obstacle ] -> [ GlobalTagPosition GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
 
 (TODO : "again" rule when player moves an atom. do not check model equality while moving)
 [ > Player PlayerTagInitDone ] -> [ > Player > PlayerTagInitDone ]
@@ -590,15 +606,17 @@ endLoop
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
 [ > Player SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
 [ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player SelectedAtom > UniqueAtomStartCheck ]
-[ GlobalTagPosition ][ RIGHT Player RIGHT SelectedAtom ] -> [ GlobalTagPosition GlobalTagSlideRight ][ RIGHT Player RIGHT SelectedAtom ]
+
+[ > Atom | Obstacle ] -> cancel
+[ > Link | Obstacle ] -> cancel
+
+[ GlobalTagPosition no GlobalTagSlideLeft ][ LEFT SelectedAtom ] -> [ GlobalTagPosition GlobalTagSlideLeft ][ LEFT SelectedAtom ]
+[ GlobalTagPosition no GlobalTagSlideRight ][ RIGHT SelectedAtom ] -> [ GlobalTagPosition GlobalTagSlideRight ][ RIGHT SelectedAtom ]
+[ GlobalTagPosition no GlobalTagSlideUp ][ UP SelectedAtom ] -> [ GlobalTagPosition GlobalTagSlideUp ][ UP SelectedAtom ]
+[ GlobalTagPosition no GlobalTagSlideDown ][ DOWN SelectedAtom ] -> [ GlobalTagPosition GlobalTagSlideDown ][ DOWN SelectedAtom ]
+[ GlobalTagSlide ] -> again
+
 [ GlobalTagPosition ][ > UniqueAtomStartCheck ] -> [ GlobalTagPosition GlobalTagRecalculateCheckZone ][ > UniqueAtomStartCheck ]
-
-[ GlobalTagPosition ][ > Atom | Obstacle ] -> [ GlobalTagPosition GlobalTagBumpedInObstacle ][ > Atom | Obstacle ]
-[ GlobalTagPosition ][ > Link | Obstacle ] -> [ GlobalTagPosition GlobalTagBumpedInObstacle ][ > Link | Obstacle ]
-
-[ GlobalTagBumpedInObstacle GlobalTagSlideRight ] -> [ GlobalTagBumpedInObstacle ]
-[ GlobalTagBumpedInObstacle ] -> cancel
-[ GlobalTagSlideRight ] -> again
 
 ( --- Grabs or releases selected atom --- )
 
@@ -606,7 +624,11 @@ endLoop
 [ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
 
 
-( --- Initiates CheckZone --- )
+( --- Initiates or recalculates CheckZone --- )
+
+(No need to recalculate the check zone if we do not have to check the patterns. This case occurs when an atom is moving.)
+(TODO : does not work. Will have to do it in another way.)
+([ GlobalTagPosition GlobalTagRecalculateCheckZone no GlobalTagMustCheckPattern ] -> [ GlobalTagPosition ])
 
 late [ GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagRecalculateCheckZone ][ ]
 
@@ -644,8 +666,8 @@ late [ GlobalTagRecalculateCheckZone ] -> [ ]
 [ CurrentCheckedOK ] -> [ ]
 
 (Loops on every square of the ModelZone and CheckZone)
-late [ GlobalTagCheckZoneComplete ][ ModelZone ] -> [ GlobalTagCheckZoneComplete ][ ModelZone LoopIterationToDo ]
-late [ GlobalTagCheckZoneComplete ][ CheckZone ] -> [ GlobalTagCheckZoneComplete ][ CheckZone LoopIterationToDo ]
+late [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ ModelZone ] -> [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ ModelZone LoopIterationToDo ]
+late [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ CheckZone ] -> [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ CheckZone LoopIterationToDo ]
 
 (Starts one loop iteration, on ModelZone and CheckZone at the same time.)
 startLoop
@@ -733,7 +755,8 @@ endLoop
 
 late [ GlobalTagCheckFailed] -> [ ]
 late [ LoopIterationToDo] -> [ ]
-late [ GlobalTagCheckZoneComplete] -> [ ]
+late [ GlobalTagCheckZoneComplete ] -> [ ]
+late [ GlobalTagMustCheckPattern ] -> [ ]
 
 
 ==============
@@ -750,11 +773,11 @@ LEVELS
 #.BF..#
 #...E.#
 #######
-#B..###
+#..B###
 #....##
-#.*...#
-#....##
-#F..#E#
+#.*..##
+#...F##
+#...#E#
 #######
 
 
