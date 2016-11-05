@@ -281,7 +281,7 @@ GlobalTagPosition
 (debug = #FF00FF. release = transparent)
 #FF00FF
 (transparent)
-(TODO : rename to GlobalTag)
+(TODO : rename to GlobalTag)
 
 GlobalTagFoundUniqueAtom
 transparent
@@ -295,7 +295,7 @@ transparent
 GlobalTagRecalculateCheckZone
 transparent
 
-GlobalTagCheckZoneComplete
+GlobalTagCheckZoneUncomplete
 transparent
 
 GlobalTagCheckFailed
@@ -436,7 +436,7 @@ GlobalTagFoundUniqueAtom
 GlobalTagSearchUniqueFail
 GlobalTagLoopIteration
 GlobalTagRecalculateCheckZone
-GlobalTagCheckZoneComplete
+GlobalTagCheckZoneUncomplete
 GlobalTagCheckFailed
 GlobalTagSlideLeft, GlobalTagSlideRight, GlobalTagSlideUp, GlobalTagSlideDown
 GlobalTagMustCheckPattern
@@ -503,7 +503,7 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 [ Player no PlayerTagInitDone ][no ArenaZone no ModelZone ] -> [ Player PlayerTagInitDone ][ GlobalTagPosition GlobalTagRecalculateCheckZone ]
 
-(TODO : raise exception if ModelZone and ArenaZone overlaps)
+(TODO : raise exception if ModelZone and ArenaZone overlaps)
 
 
 ( --- Searches for a unique atom in the ModelZone --- )
@@ -568,7 +568,7 @@ startLoop
     [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [     GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
 
     (If this loop iteration is not a fail, declares the current atom as unique.)
-    (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
+    (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
     (So that the position of the unique atom is known in both zones.)
     [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [     GlobalTagPosition ][ UniqueAtomStartCheck ]
 
@@ -624,28 +624,26 @@ DOWN [ GlobalTagPosition GlobalTagSlideDown ][ Player | Obstacle ] -> [ GlobalTa
 [ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
 
 
-( --- Initiates or recalculates CheckZone --- )
+( --- Calculates CheckZone --- )
+(The checkzone is calculated only if the unique atom moved and if the current sliding is done)
+(This is why we always check for both "GlobalTagPosition" "GlobalTagRecalculateCheckZone" during the calculation.)
 
-(No need to recalculate the check zone if we do not have to check the patterns. This case occurs when an atom is moving.)
-(TODO : does not work. Will have to do it in another way.)
-([ GlobalTagPosition GlobalTagRecalculateCheckZone no GlobalTagMustCheckPattern ] -> [ GlobalTagPosition ])
+late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ ]
 
-late [ GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagRecalculateCheckZone ][ ]
+late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ] -> [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
+late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone CheckZone ]
 
-late [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
-late [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone CheckZone ]
-
-late RIGHT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToRight | ModelZone ][ ArenaZone CopyToRight |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToRight ModelZone ][ ArenaZone | CopyToRight CheckZone ]
-late LEFT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToLeft | ModelZone ][ ArenaZone CopyToLeft |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToLeft ModelZone ][ ArenaZone | CopyToLeft CheckZone ]
-late UP [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToUp | ModelZone ][ ArenaZone CopyToUp |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToUp ModelZone ][ ArenaZone | CopyToUp CheckZone ]
-late DOWN [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToDown | ModelZone ][ ArenaZone CopyToDown |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToDown ModelZone ][ ArenaZone | CopyToDown CheckZone ]
+late RIGHT [ ModelZone CopyToRight | ModelZone ][ ArenaZone CopyToRight |  ] -> [ ModelZone | CopyToRight ModelZone ][ ArenaZone | CopyToRight CheckZone ]
+late LEFT [ ModelZone CopyToLeft | ModelZone ][ ArenaZone CopyToLeft |  ] -> [ ModelZone | CopyToLeft ModelZone ][ ArenaZone | CopyToLeft CheckZone ]
+late UP [ ModelZone CopyToUp | ModelZone ][ ArenaZone CopyToUp |  ] -> [ ModelZone | CopyToUp ModelZone ][ ArenaZone | CopyToUp CheckZone ]
+late DOWN [ ModelZone CopyToDown | ModelZone ][ ArenaZone CopyToDown |  ] -> [ ModelZone | CopyToDown ModelZone ][ ArenaZone | CopyToDown CheckZone ]
 
 late [ CopyToUp ] -> [ ]
 late [ CopyToRight ] -> [ ]
 late [ CopyToDown ] -> [ ]
 late [ CopyToLeft ] -> [ ]
 
-late [ GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagRecalculateCheckZone ][ CheckZone PropagateVertical PropagateHorizontal ]
+late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ CheckZone PropagateVertical PropagateHorizontal ]
 
 (TODO : explain this. Group with line above. Same with other procedures.)
 late VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
@@ -654,10 +652,7 @@ late [ PropagateHorizontal PropagateVertical ] -> [ CheckZone ]
 late [ PropagateVertical ] -> [ ]
 late [ PropagateHorizontal ] -> [ ]
 
-(TODO : counts the CheckZone elements. If same quantity as ModelZone, the equality checks can be made)
-late [ GlobalTagPosition ]  -> [ GlobalTagPosition GlobalTagCheckZoneComplete ]
-
-late [ GlobalTagRecalculateCheckZone ] -> [ ]
+late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ] -> [ GlobalTagMustCheckPattern ]
 
 
 ( --- Checks equality between ModelZone and CheckZone --- )
@@ -666,8 +661,14 @@ late [ GlobalTagRecalculateCheckZone ] -> [ ]
 [ CurrentCheckedOK ] -> [ ]
 
 (Loops on every square of the ModelZone and CheckZone)
-late [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ ModelZone ] -> [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ ModelZone LoopIterationToDo ]
-late [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ CheckZone ] -> [ GlobalTagMustCheckPattern GlobalTagCheckZoneComplete ][ CheckZone LoopIterationToDo ]
+(TODO : needs a little explanation)
+late [ GlobalTagMustCheckPattern ][ ModelZone no LoopIterationToDo ][ CheckZone no LoopIterationToDo ] -> [ GlobalTagMustCheckPattern ][ ModelZone LoopIterationToDo ][ CheckZone LoopIterationToDo ]
+(checks if there is the same quantity of ModelZones and CheckZones. If not, add a GlobalTagCheckZoneUncomplete)
+(It may happens if the unique atom is near a border. In that case, no need to check the pattern)
+late [ GlobalTagPosition GlobalTagMustCheckPattern ][ ModelZone no LoopIterationToDo ][ CheckZone LoopIterationToDo ] -> [ GlobalTagPosition GlobalTagMustCheckPattern GlobalTagCheckZoneUncomplete ][ ModelZone ][ CheckZone LoopIterationToDo ]
+(CheckZone is not complete. We cancel all the pattern-check loop.)
+late [ GlobalTagCheckZoneUncomplete ][ LoopIterationToDo ] -> [ GlobalTagCheckZoneUncomplete ][ ]
+late [ GlobalTagCheckZoneUncomplete ] -> [ ]
 
 (Starts one loop iteration, on ModelZone and CheckZone at the same time.)
 startLoop
@@ -755,7 +756,6 @@ endLoop
 
 late [ GlobalTagCheckFailed] -> [ ]
 late [ LoopIterationToDo] -> [ ]
-late [ GlobalTagCheckZoneComplete ] -> [ ]
 late [ GlobalTagMustCheckPattern ] -> [ ]
 
 
