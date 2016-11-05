@@ -18,17 +18,8 @@ OBJECTS
 Background
 black
 
-BackgroundModelBlockPropagate
-black
-
 Wall
 lightgray
-
-WallSeparateFromModel
-lightgray
-
-ModelStartPropagate
-red
 
 ModelZone
 darkgray
@@ -321,6 +312,9 @@ transparent
 GlobalTagLoopIteration
 transparent
 
+GlobalTagRecalculateCheckZone
+transparent
+
 LoopIterationToDo
 transparent
 
@@ -343,10 +337,7 @@ LEGEND
 =======
 
 . = Background
-, = BackgroundModelBlockPropagate
 # = Wall
-? = Background and ModelStartPropagate and ModelZone and ZoneCheckToInitiate
-! = Wall and WallSeparateFromModel
 * = Player
 
 A = Hydrogen and LinkLeftSimple
@@ -368,9 +359,7 @@ LinkDownLeft = LinkDownLeftSimple
 LinkUpLeft = LinkUpLeftSimple
 Link = LinkLeft or LinkRight or LinkUp or LinkDown or LinkUpRight or LinkDownRight or LinkDownLeft or LinkUpLeft
 
-Obstacle = WallSeparateFromModel or Wall or Atom
-
-ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
+Obstacle = Wall or Atom
 
 =======
 SOUNDS
@@ -383,13 +372,13 @@ COLLISIONLAYERS
 
 Background
 
-ModelZone, ArenaZone, BackgroundModelBlockPropagate, ModelBlockPropagate
+ModelZone
+ArenaZone
 
 ZoneCheckHorizontal
 ZoneCheckVertical
 ZoneCheck
 
-ModelStartPropagate
 CurrentlyChecking
 CheckOneByOne
 CheckedFail
@@ -426,7 +415,7 @@ AtomTagged
 AtomCheckedOK
 
 
-Player, WallSeparateFromModel
+Player
 
 SelectedAtom
 
@@ -443,6 +432,7 @@ GlobalTagPosition
 GlobalTagFoundUniqueAtom
 GlobalTagSearchUniqueFail
 GlobalTagLoopIteration
+GlobalTagRecalculateCheckZone
 
 LoopIterationToDo
 LoopIterationCurrent
@@ -486,20 +476,12 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
 
-(--- Puts the GlobalTag anywhere in a "no-zone")
+(--- Puts the GlobalTag anywhere in a "nothing-zone" --- )
+(Adds also the global tag to recalculate the CheckZone a first time.)
 
-[ Player no PlayerTagInitDone ][no ArenaZone no ModelZone ] -> [ Player PlayerTagInitDone ][ GlobalTagPosition ]
+[ Player no PlayerTagInitDone ][no ArenaZone no ModelZone ] -> [ Player PlayerTagInitDone ][ GlobalTagPosition GlobalTagRecalculateCheckZone ]
 
 (TODO : raise exception if ModelZone and ArenaZone overlaps)
-
-( --- ModelZone propagation --- )
-(Useful only at level start)
-
-([ ModelStartPropagate | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate | ModelZone no ModelBlockPropagate ]
-
-[ ModelStartPropagate ] [ ModelZone | no ModelZone no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ ModelZone | ModelZone no ModelBlockPropagate ]
-
-[ ModelStartPropagate ][ Wall ] -> [ ModelZone ][ Wall CheckOneByOne ])
 
 ( --- Search for a unique atom in the ModelZone --- )
 
@@ -583,7 +565,7 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 [ CheckedAtomOK ] -> [ ]
 
-[ > Player | WallSeparateFromModel ] -> cancel
+[ > Player | no ArenaZone ] -> cancel
 
 [ > Player PlayerTagInitDone ] -> [ > Player > PlayerTagInitDone ]
 
@@ -601,28 +583,26 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 
 ( --- ZoneCheck initialisation --- )
+(TODO : adds the GlobalTagRecalculateCheckZone if the unique atom moved)
 
-(test pour être sûr qu'il prend en premier le truc en haut à gauche)
-([ Oxygen ] [ ModelZone ] -> [ ] [ ModelZone Carbon ])
+[ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
+[ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ZoneCheck ]
 
-[ ZoneCheckToInitiate ][ UniqueAtomStartCheck ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
-[ ZoneCheckToInitiate ][ UniqueAtomStartCheck no ModelZone ] -> [ ZoneCheckToInitiate ][ UniqueAtomStartCheck no ModelZone ZoneCheck ]
+RIGHT [ UniqueAtomStartCheck ModelZone CopyToRight | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToRight ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToRight ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck ModelZone CopyToRight | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToRight ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToRight ZoneCheck ZoneCheckVertical ]
+RIGHT [ UniqueAtomStartCheck ModelZone | ... | CopyToRight | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToRight ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToRight ZoneCheck ]
 
-RIGHT [ UniqueAtomStartCheck ModelZone | ... | CopyToRight | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToRight |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToRight ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToRight ZoneCheck ZoneCheckVertical ]
+LEFT [ UniqueAtomStartCheck ModelZone CopyToLeft | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToLeft ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToLeft ZoneCheck ]
 
-LEFT [ UniqueAtomStartCheck ModelZone CopyToLeft | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToLeft ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToLeft ZoneCheck ZoneCheckVertical ]
+LEFT [ UniqueAtomStartCheck ModelZone | ... | CopyToLeft | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToLeft ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToLeft ZoneCheck ]
 
-LEFT [ UniqueAtomStartCheck ModelZone | ... | CopyToLeft | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToLeft |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToLeft ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToLeft ZoneCheck ZoneCheckVertical ]
+UP [ UniqueAtomStartCheck ModelZone CopyToUp | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToUp ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToUp ZoneCheck ]
 
-UP [ UniqueAtomStartCheck ModelZone CopyToUp | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToUp ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToUp ZoneCheck ZoneCheckHorizontal ]
+UP [ UniqueAtomStartCheck ModelZone | ... | CopyToUp | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToUp ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToUp ZoneCheck ]
 
-UP [ UniqueAtomStartCheck ModelZone | ... | CopyToUp | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToUp |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToUp ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToUp ZoneCheck ZoneCheckHorizontal ]
+DOWN [ UniqueAtomStartCheck ModelZone CopyToDown | ModelZone ] [ UniqueAtomStartCheck ArenaZone CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToDown ModelZone ] [ UniqueAtomStartCheck ArenaZone | CopyToDown ZoneCheck ]
 
-DOWN [ UniqueAtomStartCheck ModelZone CopyToDown | ModelZone ] [ UniqueAtomStartCheck no ModelZone CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | CopyToDown ModelZone ] [ UniqueAtomStartCheck no ModelZone | CopyToDown ZoneCheck ZoneCheckHorizontal ]
-
-DOWN [ UniqueAtomStartCheck ModelZone | ... | CopyToDown | ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... | CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToDown ModelZone ] [ UniqueAtomStartCheck no ModelZone | ... |  | CopyToDown ZoneCheck ZoneCheckHorizontal ]
+DOWN [ UniqueAtomStartCheck ModelZone | ... | CopyToDown | ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... | CopyToDown |  ] -> [ UniqueAtomStartCheck ModelZone | ... |  | CopyToDown ModelZone ] [ UniqueAtomStartCheck ArenaZone | ... |  | CopyToDown ZoneCheck ]
 
 [ ZoneCheckToInitiate ] -> [ ]
 [ CopyToUp ] -> [ ]
@@ -661,10 +641,10 @@ LEVELS
 =======
 
 ##################
-#,?H....,.....####
-#,BCDABA,.....####
-#,.H....,.....####
-!!!!!!!!!!!!!!!!!!
+#.?H..........####
+#.BCDABA......####
+#..H..........####
+##################
 #.............####
 ###.....H.A...####
 #.#....BC.....####
@@ -675,10 +655,10 @@ LEVELS
 
 
 ##################
-#,?H....,.....####
-#,HAABCA,.....####
-#,.H....,.....####
-!!!!!!!!!!!!!!!!!!
+#.?H..........####
+#.HAABCA......####
+#..H..........####
+##################
 #.............####
 #.......H.A...####
 #......BC.....####
