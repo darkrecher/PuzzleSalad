@@ -4,7 +4,9 @@ homepage recher.wordpress.com
 
 (condition : il faut au moins un mur)
 (TODO : expliquer comment faire le modèle)
-(TODO : expliquer qu'il faut une marge sur les bords, pour que le rectangle de la ZoneCheck puisse avoir la place de se déplacer)
+(TODO : expliquer qu'il faut une marge sur les bords, pour que le rectangle de la CheckZone puisse avoir la place de se déplacer)
+
+(TODO : utiliser des startLoop et endLoop au lieu des groupes. Voir : http://www.puzzlescript.net/documentation/rigidbodies.html)
 
 verbose_logging
 again_interval 1.1
@@ -95,11 +97,10 @@ transparent
 CopyToLeft
 transparent
 
-ZoneCheck
+CheckZone
 (debug = purple. release = transparent)
 (transparent)
 purple
-(TODO : rename to CheckZone)
 
 LinkLeftSimple
 transparent #eeeeee
@@ -366,7 +367,7 @@ Background
 ModelZone
 ArenaZone
 
-ZoneCheck
+CheckZone
 
 CurrentCheckedOK
 
@@ -560,7 +561,7 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
 [ > Player > SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
 [ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player > SelectedAtom > UniqueAtomStartCheck ]
-[ > UniqueAtomStartCheck ][ ZoneCheck ] -> [ > UniqueAtomStartCheck ][ > ZoneCheck]
+[ > UniqueAtomStartCheck ][ CheckZone ] -> [ > UniqueAtomStartCheck ][ > CheckZone]
 
 [ > Atom | Obstacle ] -> cancel
 
@@ -571,64 +572,96 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ Action Player Atom no SelectedAtom ] -> [ Player Atom SelectedAtom ]
 
 
-( --- Initiates ZoneCheck --- )
+( --- Initiates CheckZone --- )
 
 (TODO : adds the GlobalTagRecalculateCheckZone if the unique atom moved)
 (TODO : all this must be late)
 
 [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck CopyToRight CopyToUp CopyToDown CopyToLeft ]
-[ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ZoneCheck ]
+[ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone ] -> [ GlobalTagRecalculateCheckZone ][ UniqueAtomStartCheck ArenaZone CheckZone ]
 
-RIGHT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToRight | ModelZone ][ ArenaZone CopyToRight |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToRight ModelZone ][ ArenaZone | CopyToRight ZoneCheck ]
+RIGHT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToRight | ModelZone ][ ArenaZone CopyToRight |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToRight ModelZone ][ ArenaZone | CopyToRight CheckZone ]
 
-LEFT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToLeft | ModelZone ][ ArenaZone CopyToLeft |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToLeft ModelZone ][ ArenaZone | CopyToLeft ZoneCheck ]
+LEFT [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToLeft | ModelZone ][ ArenaZone CopyToLeft |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToLeft ModelZone ][ ArenaZone | CopyToLeft CheckZone ]
 
-UP [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToUp | ModelZone ][ ArenaZone CopyToUp |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToUp ModelZone ][ ArenaZone | CopyToUp ZoneCheck ]
+UP [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToUp | ModelZone ][ ArenaZone CopyToUp |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToUp ModelZone ][ ArenaZone | CopyToUp CheckZone ]
 
-DOWN [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToDown | ModelZone ][ ArenaZone CopyToDown |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToDown ModelZone ][ ArenaZone | CopyToDown ZoneCheck ]
+DOWN [ GlobalTagRecalculateCheckZone ][ ModelZone CopyToDown | ModelZone ][ ArenaZone CopyToDown |  ] -> [ GlobalTagRecalculateCheckZone ][ ModelZone | CopyToDown ModelZone ][ ArenaZone | CopyToDown CheckZone ]
 
 [ CopyToUp ] -> [ ]
 [ CopyToRight ] -> [ ]
 [ CopyToDown ] -> [ ]
 [ CopyToLeft ] -> [ ]
 
-[ GlobalTagRecalculateCheckZone ][ ZoneCheck ] -> [ GlobalTagRecalculateCheckZone ][ ZoneCheck PropagateVertical PropagateHorizontal ]
+[ GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagRecalculateCheckZone ][ CheckZone PropagateVertical PropagateHorizontal ]
 
 (TODO : explain this. Group with line above. Same with other procedures.)
 VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
 HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
-[ PropagateHorizontal PropagateVertical ] -> [ ZoneCheck ]
+[ PropagateHorizontal PropagateVertical ] -> [ CheckZone ]
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
 
-(TODO : counts the ZoneCheck elements. If same quantity as ModelZone, the equality checks can be made)
+(TODO : counts the CheckZone elements. If same quantity as ModelZone, the equality checks can be made)
 [ GlobalTagPosition ]  -> [ GlobalTagPosition GlobalTagCheckZoneComplete ]
 
 [ GlobalTagRecalculateCheckZone ] -> [ ]
 
 
-( --- Checks equality between ModelZone and ZoneCheck --- )
+( --- Checks equality between ModelZone and CheckZone --- )
 
 (Debug only. Comment on release)
 [ CurrentCheckedOK ] -> [ ]
 
-(Loops on every square of the ModelZone and ZoneCheck)
+(Loops on every square of the ModelZone and CheckZone)
 late [ GlobalTagCheckZoneComplete ][ ModelZone ] -> [ GlobalTagCheckZoneComplete ][ ModelZone LoopIterationToDo ]
-late [ GlobalTagCheckZoneComplete ][ ZoneCheck ] -> [ GlobalTagCheckZoneComplete ][ ZoneCheck LoopIterationToDo ]
+late [ GlobalTagCheckZoneComplete ][ CheckZone ] -> [ GlobalTagCheckZoneComplete ][ CheckZone LoopIterationToDo ]
 
-(Starts one loop iteration, on ModelZone and ZoneCheck at the same time.)
-late [ GlobalTagPosition no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopIterationToDo ModelZone ][ LoopIterationToDo ZoneCheck ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ModelZone ][ LoopIterationCurrent ZoneCheck ]
+(Starts one loop iteration, on ModelZone and CheckZone at the same time.)
+late [ GlobalTagPosition no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopIterationToDo ModelZone ][ LoopIterationToDo CheckZone ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ModelZone ][ LoopIterationCurrent CheckZone ]
 
 (PuzzleScript, why you no have variables ?)
-+ late [ LoopIterationCurrent ModelZone no Atom ][ LoopIterationCurrent ZoneCheck no Atom ] -> [ LoopIterationCurrent ModelZone no Atom CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck no Atom ]
-+ late [ LoopIterationCurrent ModelZone Hydrogen ][ LoopIterationCurrent ZoneCheck Hydrogen ] -> [ LoopIterationCurrent ModelZone Hydrogen CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck Hydrogen ]
-+ late [ LoopIterationCurrent ModelZone Carbon ][ LoopIterationCurrent ZoneCheck Carbon ] -> [ LoopIterationCurrent ModelZone Carbon CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck Carbon ]
-+ late [ LoopIterationCurrent ModelZone Oxygen ][ LoopIterationCurrent ZoneCheck Oxygen ] -> [ LoopIterationCurrent ModelZone Oxygen CurrentCheckedOK ][ LoopIterationCurrent ZoneCheck Oxygen ]
-+ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
++ late [ LoopIterationCurrent ModelZone no Atom ][ LoopIterationCurrent CheckZone no Atom ] -> [ LoopIterationCurrent ModelZone no Atom CurrentCheckedOK ][ LoopIterationCurrent CheckZone no Atom ]
++ late [ LoopIterationCurrent ModelZone Hydrogen ][ LoopIterationCurrent CheckZone Hydrogen ] -> [ LoopIterationCurrent ModelZone Hydrogen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Hydrogen ]
++ late [ LoopIterationCurrent ModelZone Carbon ][ LoopIterationCurrent CheckZone Carbon ] -> [ LoopIterationCurrent ModelZone Carbon CurrentCheckedOK ][ LoopIterationCurrent CheckZone Carbon ]
++ late [ LoopIterationCurrent ModelZone Oxygen ][ LoopIterationCurrent CheckZone Oxygen ] -> [ LoopIterationCurrent ModelZone Oxygen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Oxygen ]
 
++ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
 + late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
 
-(TODO : check links.)
++ late [ LoopIterationCurrent ModelZone no LinkLeft ][ LoopIterationCurrent CheckZone no LinkLeft ] -> [ LoopIterationCurrent ModelZone no LinkLeft CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkLeft ]
++ late [ LoopIterationCurrent ModelZone LinkLeftSimple ][ LoopIterationCurrent CheckZone LinkLeftSimple ] -> [ LoopIterationCurrent ModelZone LinkLeftSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftSimple ]
++ late [ LoopIterationCurrent ModelZone LinkLeftDouble ][ LoopIterationCurrent CheckZone LinkLeftDouble ] -> [ LoopIterationCurrent ModelZone LinkLeftDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftDouble ]
++ late [ LoopIterationCurrent ModelZone LinkLeftTriple ][ LoopIterationCurrent CheckZone LinkLeftTriple ] -> [ LoopIterationCurrent ModelZone LinkLeftTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftTriple ]
+
++ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
++ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+
++ late [ LoopIterationCurrent ModelZone no LinkRight ][ LoopIterationCurrent CheckZone no LinkRight ] -> [ LoopIterationCurrent ModelZone no LinkRight CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkRight ]
++ late [ LoopIterationCurrent ModelZone LinkRightSimple ][ LoopIterationCurrent CheckZone LinkRightSimple ] -> [ LoopIterationCurrent ModelZone LinkRightSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightSimple ]
++ late [ LoopIterationCurrent ModelZone LinkRightDouble ][ LoopIterationCurrent CheckZone LinkRightDouble ] -> [ LoopIterationCurrent ModelZone LinkRightDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightDouble ]
++ late [ LoopIterationCurrent ModelZone LinkRightTriple ][ LoopIterationCurrent CheckZone LinkRightTriple ] -> [ LoopIterationCurrent ModelZone LinkRightTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightTriple ]
+
++ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
++ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+
++ late [ LoopIterationCurrent ModelZone no LinkUp ][ LoopIterationCurrent CheckZone no LinkUp ] -> [ LoopIterationCurrent ModelZone no LinkUp CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkUp ]
++ late [ LoopIterationCurrent ModelZone LinkUpSimple ][ LoopIterationCurrent CheckZone LinkUpSimple ] -> [ LoopIterationCurrent ModelZone LinkUpSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpSimple ]
++ late [ LoopIterationCurrent ModelZone LinkUpDouble ][ LoopIterationCurrent CheckZone LinkUpDouble ] -> [ LoopIterationCurrent ModelZone LinkUpDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpDouble ]
++ late [ LoopIterationCurrent ModelZone LinkUpTriple ][ LoopIterationCurrent CheckZone LinkUpTriple ] -> [ LoopIterationCurrent ModelZone LinkUpTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpTriple ]
+
++ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
++ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+
++ late [ LoopIterationCurrent ModelZone no LinkDown ][ LoopIterationCurrent CheckZone no LinkDown ] -> [ LoopIterationCurrent ModelZone no LinkDown CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkDown ]
++ late [ LoopIterationCurrent ModelZone LinkDownSimple ][ LoopIterationCurrent CheckZone LinkDownSimple ] -> [ LoopIterationCurrent ModelZone LinkDownSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownSimple ]
++ late [ LoopIterationCurrent ModelZone LinkDownDouble ][ LoopIterationCurrent CheckZone LinkDownDouble ] -> [ LoopIterationCurrent ModelZone LinkDownDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownDouble ]
++ late [ LoopIterationCurrent ModelZone LinkDownTriple ][ LoopIterationCurrent CheckZone LinkDownTriple ] -> [ LoopIterationCurrent ModelZone LinkDownTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownTriple ]
+
++ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
++ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+
+(TODO : check diagonal links.)
 
 (Debug only. Comment on release)
 + late [ GlobalTagPosition no GlobalTagCheckFailed ][ LoopIterationCurrent ] -> [ GlobalTagPosition ][ LoopIterationCurrent CurrentCheckedOK ]
@@ -658,7 +691,7 @@ LEVELS
 #.BCDABA......####
 #..H..........####
 ##################
-#.............####
+#....D........####
 ###.....H.A...####
 #.#....BC.....####
 ###.....H*....####
