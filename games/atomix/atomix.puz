@@ -6,7 +6,7 @@ homepage recher.wordpress.com
 
 (Condition 1 : a level must have two zones : )
 ( - the "arena" zone, which contains the player and the atoms to move)
-( - the "model" zone, which shows the final pattern to make with the atoms to win)
+( - the "model" zone, which shows the final pattern to make with the atoms)
 (The game automatically detects the two zones from the Player initial position. The "arena" zone is where the Player is.)
 (The arena zone and the model zone MUST be separated by a vertical or horizontal line of wall that passes through the whole level.)
 ()
@@ -37,10 +37,16 @@ homepage recher.wordpress.com
 ()
 (If this condition is not fullfilled, an error message will be written at the beginning of the level, and the Player will disappear)
 
+(Info : no check is made on link coherency)
+(Your model can have something like this :)
+( H- H )
+(The First hydrogen has a link to the right, so the second Hydrogen is supposed to have a link to the left. But he has not.)
 
+(Info : no check is made on level feasability)
+(Your model can have a Hydrogen atom, without having one in the arena.)
+(Your level can not be won. But the game does not check this case and does not send message about it.)
 
-(condition : il faut au moins un mur)
-(TODO : expliquer comment faire le modèle)
+(TODO : change aspect of the player while moving an atom)
 
 verbose_logging
 again_interval 0.6
@@ -512,13 +518,22 @@ endLoop
 
 [ Player PlayerTagMustDoInit ][ PropagateDiagonalHalfWay ] -> [ Player PlayerTagMustDoInit ][ ]
 
+(The ArenaZone is now determined in the level.)
+(It is consisted of one block of adjacent tiles. (possibly "diagonnaly adjacent").)
 
+(Extends the ArenaZone to its bounding rectangle, in order to simplify further processings :)
+( - The CheckZone initialization and the Pattern Check)
+( - The Player will be able to move in the whole rectangle, allowing him to do "shortcuts" when not carrying atoms.)
+(To extend the zone, we draw a vertical line and a horizontal line passing through the whole level, at each existing ArenaZone tile)
+(Every tile where a vertical line crosses a horizontal line is considered an ArenaZone tile. (It may already is))
+(This algorithm works only if the starting shape is consisted of [possibly adjacent] tiles, which is the case here.)
 [ Player PlayerTagMustDoInit ][ ArenaZone ] -> [ Player PlayerTagMustDoInit ][ ArenaZone PropagateVertical PropagateHorizontal ]
-
-(TODO : explain this)
+(draws lines)
 VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
 HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
+(adds an ArenaZone everywhere two lines cross)
 [ PropagateHorizontal PropagateVertical ] -> [ ArenaZone ]
+(cleans the drawn lines)
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
 
@@ -527,15 +542,18 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 [ Player PlayerTagMustDoInit ][ Atom no ArenaZone ] -> [ Player PlayerTagMustDoInit ][ Atom ModelZone ]
 [ Player PlayerTagMustDoInit ][ Link no ArenaZone ] -> [ Player PlayerTagMustDoInit ][ Link ModelZone ]
-[ Player PlayerTagMustDoInit ][ ModelZone ] -> [ Player PlayerTagMustDoInit ][ ModelZone PropagateVertical PropagateHorizontal ]
 
-(TODO : explain this.)
+(Extends the ModelZone to its bounding rectangle, same algorithm as the ArenaZone extension.)
+[ Player PlayerTagMustDoInit ][ ModelZone ] -> [ Player PlayerTagMustDoInit ][ ModelZone PropagateVertical PropagateHorizontal ]
 VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
 HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
 [ PropagateHorizontal PropagateVertical ] -> [ ModelZone ]
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
-(TODO : explain also this, which is different from the other propagations)
+(For the ModelZone extension, one more step is needed.)
+(The atoms of the model may be scattered through the level. And the initial ModelZone may not be consisted of one block of adjacent tiles)
+(The previous algorithm may have left whole lines (vertical or horizontal) of not-ModelZone in the middle of the bounding rect).
+(So, the gaps between the pieces of bounding rect must be filled)
 [ Player PlayerTagMustDoInit ][ ModelZone |  | ... | ModelZone ] -> [ Player PlayerTagMustDoInit ][ ModelZone | ModelZone | ... | ModelZone ]
 
 (Raises exception if the two zones overlaps)
@@ -704,9 +722,9 @@ late [ CopyToRight ] -> [ ]
 late [ CopyToDown ] -> [ ]
 late [ CopyToLeft ] -> [ ]
 
+(Extend the CheckZone to its bounding rect.)
+(No need to fill the gap, because the initial CheckZone is consisted of a cross, which is one block of adjacent tiles.)
 late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ CheckZone ] -> [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ][ CheckZone PropagateVertical PropagateHorizontal ]
-
-(TODO : explain this. Group with line above. Same with other procedures.)
 late VERTICAL [ PropagateVertical | ] -> [ PropagateVertical | PropagateVertical ]
 late HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizontal ]
 late [ PropagateHorizontal PropagateVertical ] -> [ CheckZone ]
@@ -721,11 +739,13 @@ late [ GlobalTagMustCheckPattern GlobalTagRecalculateCheckZone ] -> [ GlobalTagM
 (Debug only. Comment on release)
 [ CurrentCheckedOK ] -> [ ]
 
-(Loops on every square of the ModelZone and CheckZone)
-(TODO : needs a little explanation)
+(Initiates a loop on every squares of the ModelZone and CheckZone)
+(The LoopIterationToDo objects are added two by two, one on the ModelZone and one on the CheckZone.)
+(So that there is always the same number of "looped" ModelZone and "looped" CheckZone.)
 late [ GlobalTagMustCheckPattern ][ ModelZone no LoopIterationToDo ][ CheckZone no LoopIterationToDo ] -> [ GlobalTagMustCheckPattern ][ ModelZone LoopIterationToDo ][ CheckZone LoopIterationToDo ]
-(checks if there is the same quantity of ModelZones and CheckZones. If not, add a GlobalTagCheckZoneUncomplete)
-(It may happens if the unique atom is near a border. In that case, no need to check the pattern)
+(Checks if there is the same quantity of looped ModelZones and CheckZones. If not, add a GlobalTagCheckZoneUncomplete.)
+(In that case, no need to check the pattern, it will inevitably fail.)
+(That case may happen if the unique atom is near a border.)
 late [ GlobalTags GlobalTagMustCheckPattern ][ ModelZone no LoopIterationToDo ][ CheckZone LoopIterationToDo ] -> [ GlobalTags GlobalTagMustCheckPattern GlobalTagCheckZoneUncomplete ][ ModelZone ][ CheckZone LoopIterationToDo ]
 (CheckZone is not complete. We cancel all the pattern-check loop.)
 late [ GlobalTagCheckZoneUncomplete ][ LoopIterationToDo ] -> [ GlobalTagCheckZoneUncomplete ][ ]
