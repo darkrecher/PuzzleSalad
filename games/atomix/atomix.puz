@@ -6,8 +6,6 @@ homepage recher.wordpress.com
 (TODO : expliquer comment faire le modèle)
 (TODO : expliquer qu'il faut une marge sur les bords, pour que le rectangle de la CheckZone puisse avoir la place de se déplacer)
 
-(TODO : utiliser des startLoop et endLoop au lieu des groupes. Voir : http://www.puzzlescript.net/documentation/rigidbodies.html)
-
 verbose_logging
 again_interval 1.1
 
@@ -481,76 +479,79 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ ModelZone Link ] -> [ GlobalTagPosition ][ ModelZone Link LoopIterationToDo ]
 
 (Starts one loop iteration, while no unique atom is found.)
+startLoop
+
 [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagLoopIteration ][ LoopIterationToDo ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ]
 
 (Tags all the atoms that are the same as the current one, in the ModelZone and the ArenaZone. (including the 'no Atom' case))
-+ [ LoopIterationCurrent Hydrogen ][ Hydrogen ] -> [ LoopIterationCurrent Hydrogen ][ Hydrogen AtomTagged ]
-+ [ LoopIterationCurrent Carbon ][ Carbon ] -> [ LoopIterationCurrent Carbon ][ Carbon AtomTagged ]
-+ [ LoopIterationCurrent Oxygen ][ Oxygen ] -> [ LoopIterationCurrent Oxygen ][ Oxygen AtomTagged ]
-+ [ LoopIterationCurrent no Atom ][ no Atom ] -> [ LoopIterationCurrent no Atom ][ no Atom AtomTagged ]
+[ LoopIterationCurrent Hydrogen ][ Hydrogen ] -> [ LoopIterationCurrent Hydrogen ][ Hydrogen AtomTagged ]
+[ LoopIterationCurrent Carbon ][ Carbon ] -> [ LoopIterationCurrent Carbon ][ Carbon AtomTagged ]
+[ LoopIterationCurrent Oxygen ][ Oxygen ] -> [ LoopIterationCurrent Oxygen ][ Oxygen AtomTagged ]
+[ LoopIterationCurrent no Atom ][ no Atom ] -> [ LoopIterationCurrent no Atom ][ no Atom AtomTagged ]
 
 (Tags all the LinkLeft that are the same as the current one, in the ModelZone and the ArenaZone. (including the 'no LinkLeft' case))
-+ [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple ] -> [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple LinkLeftTagged ]
-+ [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble ] -> [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble LinkLeftTagged ]
-+ [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple ] -> [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple LinkLeftTagged ]
-+ [ LoopIterationCurrent no LinkLeft ][ no LinkLeft ] -> [ LoopIterationCurrent no LinkLeft ][ no LinkLeft LinkLeftTagged ]
+[ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple ] -> [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple LinkLeftTagged ]
+[ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble ] -> [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble LinkLeftTagged ]
+[ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple ] -> [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple LinkLeftTagged ]
+[ LoopIterationCurrent no LinkLeft ][ no LinkLeft ] -> [ LoopIterationCurrent no LinkLeft ][ no LinkLeft LinkLeftTagged ]
 
 (Tags all the LinkRight, etc.)
-+ [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple ] -> [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple LinkRightTagged ]
-+ [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble ] -> [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble LinkRightTagged ]
-+ [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple ] -> [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple LinkRightTagged ]
-+ [ LoopIterationCurrent no LinkRight ][ no LinkRight ] -> [ LoopIterationCurrent no LinkRight ][ no LinkRight LinkRightTagged ]
+[ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple ] -> [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple LinkRightTagged ]
+[ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble ] -> [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble LinkRightTagged ]
+[ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple ] -> [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple LinkRightTagged ]
+[ LoopIterationCurrent no LinkRight ][ no LinkRight ] -> [ LoopIterationCurrent no LinkRight ][ no LinkRight LinkRightTagged ]
 
 (etc.)
-+ [ LoopIterationCurrent LinkUpSimple ][ LinkUpSimple ] -> [ LoopIterationCurrent LinkUpSimple ][ LinkUpSimple LinkUpTagged ]
-+ [ LoopIterationCurrent LinkUpDouble ][ LinkUpDouble ] -> [ LoopIterationCurrent LinkUpDouble ][ LinkUpDouble LinkUpTagged ]
-+ [ LoopIterationCurrent LinkUpTriple ][ LinkUpTriple ] -> [ LoopIterationCurrent LinkUpTriple ][ LinkUpTriple LinkUpTagged ]
-+ [ LoopIterationCurrent no LinkUp ][ no LinkUp ] -> [ LoopIterationCurrent no LinkUp ][ no LinkUp LinkUpTagged ]
+[ LoopIterationCurrent LinkUpSimple ][ LinkUpSimple ] -> [ LoopIterationCurrent LinkUpSimple ][ LinkUpSimple LinkUpTagged ]
+[ LoopIterationCurrent LinkUpDouble ][ LinkUpDouble ] -> [ LoopIterationCurrent LinkUpDouble ][ LinkUpDouble LinkUpTagged ]
+[ LoopIterationCurrent LinkUpTriple ][ LinkUpTriple ] -> [ LoopIterationCurrent LinkUpTriple ][ LinkUpTriple LinkUpTagged ]
+[ LoopIterationCurrent no LinkUp ][ no LinkUp ] -> [ LoopIterationCurrent no LinkUp ][ no LinkUp LinkUpTagged ]
 
 (etc.)
-+ [ LoopIterationCurrent LinkDownSimple ][ LinkDownSimple ] -> [ LoopIterationCurrent LinkDownSimple ][ LinkDownSimple LinkDownTagged ]
-+ [ LoopIterationCurrent LinkDownDouble ][ LinkDownDouble ] -> [ LoopIterationCurrent LinkDownDouble ][ LinkDownDouble LinkDownTagged ]
-+ [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple ] -> [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple LinkDownTagged ]
-+ [ LoopIterationCurrent no LinkDown ][ no LinkDown ] -> [ LoopIterationCurrent no LinkDown ][ no LinkDown LinkDownTagged ]
+[ LoopIterationCurrent LinkDownSimple ][ LinkDownSimple ] -> [ LoopIterationCurrent LinkDownSimple ][ LinkDownSimple LinkDownTagged ]
+[ LoopIterationCurrent LinkDownDouble ][ LinkDownDouble ] -> [ LoopIterationCurrent LinkDownDouble ][ LinkDownDouble LinkDownTagged ]
+[ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple ] -> [ LoopIterationCurrent LinkDownTriple ][ LinkDownTriple LinkDownTagged ]
+[ LoopIterationCurrent no LinkDown ][ no LinkDown ] -> [ LoopIterationCurrent no LinkDown ][ no LinkDown LinkDownTagged ]
 
 (etc. with diagonal links)
-+ [ LoopIterationCurrent LinkUpRightSimple ][ LinkUpRightSimple ] -> [ LoopIterationCurrent LinkUpRightSimple ][ LinkUpRightSimple LinkUpRightTagged ]
-+ [ LoopIterationCurrent no LinkUpRight ][ no LinkUpRight ] -> [ LoopIterationCurrent no LinkUpRight ][ no LinkUpRight LinkUpRightTagged ]
+[ LoopIterationCurrent LinkUpRightSimple ][ LinkUpRightSimple ] -> [ LoopIterationCurrent LinkUpRightSimple ][ LinkUpRightSimple LinkUpRightTagged ]
+[ LoopIterationCurrent no LinkUpRight ][ no LinkUpRight ] -> [ LoopIterationCurrent no LinkUpRight ][ no LinkUpRight LinkUpRightTagged ]
 
 (etc.)
-+ [ LoopIterationCurrent LinkDownRightSimple ][ LinkDownRightSimple ] -> [ LoopIterationCurrent LinkDownRightSimple ][ LinkDownRightSimple LinkDownRightTagged ]
-+ [ LoopIterationCurrent no LinkDownRight ][ no LinkDownRight ] -> [ LoopIterationCurrent no LinkDownRight ][ no LinkDownRight LinkDownRightTagged ]
+[ LoopIterationCurrent LinkDownRightSimple ][ LinkDownRightSimple ] -> [ LoopIterationCurrent LinkDownRightSimple ][ LinkDownRightSimple LinkDownRightTagged ]
+[ LoopIterationCurrent no LinkDownRight ][ no LinkDownRight ] -> [ LoopIterationCurrent no LinkDownRight ][ no LinkDownRight LinkDownRightTagged ]
 
 (etc.)
-+ [ LoopIterationCurrent LinkDownLeftSimple ][ LinkDownLeftSimple ] -> [ LoopIterationCurrent LinkDownLeftSimple ][ LinkDownLeftSimple LinkDownLeftTagged ]
-+ [ LoopIterationCurrent no LinkDownLeft ][ no LinkDownLeft ] -> [ LoopIterationCurrent no LinkDownLeft ][ no LinkDownLeft LinkDownLeftTagged ]
+[ LoopIterationCurrent LinkDownLeftSimple ][ LinkDownLeftSimple ] -> [ LoopIterationCurrent LinkDownLeftSimple ][ LinkDownLeftSimple LinkDownLeftTagged ]
+[ LoopIterationCurrent no LinkDownLeft ][ no LinkDownLeft ] -> [ LoopIterationCurrent no LinkDownLeft ][ no LinkDownLeft LinkDownLeftTagged ]
 
 (etc.)
-+ [ LoopIterationCurrent LinkUpLeftSimple ][ LinkUpLeftSimple ] -> [ LoopIterationCurrent LinkUpLeftSimple ][ LinkUpLeftSimple LinkUpLeftTagged ]
-+ [ LoopIterationCurrent no LinkUpLeft ][ no LinkUpLeft ] -> [ LoopIterationCurrent no LinkUpLeft ][ no LinkUpLeft LinkUpLeftTagged ]
+[ LoopIterationCurrent LinkUpLeftSimple ][ LinkUpLeftSimple ] -> [ LoopIterationCurrent LinkUpLeftSimple ][ LinkUpLeftSimple LinkUpLeftTagged ]
+[ LoopIterationCurrent no LinkUpLeft ][ no LinkUpLeft ] -> [ LoopIterationCurrent no LinkUpLeft ][ no LinkUpLeft LinkUpLeftTagged ]
 
 (If another Atom in the ModelZone has all its characteristics tagged, it means the current Atom is not Unique.)
 (This loop iteration is a fail.)
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
 
 (If this loop iteration is not a fail, declares the current atom as unique.)
 (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
 (So that the position of the unique atom is known in both zones.)
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
 
 (Declares that a unique atom has been found.)
-+ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ] -> [ GlobalTagPosition GlobalTagFoundUniqueAtom ]
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ] -> [ GlobalTagPosition GlobalTagFoundUniqueAtom ]
 
 (End of loop iteration. Cleans all : tags, loop objects, fail tag.)
-+ [ AtomTagged ] -> [ ]
-+ [ LinkLeftTagged ] -> [ ]
-+ [ LinkRightTagged ] -> [ ]
-+ [ LinkUpTagged ] -> [ ]
-+ [ LinkDownTagged ] -> [ ]
-+ [ LoopIterationCurrent ] -> [ ]
-+ [ GlobalTagLoopIteration ] -> [ ]
-+ [ GlobalTagSearchUniqueFail ] -> [ ]
+[ AtomTagged ] -> [ ]
+[ LinkLeftTagged ] -> [ ]
+[ LinkRightTagged ] -> [ ]
+[ LinkUpTagged ] -> [ ]
+[ LinkDownTagged ] -> [ ]
+[ LoopIterationCurrent ] -> [ ]
+[ GlobalTagLoopIteration ] -> [ ]
+[ GlobalTagSearchUniqueFail ] -> [ ]
 
+endLoop
 
 ( --- Handles player and atom/links moves --- )
 
@@ -618,56 +619,60 @@ late [ GlobalTagCheckZoneComplete ][ ModelZone ] -> [ GlobalTagCheckZoneComplete
 late [ GlobalTagCheckZoneComplete ][ CheckZone ] -> [ GlobalTagCheckZoneComplete ][ CheckZone LoopIterationToDo ]
 
 (Starts one loop iteration, on ModelZone and CheckZone at the same time.)
+startLoop
+
 late [ GlobalTagPosition no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopIterationToDo ModelZone ][ LoopIterationToDo CheckZone ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ModelZone ][ LoopIterationCurrent CheckZone ]
 
 (PuzzleScript, why you no have variables ?)
-+ late [ LoopIterationCurrent ModelZone no Atom ][ LoopIterationCurrent CheckZone no Atom ] -> [ LoopIterationCurrent ModelZone no Atom CurrentCheckedOK ][ LoopIterationCurrent CheckZone no Atom ]
-+ late [ LoopIterationCurrent ModelZone Hydrogen ][ LoopIterationCurrent CheckZone Hydrogen ] -> [ LoopIterationCurrent ModelZone Hydrogen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Hydrogen ]
-+ late [ LoopIterationCurrent ModelZone Carbon ][ LoopIterationCurrent CheckZone Carbon ] -> [ LoopIterationCurrent ModelZone Carbon CurrentCheckedOK ][ LoopIterationCurrent CheckZone Carbon ]
-+ late [ LoopIterationCurrent ModelZone Oxygen ][ LoopIterationCurrent CheckZone Oxygen ] -> [ LoopIterationCurrent ModelZone Oxygen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Oxygen ]
+late [ LoopIterationCurrent ModelZone no Atom ][ LoopIterationCurrent CheckZone no Atom ] -> [ LoopIterationCurrent ModelZone no Atom CurrentCheckedOK ][ LoopIterationCurrent CheckZone no Atom ]
+late [ LoopIterationCurrent ModelZone Hydrogen ][ LoopIterationCurrent CheckZone Hydrogen ] -> [ LoopIterationCurrent ModelZone Hydrogen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Hydrogen ]
+late [ LoopIterationCurrent ModelZone Carbon ][ LoopIterationCurrent CheckZone Carbon ] -> [ LoopIterationCurrent ModelZone Carbon CurrentCheckedOK ][ LoopIterationCurrent CheckZone Carbon ]
+late [ LoopIterationCurrent ModelZone Oxygen ][ LoopIterationCurrent CheckZone Oxygen ] -> [ LoopIterationCurrent ModelZone Oxygen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Oxygen ]
 
-+ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
-+ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
+late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
 
-+ late [ LoopIterationCurrent ModelZone no LinkLeft ][ LoopIterationCurrent CheckZone no LinkLeft ] -> [ LoopIterationCurrent ModelZone no LinkLeft CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkLeft ]
-+ late [ LoopIterationCurrent ModelZone LinkLeftSimple ][ LoopIterationCurrent CheckZone LinkLeftSimple ] -> [ LoopIterationCurrent ModelZone LinkLeftSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftSimple ]
-+ late [ LoopIterationCurrent ModelZone LinkLeftDouble ][ LoopIterationCurrent CheckZone LinkLeftDouble ] -> [ LoopIterationCurrent ModelZone LinkLeftDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftDouble ]
-+ late [ LoopIterationCurrent ModelZone LinkLeftTriple ][ LoopIterationCurrent CheckZone LinkLeftTriple ] -> [ LoopIterationCurrent ModelZone LinkLeftTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftTriple ]
+late [ LoopIterationCurrent ModelZone no LinkLeft ][ LoopIterationCurrent CheckZone no LinkLeft ] -> [ LoopIterationCurrent ModelZone no LinkLeft CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkLeft ]
+late [ LoopIterationCurrent ModelZone LinkLeftSimple ][ LoopIterationCurrent CheckZone LinkLeftSimple ] -> [ LoopIterationCurrent ModelZone LinkLeftSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftSimple ]
+late [ LoopIterationCurrent ModelZone LinkLeftDouble ][ LoopIterationCurrent CheckZone LinkLeftDouble ] -> [ LoopIterationCurrent ModelZone LinkLeftDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftDouble ]
+late [ LoopIterationCurrent ModelZone LinkLeftTriple ][ LoopIterationCurrent CheckZone LinkLeftTriple ] -> [ LoopIterationCurrent ModelZone LinkLeftTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkLeftTriple ]
 
-+ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
-+ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
+late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
 
-+ late [ LoopIterationCurrent ModelZone no LinkRight ][ LoopIterationCurrent CheckZone no LinkRight ] -> [ LoopIterationCurrent ModelZone no LinkRight CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkRight ]
-+ late [ LoopIterationCurrent ModelZone LinkRightSimple ][ LoopIterationCurrent CheckZone LinkRightSimple ] -> [ LoopIterationCurrent ModelZone LinkRightSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightSimple ]
-+ late [ LoopIterationCurrent ModelZone LinkRightDouble ][ LoopIterationCurrent CheckZone LinkRightDouble ] -> [ LoopIterationCurrent ModelZone LinkRightDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightDouble ]
-+ late [ LoopIterationCurrent ModelZone LinkRightTriple ][ LoopIterationCurrent CheckZone LinkRightTriple ] -> [ LoopIterationCurrent ModelZone LinkRightTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightTriple ]
+late [ LoopIterationCurrent ModelZone no LinkRight ][ LoopIterationCurrent CheckZone no LinkRight ] -> [ LoopIterationCurrent ModelZone no LinkRight CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkRight ]
+late [ LoopIterationCurrent ModelZone LinkRightSimple ][ LoopIterationCurrent CheckZone LinkRightSimple ] -> [ LoopIterationCurrent ModelZone LinkRightSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightSimple ]
+late [ LoopIterationCurrent ModelZone LinkRightDouble ][ LoopIterationCurrent CheckZone LinkRightDouble ] -> [ LoopIterationCurrent ModelZone LinkRightDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightDouble ]
+late [ LoopIterationCurrent ModelZone LinkRightTriple ][ LoopIterationCurrent CheckZone LinkRightTriple ] -> [ LoopIterationCurrent ModelZone LinkRightTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkRightTriple ]
 
-+ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
-+ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
+late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
 
-+ late [ LoopIterationCurrent ModelZone no LinkUp ][ LoopIterationCurrent CheckZone no LinkUp ] -> [ LoopIterationCurrent ModelZone no LinkUp CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkUp ]
-+ late [ LoopIterationCurrent ModelZone LinkUpSimple ][ LoopIterationCurrent CheckZone LinkUpSimple ] -> [ LoopIterationCurrent ModelZone LinkUpSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpSimple ]
-+ late [ LoopIterationCurrent ModelZone LinkUpDouble ][ LoopIterationCurrent CheckZone LinkUpDouble ] -> [ LoopIterationCurrent ModelZone LinkUpDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpDouble ]
-+ late [ LoopIterationCurrent ModelZone LinkUpTriple ][ LoopIterationCurrent CheckZone LinkUpTriple ] -> [ LoopIterationCurrent ModelZone LinkUpTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpTriple ]
+late [ LoopIterationCurrent ModelZone no LinkUp ][ LoopIterationCurrent CheckZone no LinkUp ] -> [ LoopIterationCurrent ModelZone no LinkUp CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkUp ]
+late [ LoopIterationCurrent ModelZone LinkUpSimple ][ LoopIterationCurrent CheckZone LinkUpSimple ] -> [ LoopIterationCurrent ModelZone LinkUpSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpSimple ]
+late [ LoopIterationCurrent ModelZone LinkUpDouble ][ LoopIterationCurrent CheckZone LinkUpDouble ] -> [ LoopIterationCurrent ModelZone LinkUpDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpDouble ]
+late [ LoopIterationCurrent ModelZone LinkUpTriple ][ LoopIterationCurrent CheckZone LinkUpTriple ] -> [ LoopIterationCurrent ModelZone LinkUpTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkUpTriple ]
 
-+ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
-+ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
+late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
 
-+ late [ LoopIterationCurrent ModelZone no LinkDown ][ LoopIterationCurrent CheckZone no LinkDown ] -> [ LoopIterationCurrent ModelZone no LinkDown CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkDown ]
-+ late [ LoopIterationCurrent ModelZone LinkDownSimple ][ LoopIterationCurrent CheckZone LinkDownSimple ] -> [ LoopIterationCurrent ModelZone LinkDownSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownSimple ]
-+ late [ LoopIterationCurrent ModelZone LinkDownDouble ][ LoopIterationCurrent CheckZone LinkDownDouble ] -> [ LoopIterationCurrent ModelZone LinkDownDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownDouble ]
-+ late [ LoopIterationCurrent ModelZone LinkDownTriple ][ LoopIterationCurrent CheckZone LinkDownTriple ] -> [ LoopIterationCurrent ModelZone LinkDownTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownTriple ]
+late [ LoopIterationCurrent ModelZone no LinkDown ][ LoopIterationCurrent CheckZone no LinkDown ] -> [ LoopIterationCurrent ModelZone no LinkDown CurrentCheckedOK ][ LoopIterationCurrent CheckZone no LinkDown ]
+late [ LoopIterationCurrent ModelZone LinkDownSimple ][ LoopIterationCurrent CheckZone LinkDownSimple ] -> [ LoopIterationCurrent ModelZone LinkDownSimple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownSimple ]
+late [ LoopIterationCurrent ModelZone LinkDownDouble ][ LoopIterationCurrent CheckZone LinkDownDouble ] -> [ LoopIterationCurrent ModelZone LinkDownDouble CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownDouble ]
+late [ LoopIterationCurrent ModelZone LinkDownTriple ][ LoopIterationCurrent CheckZone LinkDownTriple ] -> [ LoopIterationCurrent ModelZone LinkDownTriple CurrentCheckedOK ][ LoopIterationCurrent CheckZone LinkDownTriple ]
 
-+ late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
-+ late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
+late [ GlobalTagPosition ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTagPosition GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
+late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
 
 (TODO : check diagonal links.)
 
 (Debug only. Comment on release)
-+ late [ GlobalTagPosition no GlobalTagCheckFailed ][ LoopIterationCurrent ] -> [ GlobalTagPosition ][ LoopIterationCurrent CurrentCheckedOK ]
+late [ GlobalTagPosition no GlobalTagCheckFailed ][ LoopIterationCurrent ] -> [ GlobalTagPosition ][ LoopIterationCurrent CurrentCheckedOK ]
 
-+ late [ LoopIterationCurrent ] -> [ ]
-+ late [ GlobalTagLoopIteration ] -> [ ]
+late [ LoopIterationCurrent ] -> [ ]
+late [ GlobalTagLoopIteration ] -> [ ]
+
+endLoop
 
 (TODO : win if no GlobalTagCheckFailed)
 
