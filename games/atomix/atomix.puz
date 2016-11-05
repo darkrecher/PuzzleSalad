@@ -57,6 +57,12 @@ transparent red
 01110
 00000
 
+AtomTagged
+transparent
+
+AtomCheckedOK
+transparent
+
 SelectedAtom
 transparent yellow
 10101
@@ -122,7 +128,7 @@ red
 CheckOneByOne
 transparent
 
-LinkLeft
+LinkLeftSimple
 transparent #eeeeee
 00000
 00000
@@ -130,7 +136,29 @@ transparent #eeeeee
 00000
 00000
 
-LinkRight
+LinkLeftDouble
+transparent #eeeeee
+00000
+11100
+00000
+11100
+00000
+
+LinkLeftTriple
+transparent #eeeeee
+00000
+11100
+11100
+11100
+00000
+
+LinkLeftTagged
+transparent
+
+LinkLeftCheckedOK
+transparent
+
+LinkRightSimple
 transparent #eeeeee
 00000
 00000
@@ -138,10 +166,104 @@ transparent #eeeeee
 00000
 00000
 
-CheckedLinkLeftOk
+LinkRightDouble
+transparent #eeeeee
+00000
+00111
+00000
+00111
+00000
+
+LinkRightTriple
+transparent #eeeeee
+00000
+00111
+00111
+00111
+00000
+
+LinkRightTagged
 transparent
 
-CheckedLinkRightOk
+LinkRightCheckedOK
+transparent
+
+LinkUpSimple
+transparent #eeeeee
+00100
+00100
+00100
+00000
+00000
+
+LinkUpDouble
+transparent #eeeeee
+01010
+01010
+01010
+00000
+00000
+
+LinkUpTriple
+transparent #eeeeee
+01110
+01110
+01110
+00000
+00000
+
+LinkUpTagged
+transparent
+
+LinkUpCheckedOK
+transparent
+
+LinkDownSimple
+transparent #eeeeee
+00000
+00000
+00100
+00100
+00100
+
+LinkDownDouble
+transparent #eeeeee
+00000
+00000
+01010
+01010
+01010
+
+LinkDownTriple
+transparent #eeeeee
+00000
+00000
+01110
+01110
+01110
+
+LinkDownTagged
+transparent
+
+LinkDownCheckedOK
+transparent
+
+GlobalTagPosition
+transparent
+
+GlobalTagFoundUniqueAtom
+green
+
+GlobalTagSearchUniqueFail
+transparent
+
+LoopIterationToDo
+transparent
+
+LoopIterationCurrent
+transparent
+
+GlobalTagLoopIteration
 transparent
 
 =======
@@ -153,16 +275,25 @@ LEGEND
 # = Wall
 ? = Background and ModelStartPropagate and Model and ZoneCheckToInitiate
 ! = WallSeparateFromModel
+(TODO : auto-find a place for the GlobalTagPosition)
+% = WallSeparateFromModel and GlobalTagPosition
 * = Player
 
-A = Hydrogen and LinkLeft
-B = Hydrogen and LinkRight
-C = Carbon and LinkLeft and LinkRight and UniqueAtomStartCheck
+A = Hydrogen and LinkLeftSimple
+B = Hydrogen and LinkRightSimple
+C = Carbon and LinkLeftSimple and LinkRightSimple
+(TODO : debug)
+Z = Carbon and LinkLeftSimple and LinkRightSimple and UniqueAtomStartCheck
 H = Hydrogen
 O = Oxygen
 
 Atom = Hydrogen or Carbon or Oxygen
-Link = LinkLeft or LinkRight
+LinkLeft = LinkLeftSimple or LinkLeftDouble or LinkLeftTriple
+LinkRight = LinkRightSimple or LinkRightDouble or LinkRightTriple
+LinkUp = LinkUpSimple or LinkUpDouble or LinkUpTriple
+LinkDown = LinkDownSimple or LinkDownDouble or LinkDownTriple
+Link = LinkLeft or LinkRight or LinkUp or LinkDown
+
 Obstacle = WallSeparateFromModel or Wall or Atom
 
 ModelBlockPropagate = Wall or BackgroundModelBlockPropagate or WallSeparateFromModel
@@ -189,13 +320,24 @@ CurrentlyChecking
 CheckOneByOne
 CheckedFail
 CheckedAtomOK
-CheckedLinkLeftOk
-CheckedLinkRightOk
 
-LinkLeft
-LinkRight
+LinkLeftSimple, LinkLeftDouble, LinkLeftTriple
+LinkLeftTagged
+LinkLeftCheckedOK
+LinkRightSimple, LinkRightDouble, LinkRightTriple
+LinkRightTagged
+LinkRightCheckedOK
+LinkUpSimple, LinkUpDouble, LinkUpTriple
+LinkUpTagged
+LinkUpCheckedOK
+LinkDownSimple, LinkDownDouble, LinkDownTriple
+LinkDownTagged
+LinkDownCheckedOK
 
-Wall,  Hydrogen, Carbon, Oxygen
+Wall, Hydrogen, Carbon, Oxygen
+AtomTagged
+AtomCheckedOK
+
 
 Player, WallSeparateFromModel
 
@@ -210,6 +352,14 @@ CopyToUp
 CopyToDown
 CopyToLeft
 
+GlobalTagPosition
+GlobalTagFoundUniqueAtom
+GlobalTagLoopIteration
+GlobalTagSearchUniqueFail
+
+LoopIterationToDo
+LoopIterationCurrent
+
 ======
 RULES
 ======
@@ -221,7 +371,42 @@ RULES
 
 [ ModelStartPropagate ] [ Model | no Model no ModelBlockPropagate ] -> [ ModelStartPropagate ] [ Model | Model no ModelBlockPropagate ]
 
-[ ModelStartPropagate ][ Wall ] -> [ Model ][ CheckOneByOne ]
+[ ModelStartPropagate ][ Wall ] -> [ Model ][ Wall CheckOneByOne ]
+
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ Model Atom ] -> [ GlobalTagPosition ][ Model Atom LoopIterationToDo ]
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ Model Link ] -> [ GlobalTagPosition ][ Model Link LoopIterationToDo ]
+
+(on tagge tous les atomes, y compris ceux de la zone Arena)
+
+[ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagLoopIteration ][ LoopIterationToDo ] -> [ GlobalTagPosition GlobalTagLoopIteration ][ LoopIterationCurrent ]
+
++ [ LoopIterationCurrent Hydrogen ][ Hydrogen ] -> [ LoopIterationCurrent Hydrogen ][ Hydrogen AtomTagged ]
++ [ LoopIterationCurrent Carbon ][ Carbon ] -> [ LoopIterationCurrent Carbon ][ Carbon AtomTagged ]
++ [ LoopIterationCurrent Oxygen ][ Oxygen ] -> [ LoopIterationCurrent Oxygen ][ Oxygen AtomTagged ]
++ [ LoopIterationCurrent no Atom ][ no Atom ] -> [ LoopIterationCurrent no Atom ][ no Atom AtomTagged ]
+
++ [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple ] -> [ LoopIterationCurrent LinkLeftSimple ][ LinkLeftSimple LinkLeftTagged ]
++ [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble ] -> [ LoopIterationCurrent LinkLeftDouble ][ LinkLeftDouble LinkLeftTagged ]
++ [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple ] -> [ LoopIterationCurrent LinkLeftTriple ][ LinkLeftTriple LinkLeftTagged ]
++ [ LoopIterationCurrent no LinkLeft ][ no LinkLeft ] -> [ LoopIterationCurrent no LinkLeft ][ no LinkLeft LinkLeftTagged ]
+
++ [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple ] -> [ LoopIterationCurrent LinkRightSimple ][ LinkRightSimple LinkRightTagged ]
++ [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble ] -> [ LoopIterationCurrent LinkRightDouble ][ LinkRightDouble LinkRightTagged ]
++ [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple ] -> [ LoopIterationCurrent LinkRightTriple ][ LinkRightTriple LinkRightTagged ]
++ [ LoopIterationCurrent no LinkRight ][ no LinkRight ] -> [ LoopIterationCurrent no LinkRight ][ no LinkRight LinkRightTagged ]
+
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent Model AtomTagged LinkLeftTagged LinkRightTagged ] -> [ GlobalTagPosition no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ Model AtomTagged LinkLeftTagged LinkRightTagged ]
+
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged ] -> [ GlobalTagPosition ][ UniqueAtomStartCheck ]
++ [ GlobalTagPosition no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ] -> [ GlobalTagPosition GlobalTagFoundUniqueAtom ]
+
++ [ AtomTagged ] -> [ ]
++ [ LinkLeftTagged ] -> [ ]
++ [ LinkRightTagged ] -> [ ]
++ [ LoopIterationCurrent ] -> [ ]
++ [ GlobalTagLoopIteration ] -> [ ]
++ [ GlobalTagSearchUniqueFail ] -> [ ]
+
 
 (not here ?)
 
@@ -305,7 +490,7 @@ LEVELS
 #,?H....,.....####
 #,BCAAAA,.....####
 #,.H....,.....####
-!!!!!!!!!!!!!!!!!!
+%!!!!!!!!!!!!!!!!!
 #.............####
 #.......H.A...####
 #......BC.....####
@@ -313,3 +498,16 @@ LEVELS
 #.AAA.........####
 ##################
 
+
+
+##################
+#,?H....,.....####
+#,HAABCA,.....####
+#,.H....,.....####
+%!!!!!!!!!!!!!!!!!
+#.............####
+#.......H.A...####
+#......BC.....####
+#.......H*....####
+#.AAA.........####
+##################
