@@ -46,8 +46,6 @@ homepage recher.wordpress.com
 (Your model can have a Hydrogen atom, without having one in the arena.)
 (Your level can not be won. But the game does not check this case and does not send message about it.)
 
-(TODO : change aspect of the player while moving an atom)
-
 verbose_logging
 again_interval 0.6
 
@@ -133,7 +131,7 @@ transparent lightblue
 01110
 00000
 
-(Useful to add elements with link only)
+(Useful to have elements with link only)
 (Putting an EmptyAtom with no link in a level would not be nice.)
 EmptyAtom
 transparent
@@ -155,6 +153,14 @@ transparent
 AtomCheckedOK
 transparent
 
+MovingAtom
+transparent #FF6A00 #FF8A38 #FFA566
+23212
+10003
+20002
+30001
+21232
+
 SelectedAtom
 transparent yellow
 10101
@@ -165,11 +171,11 @@ transparent yellow
 
 Player
 transparent orange
-10101
-00000
+01010
 10001
 00000
-10101
+10001
+01010
 
 UniqueAtomStartCheck
 (debug = red point. release = transparent)
@@ -535,6 +541,7 @@ AtomCheckedOK
 
 Player
 SelectedAtom
+MovingAtom
 
 UniqueAtomStartCheck
 
@@ -740,16 +747,19 @@ endLoop
 (Prepares tags to have the "again" rule when player moves an atom.)
 (Prepares tags to enable the pattern check when a move is finished.)
 LEFT [ GlobalTagSlideLeft ][ Player | no Obstacle ] -> [ GlobalTagSlideLeft ][ LEFT Player | ]
-LEFT [ GlobalTags GlobalTagSlideLeft ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+LEFT [ GlobalTags GlobalTagSlideLeft ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ]
 RIGHT [ GlobalTagSlideRight ][ Player | no Obstacle ] -> [ GlobalTagSlideRight ][ RIGHT Player | ]
-RIGHT [ GlobalTags GlobalTagSlideRight ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+RIGHT [ GlobalTags GlobalTagSlideRight ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ]
 UP [ GlobalTagSlideUp ][ Player | no Obstacle ] -> [ GlobalTagSlideUp ][ UP Player | ]
-UP [ GlobalTags GlobalTagSlideUp ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+UP [ GlobalTags GlobalTagSlideUp ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ]
 DOWN [ GlobalTagSlideDown ][ Player | no Obstacle ] -> [ GlobalTagSlideDown ][ DOWN Player | ]
-DOWN [ GlobalTags GlobalTagSlideDown ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ] (message must check)
+DOWN [ GlobalTags GlobalTagSlideDown ][ Player | Obstacle ] -> [ GlobalTags GlobalTagMustCheckPattern ][ Player | Obstacle ]
+
+[ GlobalTags GlobalTagMustCheckPattern ][ MovingAtom ] -> [ GlobalTags GlobalTagMustCheckPattern ][ ]
 
 [ > Player SelectedAtom Atom ] -> [ > Player > SelectedAtom > Atom ]
 [ > Player SelectedAtom Link ] -> [ > Player > SelectedAtom > Link ]
+[ > Player > SelectedAtom ] -> [ > Player > SelectedAtom > MovingAtom ]
 [ > Player SelectedAtom UniqueAtomStartCheck ] -> [ > Player SelectedAtom > UniqueAtomStartCheck ]
 
 [ > Atom | Obstacle ] -> cancel
@@ -970,12 +980,13 @@ LEVELS
 (7 = Cristal)
 (8 = EmptyAtom and LinkUpSimple and LinkDownSimple)
 (9 = Fluorine)
-############
-#0123456789#
-############
-#....*.....#
-#5742690138#
-############
+()
+(############)
+(#0123456789#)
+(############)
+(#....*.....#)
+(#5742690138#)
+(############)
 
 #######
 #.BF..#
