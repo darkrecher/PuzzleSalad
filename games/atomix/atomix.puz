@@ -70,7 +70,7 @@ ArenaZone
 #686018
 
 Hydrogen
-transparent gray
+transparent blue
 00000
 01110
 01110
@@ -78,7 +78,7 @@ transparent gray
 00000
 
 Carbon
-transparent blue
+transparent gray
 00000
 01110
 01110
@@ -93,7 +93,61 @@ transparent red
 01110
 00000
 
-(TODO : add other atoms)
+Nitrogen
+transparent green
+00000
+01110
+01110
+01110
+00000
+
+Sulfur
+transparent orange
+00000
+01110
+01110
+01110
+00000
+
+Chlorine
+transparent #D0D0D0
+00000
+01110
+01110
+01110
+00000
+
+Phosphore
+transparent purple
+00000
+01110
+01110
+01110
+00000
+
+Cristal
+transparent lightblue
+00000
+01110
+01110
+01110
+00000
+
+(Useful to add elements with link only)
+(Putting an EmptyAtom with no link in a level would not be nice.)
+EmptyAtom
+transparent
+
+Fluorine
+transparent yellow
+00000
+01110
+01110
+01110
+00000
+
+
+(TODO : draw prettier atoms)
 
 AtomTagged
 transparent
@@ -402,8 +456,19 @@ F = Oxygen and LinkLeftSimple and LinkDownRightSimple
 H = Hydrogen
 O = Oxygen
 Z = Carbon and LinkLeftSimple and LinkRightSimple
+0 = Hydrogen
+1 = Carbon
+2 = Oxygen
+3 = Nitrogen
+4 = Sulfur
+5 = Chlorine
+6 = Phosphore
+7 = Cristal
+8 = EmptyAtom and LinkUpSimple and LinkDownSimple
+9 = Fluorine
 
-Atom = Hydrogen or Carbon or Oxygen
+Atom = Hydrogen or Carbon or Oxygen or Nitrogen or Sulfur or Chlorine or Phosphore or Cristal or EmptyAtom or Fluorine
+
 LinkLeft = LinkLeftSimple or LinkLeftDouble or LinkLeftTriple
 LinkRight = LinkRightSimple or LinkRightDouble or LinkRightTriple
 LinkUp = LinkUpSimple or LinkUpDouble or LinkUpTriple
@@ -464,7 +529,7 @@ LinkUpLeftSimple
 LinkUpLeftTagged
 LinkUpLeftCheckedOK
 
-Wall, Hydrogen, Carbon, Oxygen
+Wall, Atom
 AtomTagged
 AtomCheckedOK
 
@@ -591,6 +656,13 @@ startLoop
     [ LoopIterationCurrent Hydrogen ][ Hydrogen ] -> [ LoopIterationCurrent Hydrogen ][ Hydrogen AtomTagged ]
     [ LoopIterationCurrent Carbon ][ Carbon ] -> [ LoopIterationCurrent Carbon ][ Carbon AtomTagged ]
     [ LoopIterationCurrent Oxygen ][ Oxygen ] -> [ LoopIterationCurrent Oxygen ][ Oxygen AtomTagged ]
+    [ LoopIterationCurrent Nitrogen ][ Nitrogen ] -> [ LoopIterationCurrent Nitrogen ][ Nitrogen AtomTagged ]
+    [ LoopIterationCurrent Sulfur ][ Sulfur ] -> [ LoopIterationCurrent Sulfur ][ Sulfur AtomTagged ]
+    [ LoopIterationCurrent Chlorine ][ Chlorine ] -> [ LoopIterationCurrent Chlorine ][ Chlorine AtomTagged ]
+    [ LoopIterationCurrent Phosphore ][ Phosphore ] -> [ LoopIterationCurrent Phosphore ][ Phosphore AtomTagged ]
+    [ LoopIterationCurrent Cristal ][ Cristal ] -> [ LoopIterationCurrent Cristal ][ Cristal AtomTagged ]
+    [ LoopIterationCurrent EmptyAtom ][ EmptyAtom ] -> [ LoopIterationCurrent EmptyAtom ][ EmptyAtom AtomTagged ]
+    [ LoopIterationCurrent Fluorine ][ Fluorine ] -> [ LoopIterationCurrent Fluorine ][ Fluorine AtomTagged ]
     [ LoopIterationCurrent no Atom ][ no Atom ] -> [ LoopIterationCurrent no Atom ][ no Atom AtomTagged ]
 
     (Tags all the LinkLeft that are the same as the current one, in the ModelZone and the ArenaZone. (including the 'no LinkLeft' case))
@@ -755,6 +827,13 @@ late [ GlobalTags no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopItera
     late [ LoopIterationCurrent ModelZone Hydrogen ][ LoopIterationCurrent CheckZone Hydrogen ] -> [ LoopIterationCurrent ModelZone Hydrogen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Hydrogen ]
     late [ LoopIterationCurrent ModelZone Carbon ][ LoopIterationCurrent CheckZone Carbon ] -> [ LoopIterationCurrent ModelZone Carbon CurrentCheckedOK ][ LoopIterationCurrent CheckZone Carbon ]
     late [ LoopIterationCurrent ModelZone Oxygen ][ LoopIterationCurrent CheckZone Oxygen ] -> [ LoopIterationCurrent ModelZone Oxygen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Oxygen ]
+    late [ LoopIterationCurrent ModelZone Nitrogen ][ LoopIterationCurrent CheckZone Nitrogen ] -> [ LoopIterationCurrent ModelZone Nitrogen CurrentCheckedOK ][ LoopIterationCurrent CheckZone Nitrogen ]
+    late [ LoopIterationCurrent ModelZone Sulfur ][ LoopIterationCurrent CheckZone Sulfur ] -> [ LoopIterationCurrent ModelZone Sulfur CurrentCheckedOK ][ LoopIterationCurrent CheckZone Sulfur ]
+    late [ LoopIterationCurrent ModelZone Chlorine ][ LoopIterationCurrent CheckZone Chlorine ] -> [ LoopIterationCurrent ModelZone Chlorine CurrentCheckedOK ][ LoopIterationCurrent CheckZone Chlorine ]
+    late [ LoopIterationCurrent ModelZone Phosphore ][ LoopIterationCurrent CheckZone Phosphore ] -> [ LoopIterationCurrent ModelZone Phosphore CurrentCheckedOK ][ LoopIterationCurrent CheckZone Phosphore ]
+    late [ LoopIterationCurrent ModelZone Cristal ][ LoopIterationCurrent CheckZone Cristal ] -> [ LoopIterationCurrent ModelZone Cristal CurrentCheckedOK ][ LoopIterationCurrent CheckZone Cristal ]
+    late [ LoopIterationCurrent ModelZone EmptyAtom ][ LoopIterationCurrent CheckZone EmptyAtom ] -> [ LoopIterationCurrent ModelZone EmptyAtom CurrentCheckedOK ][ LoopIterationCurrent CheckZone EmptyAtom ]
+    late [ LoopIterationCurrent ModelZone Fluorine ][ LoopIterationCurrent CheckZone Fluorine ] -> [ LoopIterationCurrent ModelZone Fluorine CurrentCheckedOK ][ LoopIterationCurrent CheckZone Fluorine ]
 
     late [ GlobalTags ][ LoopIterationCurrent ModelZone no CurrentCheckedOK ] -> [ GlobalTags GlobalTagCheckFailed ][ LoopIterationCurrent ModelZone ]
     late [ LoopIterationCurrent CurrentCheckedOK ] -> [ LoopIterationCurrent ]
@@ -878,6 +957,25 @@ LEVELS
 (#AB#AA#)
 (#AB#BB#)
 (#######)
+
+(Test to validate all the atom-related rules, and the atoms appearance)
+(Must have the following values in the legend)
+(0 = Hydrogen)
+(1 = Carbon)
+(2 = Oxygen)
+(3 = Nitrogen)
+(4 = Sulfur)
+(5 = Chlorine)
+(6 = Phosphore)
+(7 = Cristal)
+(8 = EmptyAtom and LinkUpSimple and LinkDownSimple)
+(9 = Fluorine)
+############
+#0123456789#
+############
+#....*.....#
+#5742690138#
+############
 
 #######
 #.BF..#
