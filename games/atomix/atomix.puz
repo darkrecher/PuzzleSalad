@@ -445,6 +445,40 @@ transparent
 GlobalTagModelZoneExists
 transparent
 
+GlobalTagWon
+transparent
+
+WinStar0
+transparent
+
+(TODO : prettier Winstars)
+WinStar1
+transparent lightblue
+00000
+00100
+01110
+00100
+00000
+
+WinStar2
+transparent lightblue
+00100
+01110
+11111
+01110
+00100
+
+WinStar3
+transparent lightblue
+00000
+00100
+01110
+00100
+00000
+
+WinStar4
+transparent
+
 =======
 LEGEND
 =======
@@ -491,6 +525,8 @@ GlobalTagSlide = GlobalTagSlideLeft or GlobalTagSlideRight or GlobalTagSlideUp o
 
 LinkTagged = LinkLeftTagged or LinkRightTagged or LinkUpTagged or LinkDownTagged or LinkUpRightTagged or LinkDownRightTagged or LinkDownLeftTagged or LinkUpLeftTagged
 
+WinStar = WinStar0 or WinStar1 or WinStar2 or WinStar3 or WinStar4
+
 =======
 SOUNDS
 =======
@@ -535,7 +571,7 @@ LinkUpLeftSimple
 LinkUpLeftTagged
 LinkUpLeftCheckedOK
 
-Wall, Atom
+Wall, Atom, WinStar
 AtomTagged
 AtomCheckedOK
 
@@ -560,6 +596,7 @@ GlobalTagCheckFailed
 GlobalTagSlideLeft, GlobalTagSlideRight, GlobalTagSlideUp, GlobalTagSlideDown
 GlobalTagMustCheckPattern
 GlobalTagModelZoneExists
+GlobalTagWon
 
 LoopIterationToDo
 LoopIterationCurrent
@@ -916,17 +953,34 @@ late [ GlobalTags no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopItera
 
 endLoop
 
-(TODO : win if no GlobalTagCheckFailed)
+late random [ GlobalTags GlobalTagMustCheckPattern no GlobalTagCheckFailed ][ ArenaZone Atom ] -> [ GlobalTags GlobalTagMustCheckPattern GlobalTagWon ][ ArenaZone WinStar1 ]
+late [ GlobalTagWon ][ Player SelectedAtom ] -> [ GlobalTagWon ][ ]
 
 late [ GlobalTagCheckFailed] -> [ ]
 late [ LoopIterationToDo] -> [ ]
 late [ GlobalTagMustCheckPattern ] -> [ ]
 
+(The evolution of WinStars must be written in reversed order, to prevent a WinStar0 to be replaced by a WinStar3 in one turn)
+(Anyway, because it loops, the 3 following actions are made in one turn :)
+(removing of WinStar3, creation of  WinStar0, replacement of WinStar0 by WinStar1)
+(This is why WinStar0 is a transparent object)
+late random [ WinStar4 ][ ArenaZone Atom ] -> [ ][ ArenaZone WinStar0 ]
+late [ WinStar4 ] -> [ ]
+late [ WinStar3 ] -> [ WinStar4 ]
+late [ WinStar2 ] -> [ WinStar3 ]
+late [ WinStar1 ] -> [ WinStar2 ]
+late [ WinStar0 ] -> [ WinStar1 ]
+late [ GlobalTagWon ] -> again
+
+late [ WinStar Link ] -> [ WinStar ]
 
 ==============
 WINCONDITIONS
 ==============
 
+Some GlobalTagWon
+no Atom on ArenaZone
+no WinStar
 
 
 =======
@@ -987,6 +1041,18 @@ LEVELS
 (#....*.....#)
 (#5742690138#)
 (############)
+
+#######
+#.BF..#
+#...E.#
+#######
+#...###
+#...F##
+#.*..##
+#..B.##
+#...#E#
+#######
+
 
 #######
 #.BF..#
