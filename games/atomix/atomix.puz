@@ -427,6 +427,9 @@ pink
 PropagateDiagonalHalfWay
 transparent
 
+GlobalTagBorderModelMade
+transparent
+
 GlobalTagSlideLeft
 transparent
 
@@ -478,6 +481,71 @@ transparent lightblue
 
 WinStar4
 transparent
+
+BorderModelLeft
+transparent white gray
+00012
+00012
+00012
+00012
+00012
+
+BorderModelRight
+transparent white gray
+12000
+12000
+12000
+12000
+12000
+
+BorderModelUp
+transparent white gray
+00000
+00000
+00000
+11111
+22222
+
+BorderModelDown
+transparent white gray
+11111
+22222
+00000
+00000
+00000
+
+BorderModelUpRight
+transparent white gray
+00000
+00000
+00000
+11000
+22000
+
+BorderModelDownRight
+transparent white gray
+12000
+22000
+00000
+00000
+00000
+
+BorderModelDownLeft
+transparent white gray
+00012
+00012
+00000
+00000
+00000
+
+BorderModelUpLeft
+transparent white gray
+00000
+00000
+00000
+00011
+00012
+
 
 =======
 LEGEND
@@ -587,6 +655,7 @@ CopyToDown
 CopyToLeft
 
 GlobalTags
+GlobalTagBorderModelMade
 GlobalTagFoundUniqueAtom
 GlobalTagSearchUniqueFail
 GlobalTagLoopIteration
@@ -606,6 +675,9 @@ PlayerTagMustDoInit
 PropagateVertical
 PropagateHorizontal
 PropagateDiagonalHalfWay
+
+BorderModelLeft, BorderModelRight, BorderModelUp, BorderModelDown, BorderModelUpRight, BorderModelDownRight, BorderModelDownLeft, BorderModelUpLeft
+
 
 ======
 RULES
@@ -683,6 +755,19 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 (Raises exception if there is no ModelZone)
 [ GlobalTags ][ ModelZone ] -> [ GlobalTags GlobalTagModelZoneExists ][ ModelZone ]
 [ GlobalTags no GlobalTagModelZoneExists ][ Player ] -> [ GlobalTags ][ ] message ERROR : no model zone. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level
+
+
+( --- Adds Borders around the ModelZone --- )
+
+LEFT [ GlobalTags no GlobalTagBorderModelMade ][ ModelZone | no ModelZone ] -> [ GlobalTags ][ ModelZone | BorderModelLeft ]
+RIGHT [ GlobalTags no GlobalTagBorderModelMade ][ ModelZone | no ModelZone ] -> [ GlobalTags ][ ModelZone | BorderModelRight ]
+UP [ GlobalTags no GlobalTagBorderModelMade ][ ModelZone | no ModelZone ] -> [ GlobalTags ][ ModelZone | BorderModelUp ]
+DOWN [ GlobalTags no GlobalTagBorderModelMade ][ ModelZone | no ModelZone ] -> [ GlobalTags ][ ModelZone | BorderModelDown ]
+
+RIGHT [ GlobalTags no GlobalTagBorderModelMade ][ no BorderModelUp | BorderModelUp | ... | BorderModelUp | no BorderModelUp ] -> [ GlobalTags ][ BorderModelUpLeft | BorderModelUp | ... | BorderModelUp | BorderModelUpRight ]
+RIGHT [ GlobalTags no GlobalTagBorderModelMade ][ no BorderModelDown | BorderModelDown | ... | BorderModelDown | no BorderModelDown ] -> [ GlobalTags ][ BorderModelDownLeft | BorderModelDown | ... | BorderModelDown | BorderModelDownRight ]
+
+[ GlobalTags ] -> [ GlobalTags GlobalTagBorderModelMade ]
 
 
 ( --- Searches for a unique atom in the ModelZone --- )
@@ -1042,16 +1127,13 @@ LEVELS
 (#5742690138#)
 (############)
 
-#######
-#.BF..#
-#...E.#
-#######
-#...###
-#...F##
-#.*..##
-#..B.##
-#...#E#
-#######
+.....#######
+.....#...###
+.....#...F##
+.....#.*..##
+.BF..#..B.##
+...E.#...#E#
+.....#######
 
 
 #######
