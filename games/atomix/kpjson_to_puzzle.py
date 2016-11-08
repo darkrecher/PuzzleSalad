@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-Conversion d'un fichier JSON contenant la description de niveaux "kp-atomic" vers un fichier PuzzleSalad/PuzzleScript.
+Conversion d'un fichier JSON contenant la description de niveaux "kp-atomix" vers un fichier PuzzleSalad/PuzzleScript.
 """
 
 import json
@@ -42,6 +42,28 @@ LINK_STRENGTH = enum(
 )
 ls = LINK_STRENGTH
 
+# Correspondance. Clé : identifiant de l'atome dans les fichiers json de kp-atomix. Valeur : atome correspondant.
+ATOM_FROM_KP_JSON = {
+	"1" : at.HYDROGEN,
+	"2" : at.CARBON,
+	"3" : at.OXYGEN,
+	"4" : at.NITROGEN,
+}
+
+# Correspondance des liaisons. TODO.
+# liaisons simples :
+# hab
+# g c
+# fed
+# liaisons doubles (pas de diagonales) :
+#  A
+# D B
+#  C
+# liaisons triples (pas de diagonales non plus) :
+#  E
+# H F
+#  G
+
 # Vocabulaire des structure de données
 # Un link : un tuple de deux éléments :
 #  - une valeur de type enum.LINK_DIR
@@ -54,7 +76,11 @@ ls = LINK_STRENGTH
 
 # Correspondance entre un atoli et son caractère utilisé dans la légende de PuzzleSalad.
 # clé : un atoli. valeur : une string de un seul caractère.
-atoli_to_ps_legend = {}
+ps_legend_from_atoli = {}
+
+
+# TODO : une fonction qui construit ps_legend_from_atoli et qui en même temps modifie data_json,
+# en ajoutant à chaque définition d'atome de chaque level, le caractère de légende dans PuzzleSalad.
 
 
 def read_json_file(filepath_json):
