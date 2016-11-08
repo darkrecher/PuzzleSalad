@@ -515,11 +515,11 @@ transparent white gray
 00000
 
 BorderModelUpRight
-transparent white gray
+transparent white gray #cccccc
 00000
 00000
 00000
-11000
+13000
 22000
 
 BorderModelDownRight
@@ -531,9 +531,9 @@ transparent white gray
 00000
 
 BorderModelDownLeft
-transparent white gray
+transparent white gray #cccccc
 00012
-00012
+00032
 00000
 00000
 00000
