@@ -62,10 +62,12 @@ Wall
 lightgray
 
 ModelZone
-darkgray
+(debug = darkgray. release = transparent)
+transparent
+(darkgray)
 
 ArenaZone
-#686018
+#392900
 
 Hydrogen
 transparent blue
@@ -170,7 +172,7 @@ transparent yellow
 10101
 
 Player
-transparent orange
+transparent #FF0000
 01010
 10001
 00000
@@ -179,13 +181,13 @@ transparent orange
 
 UniqueAtomStartCheck
 (debug = red point. release = transparent)
-(transparent)
-transparent red
-00000
-00000
-00100
-00000
-00000
+transparent
+(transparent red)
+(00000)
+(00000)
+(00100)
+(00000)
+(00000)
 
 CopyToRight
 transparent
@@ -201,8 +203,8 @@ transparent
 
 CheckZone
 (debug = purple. release = transparent)
-(transparent)
-purple
+transparent
+(purple)
 
 LinkLeftSimple
 transparent #eeeeee
@@ -383,8 +385,9 @@ transparent
 
 GlobalTags
 (debug = #FF00FF. release = transparent)
-#FF00FF
-(transparent)
+transparent
+(#FF00FF)
+
 
 GlobalTagFoundUniqueAtom
 transparent
@@ -421,8 +424,8 @@ transparent
 
 CurrentCheckedOK
 (debug = pink. release = transparent)
-pink
-(transparent)
+transparent
+(pink)
 
 PropagateDiagonalHalfWay
 transparent
