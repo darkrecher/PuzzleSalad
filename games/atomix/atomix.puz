@@ -58,8 +58,13 @@ OBJECTS
 Background
 black
 
-Wall
-lightgray
+WallBrick
+#494949 #707070 #9E9E9E #D3D3D3
+23332
+12320
+11200
+12120
+21112
 
 ModelZone
 (debug = darkgray. release = transparent)
@@ -70,11 +75,11 @@ ArenaZone
 #392900
 
 Hydrogen
-transparent blue
+transparent #4460FF #2646FF #0026FF #001ECC #0019AA
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Carbon
@@ -555,7 +560,7 @@ LEGEND
 =======
 
 . = Background
-# = Wall
+# = WallBrick
 * = Player and PlayerTagMustDoInit
 
 A = Hydrogen and LinkLeftSimple
@@ -578,6 +583,7 @@ Z = Carbon and LinkLeftSimple and LinkRightSimple
 8 = EmptyAtom and LinkUpSimple and LinkDownSimple
 9 = Fluorine
 
+Wall = WallBrick
 Atom = Hydrogen or Carbon or Oxygen or Nitrogen or Sulfur or Chlorine or Phosphore or Cristal or EmptyAtom or Fluorine
 
 LinkLeft = LinkLeftSimple or LinkLeftDouble or LinkLeftTriple
@@ -1130,10 +1136,10 @@ LEVELS
 (#5742690138#)
 (############)
 
-.....#######
-.....#...###
-.....#...F##
-.....#.*..##
+.....#####..
+.....#...##.
+.....#...F#.
+.....#.*..#.
 .BF..#..B.##
 ...E.#...#E#
 .....#######
