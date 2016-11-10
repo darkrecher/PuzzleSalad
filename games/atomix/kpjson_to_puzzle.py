@@ -131,6 +131,15 @@ def read_json_file(filepath_json):
 	data_json = json.loads(str_json)
 	return data_json
 
+# TODO : Fonction(s) qui process un level.
+#  - mettre les ps_legend_char à la place des identifiant de kpatom. (aussi bien dans l'arena que dans le model)
+#  - remplacer par un espace les murs entourés entièrement de murs.
+#  - placement du joueur où on peut (là où y'a ni mur ni atome), en cherchant en priorité au milieu de l'arena.
+
+# TODO : fonctions pour gérer des rectangles de strings comme des matrix :
+#  - récupération de la taille (x, y)
+#  - copie d'un rectangle de string dans un autre rectangle, à une coordonnée indiquée. On blitte pas les espaces.
+#  - crop d'un rectangle de string (à partir de (0, 0), pas besoin de faire générique).
 
 def main():
 
