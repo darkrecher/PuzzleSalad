@@ -28,9 +28,9 @@ LINK_DIR = enum(
 	"LEFT",
 	"RIGHT",
 	"UP_RIGHT",
-	"RIGHT_DOWN",
+	"DOWN_RIGHT",
+	"UP_LEFT",
 	"DOWN_LEFT",
-	"LEFT_UP",
 )
 ld = LINK_DIR
 
@@ -48,9 +48,10 @@ ATOM_FROM_KP_JSON = {
 	"2" : at.CARBON,
 	"3" : at.OXYGEN,
 	"4" : at.NITROGEN,
+	# TODO : ajouter les autres atomes ici aussi
 }
 
-# Correspondance des liaisons. TODO.
+# Correspondance. Clé : identifiant du link dans les fichiers json de kp-atomix. Valeur : link correspondant.
 # liaisons simples :
 # hab
 # g c
@@ -63,6 +64,24 @@ ATOM_FROM_KP_JSON = {
 #  E
 # H F
 #  G
+LINK_FROM_KP_JSON = {
+	"a" : (ld.UP, ls.SIMPLE),
+	"b" : (ld.UP_RIGHT, ls.SIMPLE),
+	"c" : (ld.RIGHT, ls.SIMPLE),
+	"d" : (ld.DOWN_RIGHT, ls.SIMPLE),
+	"e" : (ld.DOWN, ls.SIMPLE),
+	"f" : (ld.DOWN_LEFT, ls.SIMPLE),
+	"g" : (ld.LEFT, ls.SIMPLE),
+	"h" : (ld.UP_LEFT, ls.SIMPLE),
+	"A" : (ld.UP, ls.DOUBLE),
+	"B" : (ld.RIGHT, ls.DOUBLE),
+	"C" : (ld.DOWN, ls.DOUBLE),
+	"D" : (ld.LEFT, ls.DOUBLE),
+	"E" : (ld.UP, ls.TRIPLE),
+	"F" : (ld.RIGHT, ls.TRIPLE),
+	"G" : (ld.DOWN, ls.TRIPLE),
+	"H" : (ld.LEFT, ls.TRIPLE),
+}
 
 # Vocabulaire des structure de données
 # Un link : un tuple de deux éléments :
@@ -72,16 +91,39 @@ ATOM_FROM_KP_JSON = {
 #  - une valeur de type enum.ATOM
 #  - 0, un ou plusieurs link.
 # Exemple d'atoli, présent dans le niveau 8 du pack de niveau de draknek (Ethylène) : =/\
-# (at.CARBON, (ld.LEFT, ls.DOUBLE), (ld.UP_RIGHT, ls.SIMPLE), (ld.RIGHT_DOWN, ls.SIMPLE))
+# (at.CARBON, (ld.LEFT, ls.DOUBLE), (ld.UP_RIGHT, ls.SIMPLE), (ld.DOWN_RIGHT, ls.SIMPLE))
+
+def atoli_from_kpjson(kpjson_atom):
+	# Ça va thrower des exception si le json contient un identifant d'atome ou de link inconnu.
+	# C'est ce qu'on veut. (Car on veut pas s'embêter à gérer un message d'erreur spécifique pour ça).
+	atom = ATOM_FROM_KP_JSON[kpjson_atom[0]]
+	links = tuple(
+		LINK_FROM_KP_JSON[data_kpjson_link] for data_kpjson_link in kpjson_atom[1]
+	)
+	return (atom, links)
+
+def generator_ps_legend_characters():
+	# #.*,/%\-+
+	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuvwxyz0123456789={}_;:?!$&'\"")
+	while PS_LEGEND_CHARACTERS:
+		yield(PS_LEGEND_CHARACTERS.pop(0))
+	raise Exception("Plus assez de caractères pour définir tous les atoli (combinaison atom + link) dans la partie 'légende' de PuzzleSalad.")
 
 # Correspondance entre un atoli et son caractère utilisé dans la légende de PuzzleSalad.
 # clé : un atoli. valeur : une string de un seul caractère.
 ps_legend_from_atoli = {}
 
-
-# TODO : une fonction qui construit ps_legend_from_atoli et qui en même temps modifie data_json,
-# en ajoutant à chaque définition d'atome de chaque level, le caractère de légende dans PuzzleSalad.
-
+def legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters):
+	"""
+	Effectue deux actions :
+	 - Ajout d'un élément dans ps_legend_from_atoli, si nécessaire.
+	 - Modifie kpjson_atom, en ajoutant au bout de la liste l'atoli correspondant.
+    """
+	atoli = atoli_from_kpjson(kpjson_atom)
+	if not atoli in ps_legend_from_atoli:
+		ps_legend_char = next(ps_legend_characters)
+		ps_legend_from_atoli[atoli] = ps_legend_char
+	kpjson_atom.append(atoli)
 
 def read_json_file(filepath_json):
 	with open(filepath_json, 'r', encoding='utf-8') as file_json:
@@ -91,13 +133,26 @@ def read_json_file(filepath_json):
 
 
 def main():
-	print("hellow")
-	kplevels_json = read_json_file(FILEPATH_KPATOMIC_JSON)
-	print(kplevels_json["levels"][1])
-	for level in kplevels_json["levels"]:
-		for atom_key, atom_val in level["atoms"].items():
-			print(atom_val)
 
+	print("hellow")
+	first = True
+	kplevels_json = read_json_file(FILEPATH_KPATOMIC_JSON)
+	ps_legend_characters = generator_ps_legend_characters()
+
+	for level in kplevels_json["levels"]:
+		for atom_key, kpjson_atom in level["atoms"].items():
+			legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters)
+
+	print("")
+	print("Légende des atoli")
+	for atoli, ps_legend_char in ps_legend_from_atoli.items():
+		print(ps_legend_char, ":", atoli)
+
+	print("")
+	print("Liste des atomes des levels, avec atoli correspondant")
+	for level in kplevels_json["levels"]:
+		for atom_key, kpjson_atom in level["atoms"].items():
+			print(kpjson_atom, " : ", ps_legend_from_atoli[kpjson_atom[2]])
 
 if __name__ == '__main__':
 	main()
