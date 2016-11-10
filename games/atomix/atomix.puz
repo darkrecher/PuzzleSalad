@@ -70,7 +70,7 @@ WallBlack
 black
 
 WallBlueBarMain
-black #0900C4 #3D53FF #47B2FF
+black #000073 #0002AE #0061AE
 00123
 01232
 12321
@@ -78,7 +78,7 @@ black #0900C4 #3D53FF #47B2FF
 32100
 
 WallBlueBarUp
-black #0900C4 #3D53FF #47B2FF
+black #000073 #0002AE #0061AE
 00000
 00000
 00000
@@ -86,12 +86,28 @@ black #0900C4 #3D53FF #47B2FF
 00012
 
 WallBlueBarDown
-black #0900C4 #3D53FF #47B2FF
+black #000073 #0002AE #0061AE
 21000
 10000
 00000
 00000
 00000
+
+WallBlueBarEndUp
+black #000073 #0002AE #0061AE
+00110
+01221
+12321
+23210
+32100
+
+WallBlueBarEndDown
+black #000073 #0002AE #0061AE
+00123
+01232
+12321
+12210
+01100
 
 ModelZone
 (debug = darkgray. release = transparent)
@@ -592,6 +608,8 @@ LEGEND
 % = WallBlueBarMain
 / = WallBlueBarUp
 \ = WallBlueBarDown
++ = WallBlueBarEndUp
+- = WallBlueBarEndDown
 * = Player and PlayerTagMustDoInit
 
 A = Hydrogen and LinkLeftSimple
@@ -614,7 +632,7 @@ Z = Carbon and LinkLeftSimple and LinkRightSimple
 8 = EmptyAtom and LinkUpSimple and LinkDownSimple
 9 = Fluorine
 
-Wall = WallBrick or WallBlack or WallBlueBarMain or WallBlueBarUp or WallBlueBarDown
+Wall = WallBrick or WallBlack or WallBlueBarMain or WallBlueBarUp or WallBlueBarDown or WallBlueBarEndUp or WallBlueBarEndDown
 Atom = Hydrogen or Carbon or Oxygen or Nitrogen or Sulfur or Chlorine or Phosphore or Cristal or EmptyAtom or Fluorine
 
 LinkLeft = LinkLeftSimple or LinkLeftDouble or LinkLeftTriple
@@ -1167,8 +1185,8 @@ LEVELS
 (#5742690138#)
 (############)
 
-%\/%\#####..
-\/%\.#...##.
+-\/+.#####..
+./%\.#...##.
 /%\..#...F#.
 %\...#.*..#.
 \BF..#..B.##
