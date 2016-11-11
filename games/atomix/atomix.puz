@@ -1096,7 +1096,7 @@ late [ GlobalTags no GlobalTagLoopIteration no GlobalTagCheckFailed ][ LoopItera
 
 endLoop
 
-late random [ GlobalTags GlobalTagMustCheckPattern no GlobalTagCheckFailed ][ ArenaZone Atom ] -> [ GlobalTags GlobalTagMustCheckPattern GlobalTagWon ][ ArenaZone WinStar1 ]
+late random [ GlobalTags GlobalTagMustCheckPattern no GlobalTagCheckFailed ][ ArenaZone Atom ] -> [ GlobalTags GlobalTagMustCheckPattern GlobalTagWon ][ ArenaZone WinStar0 ]
 late [ GlobalTagWon ][ Player SelectedAtom ] -> [ GlobalTagWon ][ ]
 
 late [ GlobalTagCheckFailed] -> [ ]
@@ -1105,7 +1105,7 @@ late [ GlobalTagMustCheckPattern ] -> [ ]
 
 (The evolution of WinStars must be written in reversed order, to prevent a WinStar0 to be replaced by a WinStar3 in one turn)
 (Anyway, because it loops, the 3 following actions are made in one turn :)
-(removing of WinStar3, creation of  WinStar0, replacement of WinStar0 by WinStar1)
+(removing of WinStar4, creation of  WinStar0, replacement of WinStar0 by WinStar1)
 (This is why WinStar0 is a transparent object)
 late random [ WinStar4 ][ ArenaZone Atom ] -> [ ][ ArenaZone WinStar0 ]
 late [ WinStar4 ] -> [ ]
