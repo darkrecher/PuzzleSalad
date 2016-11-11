@@ -47,9 +47,10 @@ homepage recher.wordpress.com
 (Your level can not be won. But the game does not check this case and does not send message about it.)
 
 verbose_logging
-again_interval 0.6
+again_interval 0.3
 
 run_rules_on_level_start
+norepeat_action
 
 ========
 OBJECTS
@@ -1002,7 +1003,7 @@ late [ GlobalTagMustCheckPattern ][ ModelZone no LoopIterationToDo ][ CheckZone 
 late [ GlobalTags GlobalTagMustCheckPattern ][ ModelZone no LoopIterationToDo ][ CheckZone LoopIterationToDo ] -> [ GlobalTags GlobalTagMustCheckPattern GlobalTagCheckZoneUncomplete ][ ModelZone ][ CheckZone LoopIterationToDo ]
 (CheckZone is not complete. We cancel all the pattern-check loop.)
 late [ GlobalTagCheckZoneUncomplete ][ LoopIterationToDo ] -> [ GlobalTagCheckZoneUncomplete ][ ]
-late [ GlobalTagCheckZoneUncomplete ] -> [ ]
+late [ GlobalTags GlobalTagCheckZoneUncomplete ] -> [ GlobalTags GlobalTagCheckFailed ]
 
 (Starts one loop iteration, on ModelZone and CheckZone at the same time.)
 startLoop
@@ -1175,12 +1176,12 @@ LEVELS
 (8 = EmptyAtom and LinkUpSimple and LinkDownSimple)
 (9 = Fluorine)
 ()
-(############)
-(#0123456789#)
-(############)
-(#....*.....#)
-(#5742690138#)
-(############)
+############
+#0123456789#
+############
+#....*.....#
+#5742690138#
+############
 
 
 (The global background where to put levels,)
