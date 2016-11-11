@@ -503,30 +503,29 @@ transparent
 WinStar0
 transparent
 
-(TODO : prettier Winstars)
 WinStar1
-transparent lightblue
+transparent #224FCC #00A5FF
 00000
 00100
-01110
+01210
 00100
 00000
 
 WinStar2
-transparent lightblue
+transparent #245CEF #2494EF #24D0EF
 00100
-01110
-11111
-01110
+01210
+12321
+01210
 00100
 
 WinStar3
-transparent lightblue
-00000
-00100
-01110
-00100
-00000
+transparent #366AFF #34A4FF #53E3FF #82FFFF
+01210
+12321
+23432
+12321
+01210
 
 WinStar4
 transparent
@@ -1176,12 +1175,12 @@ LEVELS
 (8 = EmptyAtom and LinkUpSimple and LinkDownSimple)
 (9 = Fluorine)
 ()
-############
-#0123456789#
-############
-#....*.....#
-#5742690138#
-############
+(############)
+(#0123456789#)
+(############)
+(#....*.....#)
+(#5742690138#)
+(############)
 
 
 (The global background where to put levels,)
