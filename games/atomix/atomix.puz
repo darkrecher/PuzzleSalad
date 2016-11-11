@@ -126,59 +126,59 @@ transparent #4460FF #2646FF #0026FF #001ECC #0019AA
 00000
 
 Carbon
-transparent gray
+transparent #B9B9B9 #A4A4A4 #8B8B8B #6C6C6C #5F5F5F
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Oxygen
-transparent red
+transparent #FF5E5E #FF4747 #FF0000 #D90000 #B60000
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Nitrogen
-transparent green
+transparent #8CFF8C #66FF66 #00FF00 #00DD00 #00C600
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Sulfur
-transparent orange
+transparent #FF9756 #FF8A42 #FF741E #EA671C #DB611A
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Chlorine
-transparent #D0D0D0
+transparent #FDFDFD #E9E9E9 #D7D7D7 #C3C3C3 #ACACAC
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Phosphore
-transparent purple
+transparent #CC5EFF #C447FF #AE00FF #9200D6 #8200BF
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 Cristal
-transparent lightblue
+transparent #87FFFD #5EFFFC #00FFFA #00D8D5 #00C4C1
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
 
 (Useful to have elements with link only)
@@ -187,15 +187,12 @@ EmptyAtom
 transparent
 
 Fluorine
-transparent yellow
+transparent #FFF69E #FFF370 #FFE900 #E5D200 #D6C400
 00000
-01110
-01110
-01110
+01230
+02340
+03450
 00000
-
-
-(TODO : draw prettier atoms)
 
 AtomTagged
 transparent
