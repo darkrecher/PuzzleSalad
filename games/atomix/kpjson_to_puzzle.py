@@ -137,11 +137,6 @@ def read_json_file(filepath_json):
 #  - remplacer par un espace les murs entourés entièrement de murs.
 #  - placement du joueur où on peut (là où y'a ni mur ni atome), en cherchant en priorité au milieu de l'arena.
 
-# TODO : fonctions pour gérer des rectangles de strings comme des matrix :
-#  - récupération de la taille (x, y)
-#  - copie d'un rectangle de string dans un autre rectangle, à une coordonnée indiquée. On blitte pas les espaces.
-#  - crop d'un rectangle de string (générique : x, y, w, h).
-
 def main():
 
 	print("hellow")
