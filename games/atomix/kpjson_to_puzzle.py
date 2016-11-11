@@ -103,7 +103,8 @@ def atoli_from_kpjson(kpjson_atom):
 	return (atom, links)
 
 def generator_ps_legend_characters():
-	# #.*,/%\-+
+	# Charactères interdits : #.*,/%\-+
+	# RECTODO : determiner les charactères interdit à partir de la ps_legend en dur (qui n'est pas encore faite).
 	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuvwxyz0123456789={}_;:?!$&'\"")
 	while PS_LEGEND_CHARACTERS:
 		yield(PS_LEGEND_CHARACTERS.pop(0))
@@ -118,7 +119,7 @@ def legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters):
 	Effectue deux actions :
 	 - Ajout d'un élément dans ps_legend_from_atoli, si nécessaire.
 	 - Modifie kpjson_atom, en ajoutant au bout de la liste l'atoli correspondant.
-    """
+	"""
 	atoli = atoli_from_kpjson(kpjson_atom)
 	if not atoli in ps_legend_from_atoli:
 		ps_legend_char = next(ps_legend_characters)
@@ -139,7 +140,7 @@ def read_json_file(filepath_json):
 # TODO : fonctions pour gérer des rectangles de strings comme des matrix :
 #  - récupération de la taille (x, y)
 #  - copie d'un rectangle de string dans un autre rectangle, à une coordonnée indiquée. On blitte pas les espaces.
-#  - crop d'un rectangle de string (à partir de (0, 0), pas besoin de faire générique).
+#  - crop d'un rectangle de string (générique : x, y, w, h).
 
 def main():
 
