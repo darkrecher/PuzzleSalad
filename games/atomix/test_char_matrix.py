@@ -70,3 +70,34 @@ def test_replace():
 		"2z0",
 	))
 	assert str(cm) == str_cm_final
+
+def test_cropped():
+	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"])
+	cm_cropped = cm.cropped((1, 2), (4, 2))
+	str_cm_cropped_final = '\n'.join((
+		"uvwx",
+		"*-+,",
+	))
+	assert str(cm_cropped) == str_cm_cropped_final
+	cm_cropped_all = cm.cropped((0, 0), cm.dimensions())
+	assert str(cm_cropped_all) == str(cm)
+
+def test_blit():
+	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"])
+	cm_to_blit = CharMatrix( ["ij", "kl", "m "])
+	cm.blit(cm_to_blit, (4, 1))
+	str_cm_blitted_final = '\n'.join((
+		"0123456",
+		"abcdijg",
+		"tuvwklz",
+		"/*-+m !",
+	))
+	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"])
+	cm_to_blit = CharMatrix( ["ij", " l", "m "], ' ')
+	cm.blit(cm_to_blit, (4, 1))
+	str_cm_blitted_final = '\n'.join((
+		"0123456",
+		"abcdijg",
+		"tuvwxlz",
+		"/*-+m.!",
+	))
