@@ -92,6 +92,8 @@ class CharMatrix():
 				return False
 		return True
 
+	# RECTODO : itérateur sur l'ensemble de la matrice, renvoyant la position et le char.
+
 	def get_char(self, coord, raise_exception=False):
 		"""
 		Renvoie le caractère aux coordonnées spécifiées. Contrôle les coordonnées par rapport au dimensions de la matrice.
@@ -126,6 +128,8 @@ class CharMatrix():
 			line = self.char_matrix[y]
 			line = line[:x] + new_char + line[x+1:]
 			self.char_matrix[y] = line
+
+	# RECTODO : renvoie (sous forme d'itérateur of course), tous les chars différents de la matrice.
 
 	def get_coords_around(self, coord):
 		"""
@@ -179,7 +183,7 @@ class CharMatrix():
 		:return: la matrice demandée.
 		:rtype: instance de CharMatrix.
 		"""
-		# FUTUR : repositionner le corner_up_left et/ou diminuer les dimensions si elles sont hors limites,
+		# FUTURE : repositionner le corner_up_left et/ou diminuer les dimensions si elles sont hors limites,
 		# afin de renvoyer la partie existante de la matrice, au lieu de raiser des exceptions comme un bourrin.
 		self.in_dimensions(corner_up_left, True)
 		corner_down_right = (
@@ -205,7 +209,7 @@ class CharMatrix():
 		:type corner_up_left: tuple de deux entiers.
 		:type source_matrix: instance de CharMatrix.
 		"""
-		# FUTUR : blitter une source_matrix cropped au cas où le corner_up_left et/ou les dimensions sont hors limites,
+		# FUTURE : blitter une source_matrix cropped au cas où le corner_up_left et/ou les dimensions sont hors limites,
 		# au lieu de raiser des exceptions comme un bourrin.
 		# D'ailleurs, je raise même pas tout ce que je pourrais raiser. Bon, bref...
 		self.in_dimensions(corner_up_left, True)

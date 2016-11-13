@@ -107,8 +107,9 @@ def atoli_from_kpjson(kpjson_atom):
 
 def generator_ps_legend_characters():
 	# Charactères interdits : #.*,/%\-+
-	# RECTODO : determiner les charactères interdit à partir de la ps_legend en dur (qui n'est pas encore faite).
-	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuvwxyz0123456789={}_;:?!$&'\"")
+	# RECTODO : determiner les caractères interdit à partir de la ps_legend en dur (qui n'est pas encore faite).
+	# RECTODO : il faut aussi enlever les caractères présents dans le backround.
+	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuvwxyz0123456789{}_;:?!$&'\"")
 	while PS_LEGEND_CHARACTERS:
 		yield(PS_LEGEND_CHARACTERS.pop(0))
 	raise Exception("Plus assez de caractères pour définir tous les atoli (combinaison atom + link) dans la partie 'légende' de PuzzleSalad.")
@@ -146,6 +147,7 @@ def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background
 		kpjson_atoms += atom_key
 		ps_legend_atoms += ps_legend_from_atoli[atom_legendified[-1]]
 
+	# RECTODO : translater kpjson->PuzzleSalad les murs et les cases vides (même si ça sert à rien)
 	cm_arena.translate(kpjson_atoms, ps_legend_atoms)
 	cm_model.translate(kpjson_atoms, ps_legend_atoms)
 
@@ -155,8 +157,15 @@ def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background
 	global_h = 2 + max(model_h, arena_h) + 2
 	cm_background.in_dimensions((global_w-1, global_h-1), True)
 
-	# RECTODO : mettre des caractères espaces sur les cases extérieures
-	# remplacer par un espace les murs entourés entièrement de murs. (mais c'est pas exactement ça).
+	# RECTODO : mettre des caractères espaces sur les cases extérieures. Algo (bourrin, mais osef) :
+	#  - créer un CharMatrix avec que des espaces dedans, de dimensions (arena+2)
+	#  - blitter l'arena dans ce CharMatrix
+	#  - parcourir les cases, plusieurs fois. changer en espace tous les '.' ayant au moins un espace autour.
+	#    À refaire sur toute la CharMatrix, tant qu'on a fait au moins une transformation.
+	#  - recropper la CharMatrix pour enlever les cases d'espaces environnantes.
+
+	# RECTODO : mettre des espaces sur toutes les cases entourées de murs ou d'espace.
+	#  - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
 
 	# RECTODO : placement du joueur où on peut (là où y'a ni mur ni atome), en cherchant en priorité au milieu de l'arena.
 
@@ -197,6 +206,10 @@ def main():
 		for atom_key, kpjson_atom in level["atoms"].items():
 			print(kpjson_atom, " : ", ps_legend_from_atoli[kpjson_atom[2]])
 
+	# RECTODO : faire un fichier pytest pour tous ce code.
+	#  - un test de génération d'un seul level, sans les ajouts d'espaces, et sur le background de walls.
+	#  - un test avec les ajouts d'espace, et sur un background de virgules.
+	#  - un test avec les ajouts d'espace, et sur le background de barres obliques, avec le cropping positionné en semi-random.
 	ps_level = build_ps_level(
 		kplevels_json["levels"][0],
 		ps_legend_from_atoli,
