@@ -111,6 +111,22 @@ class CharMatrix():
 			return(self.char_matrix[y][x])
 		return None
 
+	def set_char(self, coord, new_char, raise_exception=False):
+		"""
+		Modifie un caractère aux coordonnées spécifiées. Contrôle les coordonnées par rapport au dimensions de la matrice.
+		:param coord: coordonnée (x, y) de la position du caractère à modifier dans la matrice.
+		:param new_char: nouvelle valeur du caractère à écrire dans la matrice.
+		:param raise_exception: indique le comportement si les coordonnées spécifiées sont en dehors des dimensions de la matrice.
+		:type coord: tuple de deux entiers.
+		:type new_char: string de un seul caractère.
+		:type raise_exception: boolean.
+		"""
+		if self.in_dimensions(coord, raise_exception):
+			x, y = coord
+			line = self.char_matrix[y]
+			line = line[:x] + new_char + line[x+1:]
+			self.char_matrix[y] = line
+
 	def get_coords_around(self, coord):
 		"""
 		Itére sur les coordonnées autour des coordonnées spécifiées (diagonales comprises).

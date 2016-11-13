@@ -38,6 +38,23 @@ def test_get_char():
 	assert cm.get_char((7, 0)) is None
 	assert cm.get_char((0, 3)) is None
 
+def test_set_char():
+	cm = CharMatrix( ["0123456", "abcdefg"])
+	cm.set_char((0, 0), '@')
+	str_cm_set = '\n'.join((
+		"@123456",
+		"abcdefg",
+	))
+	assert str(cm) == str_cm_set
+	pos_down_right = cm.dimensions()
+	pos_down_right = (pos_down_right[0]-1, pos_down_right[1]-1)
+	cm.set_char(pos_down_right, '+')
+	str_cm_set = '\n'.join((
+		"@123456",
+		"abcdef+",
+	))
+	assert str(cm) == str_cm_set
+
 def test_get_coords_around():
 	cm = CharMatrix( ["0123456", "abcdefg", "-------", "*******"])
 	assert tuple(cm.get_coords_around((2, 2))) == (
@@ -99,6 +116,7 @@ def test_blit():
 		"tuvwklz",
 		"/*-+m !",
 	))
+	assert str(cm) == str_cm_blitted_final
 	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"])
 	cm_to_blit = CharMatrix( ["ij", " l", "m "], ' ')
 	cm.blit(cm_to_blit, (4, 1))
@@ -108,6 +126,7 @@ def test_blit():
 		"tuvwxlz",
 		"/*-+m.!",
 	))
+	assert str(cm) == str_cm_blitted_final
 
 def test_get_char_positions():
 	cm = CharMatrix( ["@12345@", "ab@@@fg", "tuvwxyz", "/@-+,.@"])
