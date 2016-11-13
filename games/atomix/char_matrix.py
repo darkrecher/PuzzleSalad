@@ -4,9 +4,8 @@
 Gestion d'un tableau de caractères en deux dimensions, un peu comme si c'était un tableau de pixels.
 """
 
-# TODO : fonctions pour gérer des rectangles de strings comme des matrix :
-#  - copie d'un rectangle de string dans un autre rectangle, à une coordonnée indiquée. On blitte pas les espaces.
-#  - recherche de tous les éléments d'un char spécifique.
+import re
+
 
 def _get_coords_around(coord):
 	yield (coord[0]-1, coord[1]-1)
@@ -118,7 +117,7 @@ class CharMatrix():
 		Tient compte des dimensions de la matrice.
 		:param coord: coordonnée (x, y) de la position dont on veut récupérer les coordonnées alentours.
 		:type coord: tuple de deux entiers.
-		:return: une itération sur des coordonnées
+		:return: une itération sur des coordonnées.
 		:rtype: tuples de deux entiers, les uns après les autres.
 		"""
 		for coord_around in _get_coords_around(coord):
@@ -143,6 +142,7 @@ class CharMatrix():
 		"""
 		Remplace un char par un autre sur l'ensemble de la matrice.
 		"""
+		# RECTODO : faire un translate, pour remplacer plusieurs char d'un seul coup.
 		self.char_matrix = [
 			line.replace(before, after)
 			for line in self.char_matrix
@@ -175,6 +175,15 @@ class CharMatrix():
 		return CharMatrix(str_cropped)
 
 	def blit(self, source_matrix, corner_up_left):
+		"""
+		Modifie la matrice en y recopiant dedans la source_matrix, aux coordonnées spécifiées.
+		Si source_matrix possède un transparent_char différent de None, tous les caractères de source_matrix égaux à transparent_char
+		ne seront pas recopiés. (Comme si c'était des pixels transparents).
+		:param source_matrix: la matrice à recopier.
+		:param corner_up_left: cordonnées (x, y) du coin haut gauche, dans self.char_matrix, où sera recopié source_matrix.
+		:type corner_up_left: tuple de deux entiers.
+		:type source_matrix: instance de CharMatrix.
+		"""
 		# FUTUR : blitter une source_matrix cropped au cas où le corner_up_left et/ou les dimensions sont hors limites,
 		# au lieu de raiser des exceptions comme un bourrin.
 		# D'ailleurs, je raise même pas tout ce que je pourrais raiser. Bon, bref...
@@ -192,6 +201,16 @@ class CharMatrix():
 			line_dest = "".join(unpacked_line_dest)
 			self.char_matrix[y_dest] = line_dest
 
-
-
-
+	def get_char_positions(self, char):
+		"""
+		Itère sur les positions (x, y) de toutes les occurrences de char dans self.char_matrix
+		:param char: le caractère à chercher.
+		:type char: string de un seul caractère.
+		:return: une itération sur des coordonnées.
+		:rtype: tuples de deux entiers, les uns après les autres.
+		"""
+		for y, line in enumerate(self.char_matrix):
+			# http://stackoverflow.com/a/13009866/6241709
+			# http://stackoverflow.com/questions/4202538/python-escape-regex-special-characters
+			for x in re.finditer(re.escape(char), line):
+				yield(x.start(), y)

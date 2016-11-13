@@ -101,3 +101,16 @@ def test_blit():
 		"tuvwxlz",
 		"/*-+m.!",
 	))
+
+def test_get_char_positions():
+	cm = CharMatrix( ["@12345@", "ab@@@fg", "tuvwxyz", "/@-+,.@"])
+	char_positions = cm.get_char_positions('@')
+	assert tuple(char_positions) == (
+		(0, 0), (6, 0),
+		(2, 1), (3, 1), (4, 1),
+		(1, 3), (6, 3),
+	)
+	char_positions = cm.get_char_positions('!')
+	assert tuple(char_positions) == ()
+	char_positions = cm.get_char_positions('.')
+	assert tuple(char_positions) == ((5, 3), )
