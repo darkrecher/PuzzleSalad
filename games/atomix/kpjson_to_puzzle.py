@@ -7,9 +7,10 @@ Conversion d'un fichier JSON contenant la description de niveaux "kp-atomix" ver
 import json
 
 from bat_belt import enum
+from char_matrix import CharMatrix
 
 FILEPATH_KPATOMIC_JSON = "draknek_levels_json.js"
-
+CM_BACKGROUND_WALLS = CharMatrix(['#' * 100] * 100)
 
 ATOM = enum(
 	"ATOM",
@@ -17,7 +18,7 @@ ATOM = enum(
 	"CARBON",
 	"OXYGEN",
 	"NITROGEN",
-	# TODO : ajouter les autres atomes
+	# RECTODO : ajouter les autres atomes
 )
 at = ATOM
 
@@ -48,7 +49,7 @@ ATOM_FROM_KP_JSON = {
 	"2" : at.CARBON,
 	"3" : at.OXYGEN,
 	"4" : at.NITROGEN,
-	# TODO : ajouter les autres atomes ici aussi
+	# RECTODO : ajouter les autres atomes ici aussi
 }
 
 # Correspondance. Clé : identifiant du link dans les fichiers json de kp-atomix. Valeur : link correspondant.
@@ -98,7 +99,9 @@ def atoli_from_kpjson(kpjson_atom):
 	# C'est ce qu'on veut. (Car on veut pas s'embêter à gérer un message d'erreur spécifique pour ça).
 	atom = ATOM_FROM_KP_JSON[kpjson_atom[0]]
 	links = tuple(
-		LINK_FROM_KP_JSON[data_kpjson_link] for data_kpjson_link in kpjson_atom[1]
+		LINK_FROM_KP_JSON[data_kpjson_link]
+		for data_kpjson_link
+		in kpjson_atom[1]
 	)
 	return (atom, links)
 
@@ -126,16 +129,51 @@ def legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters):
 		ps_legend_from_atoli[atoli] = ps_legend_char
 	kpjson_atom.append(atoli)
 
+def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background):
+	"""
+	Renvoie un CharMatrix correspondant à la représentation dans PuzzleSalad du level d'atomix spécifié (kpjson_level_legendified).
+	RECTODO : docstring plus précise.
+	"""
+
+	atoms_legendified = kpjson_level_legendified["atoms"]
+	cm_arena = CharMatrix(kpjson_level_legendified["arena"], ' ')
+	cm_model = CharMatrix(kpjson_level_legendified["molecule"])
+	cm_arena.verify_matrix()
+	cm_model.verify_matrix()
+	kpjson_atoms = ""
+	ps_legend_atoms = ""
+	for atom_key, atom_legendified in atoms_legendified.items():
+		kpjson_atoms += atom_key
+		ps_legend_atoms += ps_legend_from_atoli[atom_legendified[-1]]
+
+	cm_arena.translate(kpjson_atoms, ps_legend_atoms)
+	cm_model.translate(kpjson_atoms, ps_legend_atoms)
+
+	arena_w, arena_h = cm_arena.dimensions()
+	model_w, model_h = cm_model.dimensions()
+	global_w = 2 + model_w + 2 + arena_w + 2
+	global_h = 2 + max(model_h, arena_h) + 2
+	cm_background.in_dimensions((global_w-1, global_h-1), True)
+
+	# RECTODO : mettre des caractères espaces sur les cases extérieures
+	# remplacer par un espace les murs entourés entièrement de murs. (mais c'est pas exactement ça).
+
+	# RECTODO : placement du joueur où on peut (là où y'a ni mur ni atome), en cherchant en priorité au milieu de l'arena.
+
+	model_pos_up_left = (2, global_h-model_h-2)
+	arena_pos_up_left = (2+model_w+2, 2)
+	# RECTODO : cropper depuis un autre endroit que le coin sup gauche, pour avoir des background différents selon les niveaux.
+	ps_level_map = cm_background.cropped((0, 0), (global_w, global_h))
+	ps_level_map.blit(cm_model, model_pos_up_left)
+	ps_level_map.blit(cm_arena, arena_pos_up_left)
+	return ps_level_map
+
 def read_json_file(filepath_json):
 	with open(filepath_json, 'r', encoding='utf-8') as file_json:
 		str_json = file_json.read()
 	data_json = json.loads(str_json)
 	return data_json
 
-# TODO : Fonction(s) qui process un level.
-#  - mettre les ps_legend_char à la place des identifiant de kpatom. (aussi bien dans l'arena que dans le model)
-#  - remplacer par un espace les murs entourés entièrement de murs.
-#  - placement du joueur où on peut (là où y'a ni mur ni atome), en cherchant en priorité au milieu de l'arena.
 
 def main():
 
@@ -158,6 +196,13 @@ def main():
 	for level in kplevels_json["levels"]:
 		for atom_key, kpjson_atom in level["atoms"].items():
 			print(kpjson_atom, " : ", ps_legend_from_atoli[kpjson_atom[2]])
+
+	ps_level = build_ps_level(
+		kplevels_json["levels"][0],
+		ps_legend_from_atoli,
+		CM_BACKGROUND_WALLS
+	)
+	print(ps_level)
 
 if __name__ == '__main__':
 	main()
