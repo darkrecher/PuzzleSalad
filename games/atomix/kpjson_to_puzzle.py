@@ -84,6 +84,33 @@ LINK_FROM_KP_JSON = {
 	"H" : (ld.LEFT, ls.TRIPLE),
 }
 
+PS_NAME_FROM_ATOM = {
+	# RECTODO : faut les ajouter ici aussi les autres atomes.
+	at.HYDROGEN : "Hydrogen",
+	at.CARBON : "Carbon",
+	at.OXYGEN : "Oxygen",
+	at.NITROGEN : "Nitrogen",
+}
+
+PS_NAME_FROM_LINK = {
+	(ld.UP, ls.SIMPLE) : "LinkUpSimple",
+	(ld.UP_RIGHT, ls.SIMPLE) : "LinkUpRightSimple",
+	(ld.RIGHT, ls.SIMPLE) : "LinkRightSimple",
+	(ld.DOWN_RIGHT, ls.SIMPLE) : "LinkDownRightSimple",
+	(ld.DOWN, ls.SIMPLE) : "LinkDownSimple",
+	(ld.DOWN_LEFT, ls.SIMPLE) : "LinkDownLeftSimple",
+	(ld.LEFT, ls.SIMPLE) : "LinkLeftSimple",
+	(ld.UP_LEFT, ls.SIMPLE) : "LinkUpLeftSimple",
+	(ld.UP, ls.DOUBLE) : "LinkUpDouble",
+	(ld.RIGHT, ls.DOUBLE) : "LinkRightDouble",
+	(ld.DOWN, ls.DOUBLE) : "LinkDownDouble",
+	(ld.LEFT, ls.DOUBLE) : "LinkLeftDouble",
+	(ld.UP, ls.TRIPLE) : "LinkUpTriple",
+	(ld.RIGHT, ls.TRIPLE) : "LinkRightTriple",
+	(ld.DOWN, ls.TRIPLE) : "LinkDownTriple",
+	(ld.LEFT, ls.TRIPLE) : "LinkLeftTriple",
+}
+
 # Vocabulaire des structure de données
 # Un link : un tuple de deux éléments :
 #  - une valeur de type enum.LINK_DIR
@@ -106,10 +133,13 @@ def atoli_from_kpjson(kpjson_atom):
 	return (atom, links)
 
 def generator_ps_legend_characters():
-	# Charactères interdits : #.*,/%\-+
+	# Caractères interdits par PuzzleScript, car faisant partie de la syntaxe du langage :
+	# []() =<>-V^
+	# La lettre "V" toute seule (minuscule ou majuscule) est interdite car elle représente la flèche vers le bas.
+	# Caractères interdits : #.*,/%\-+
 	# RECTODO : determiner les caractères interdit à partir de la ps_legend en dur (qui n'est pas encore faite).
 	# RECTODO : il faut aussi enlever les caractères présents dans le backround.
-	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuvwxyz0123456789{}_;:?!$&'\"")
+	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&'\"")
 	while PS_LEGEND_CHARACTERS:
 		yield(PS_LEGEND_CHARACTERS.pop(0))
 	raise Exception("Plus assez de caractères pour définir tous les atoli (combinaison atom + link) dans la partie 'légende' de PuzzleSalad.")
@@ -167,7 +197,18 @@ def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background
 	# RECTODO : mettre des espaces sur toutes les cases entourées de murs ou d'espace.
 	#  - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
 
-	# RECTODO : placement du joueur où on peut (là où y'a ni mur ni atome), en cherchant en priorité au milieu de l'arena.
+	# Placement du joueur où on peut (là où y'a ni mur ni atome), en prenant plus ou moins le milieu de l'arena.
+	empty_tile_positions = tuple(cm_arena.get_char_positions('.')) # RECTODO : constant
+	if not empty_tile_positions:
+		raise Exception(
+			"".join((
+				"Niveau : ",
+				kpjson_level_legendified["name"],
+				"Il faut au moins une case vide pour placer le joueur.",
+			))
+		)
+	player_position = empty_tile_positions[len(empty_tile_positions) // 2]
+	cm_arena.set_char(player_position, '*') # RECTODO : constant
 
 	model_pos_up_left = (2, global_h-model_h-2)
 	arena_pos_up_left = (2+model_w+2, 2)
@@ -176,6 +217,21 @@ def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background
 	ps_level_map.blit(cm_model, model_pos_up_left)
 	ps_level_map.blit(cm_arena, arena_pos_up_left)
 	return ps_level_map
+
+def str_from_atoli(atoli):
+	atom, links = atoli
+	str_atom = PS_NAME_FROM_ATOM[atom]
+	str_links = [ PS_NAME_FROM_LINK[link] for link in links ]
+	return " and ".join([str_atom] + str_links)
+
+def str_ps_legend(ps_legend_from_atoli):
+	str_ps_legend_atoms = [
+		"%s = %s" % (ps_legend_char, str_from_atoli(atoli))
+		for atoli, ps_legend_char
+		in ps_legend_from_atoli.items()
+	]
+	str_ps_legend_atoms.sort()
+	return '\n'.join(str_ps_legend_atoms)
 
 def read_json_file(filepath_json):
 	with open(filepath_json, 'r', encoding='utf-8') as file_json:
@@ -206,16 +262,15 @@ def main():
 		for atom_key, kpjson_atom in level["atoms"].items():
 			print(kpjson_atom, " : ", ps_legend_from_atoli[kpjson_atom[2]])
 
-	# RECTODO : faire un fichier pytest pour tous ce code.
-	#  - un test de génération d'un seul level, sans les ajouts d'espaces, et sur le background de walls.
-	#  - un test avec les ajouts d'espace, et sur un background de virgules.
-	#  - un test avec les ajouts d'espace, et sur le background de barres obliques, avec le cropping positionné en semi-random.
 	ps_level = build_ps_level(
 		kplevels_json["levels"][0],
 		ps_legend_from_atoli,
 		CM_BACKGROUND_WALLS
 	)
+	print(str_ps_legend(ps_legend_from_atoli))
+	print("")
 	print(ps_level)
+
 
 if __name__ == '__main__':
 	main()
