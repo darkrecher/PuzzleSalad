@@ -62,12 +62,19 @@ def test_get_chars_around():
 	assert "".join(cm.get_chars_around((6, 3))) == "yz."
 	assert "".join(cm.get_chars_around((10, 10))) == ""
 
-def test_replace():
+def test_translate():
 	cm = CharMatrix( ["001", "210"])
-	cm.replace('1', 'z')
+	cm.translate('1', 'z')
 	str_cm_final = '\n'.join((
 		"00z",
 		"2z0",
+	))
+	assert str(cm) == str_cm_final
+	cm = CharMatrix( ["001", "210"])
+	cm.translate('01234', 'abcde')
+	str_cm_final = '\n'.join((
+		"aab",
+		"cba",
 	))
 	assert str(cm) == str_cm_final
 

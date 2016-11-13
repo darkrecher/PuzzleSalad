@@ -138,13 +138,18 @@ class CharMatrix():
 			if char is not None:
 				yield char
 
-	def replace(self, before, after):
+	def translate(self, intab, outtab):
 		"""
-		Remplace un char par un autre sur l'ensemble de la matrice.
+		Remplace des chars par d'autres sur l'ensemble de la matrice.
+		Voir built-in fonction str.translate.
+		:param intab: string contenant les caractères de départ, ceux qu'il faut remplacer.
+		:param outtab: string contenant les caractères d'arrivée, ceux qui seront mis à la place de ceux remplacés.
+		:type intab: string. Le nombre de caractères doit être le même dans intab et outtab.
+		:type outtab: string. Le nombre de caractères doit être le même dans intab et outtab.
 		"""
-		# RECTODO : faire un translate, pour remplacer plusieurs char d'un seul coup.
+		translation_tab = str.maketrans(intab, outtab)
 		self.char_matrix = [
-			line.replace(before, after)
+			line.translate(translation_tab)
 			for line in self.char_matrix
 		]
 
