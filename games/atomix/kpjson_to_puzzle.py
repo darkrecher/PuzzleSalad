@@ -203,6 +203,18 @@ def external_empty_tiles_transparented(cm_arena):
 	cm_arena_transparented.transparent_char = SYMB_TRANSPARENT
 	return cm_arena_transparented
 
+def transparencify_tiles_surrounded(cm_arena):
+	"""
+	mettre des espaces sur toutes les cases entourées de murs ou d'espace.
+	 - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
+	 # RECTODO : docstring plus précise.
+	"""
+	wall_and_transp = {'#', ' '}
+	for pos_wall_tile in cm_arena.get_char_positions(PS_SYMB_WALL):
+		set_chars_around = set(cm_arena.get_chars_around(pos_wall_tile))
+		if set.union(wall_and_transp, set_chars_around) == wall_and_transp:
+			cm_arena.set_char(pos_wall_tile, SYMB_TRANSPARENT)
+
 def build_ps_level(
 	kpjson_level_legendified,
 	ps_legend_from_atoli,
@@ -238,9 +250,7 @@ def build_ps_level(
 
 	if transparencify:
 		cm_arena = external_empty_tiles_transparented(cm_arena)
-
-		# RECTODO : mettre des espaces sur toutes les cases entourées de murs ou d'espace.
-		#  - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
+		transparencify_tiles_surrounded(cm_arena)
 
 	# Placement du joueur où on peut (là où y'a ni mur ni atome), en prenant plus ou moins le milieu de l'arena.
 	empty_tile_positions = tuple(cm_arena.get_char_positions(PS_SYMB_EMPTY))
