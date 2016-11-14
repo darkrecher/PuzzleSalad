@@ -14,7 +14,7 @@ from kpjson_to_puzzle import (
 
 def test_kpjson_to_puzzle_on_walls():
 	"""
-	test de génération d'un seul level, sans les ajouts d'espaces, et sur le background de walls.
+	Test de génération d'un seul level, sans les ajouts d'espaces, et sur le background de walls.
 	"""
 
 	kplevel_str = """
@@ -79,3 +79,66 @@ def test_kpjson_to_puzzle_on_walls():
 		"################",
 	))
 
+
+def test_kpjson_to_puzzle_on_walls():
+	"""
+	Test avec les ajouts d'espace, et sur un background de virgules.
+	RECTODO : c'est pas du tout fini.
+	"""
+
+	kplevel_str = """
+	{
+		"name": "Formaldehyde",
+		"id": "1",
+		"atoms": {
+			"1": ["3", "B"],
+			"2": ["3", "D"]
+		},
+		"arena": [
+			"...######...",
+			"..##..21##..",
+			"###......###",
+			"#...####...#",
+			"#...#..#...#",
+			"#...####...#",
+			"###......###",
+			"..##....##..",
+			"...######..."
+		],
+		"molecule": [
+			"12"
+		]
+	}
+	"""
+
+	kplevel_json = json.loads(kplevel_str)
+	ps_legend_characters = generator_ps_legend_characters()
+	ps_legend_from_atoli = {}
+	for atom_key in sorted(kplevel_json["atoms"]):
+		kpjson_atom = kplevel_json["atoms"][atom_key]
+		legendify_atoli(
+			kpjson_atom,
+			ps_legend_from_atoli,
+			ps_legend_characters
+		)
+	ps_level = build_ps_level(
+		kplevel_json,
+		ps_legend_from_atoli,
+		CM_BACKGROUND_WALLS,
+		True
+	)
+	assert str(ps_level) == '\n'.join((
+		"####################",
+		"####################",
+		"####################",
+		"##########..ba######",
+		"#########......#####",
+		"#######...####...###",
+		"#######...#..#*..###",
+		"#######...####...###",
+		"#########......#####",
+		"##########....######",
+		"##ab################",
+		"####################",
+		"####################",
+	))

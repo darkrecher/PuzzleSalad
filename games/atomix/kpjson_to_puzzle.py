@@ -4,13 +4,24 @@
 Conversion d'un fichier JSON contenant la description de niveaux "kp-atomix" vers un fichier PuzzleSalad/PuzzleScript.
 """
 
+# RECTODO : remplacer les doubles guillemets par des simples, sur les chaînes simples ou vides.
+
 import json
 
 from bat_belt import enum
 from char_matrix import CharMatrix
 
 FILEPATH_KPATOMIC_JSON = "draknek_levels_json.js"
-CM_BACKGROUND_WALLS = CharMatrix(['#' * 100] * 100)
+
+# Tous les symboles de bases, dans kpjson et PuzzleSalad.
+KPJSON_SYMB_WALL = '#'
+PS_SYMB_WALL = '#'
+KPJSON_SYMB_EMPTY = '.'
+PS_SYMB_EMPTY = '.'
+PS_SYMB_PLAYER = '*'
+SYMB_TRANSPARENT = ' '
+
+CM_BACKGROUND_WALLS = CharMatrix([PS_SYMB_WALL * 100] * 100)
 
 ATOM = enum(
 	"ATOM",
@@ -160,26 +171,65 @@ def legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters):
 		ps_legend_from_atoli[atoli] = ps_legend_char
 	kpjson_atom.append(atoli)
 
-def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background):
+def external_empty_tiles_transparented(cm_arena):
+	"""
+	Remplace les caractères de cases vides '.' qui sont à l'extérieur de l'arène, par des caractères de transparence ' '.
+	RECTODO : docstring plus précise.
+	"""
+	# Algo (bourrin, mais osef) :
+	#  - créer un CharMatrix avec que des espaces dedans, de dimensions (arena+2)
+	#  - blitter l'arena dans ce CharMatrix, pour créer une "bordered arena" (cm_brd_arena).
+	#  - parcourir les cases, plusieurs fois. changer en espace tous les '.' ayant au moins un espace autour.
+	#    À refaire sur toute la CharMatrix, tant qu'on a fait au moins une transformation.
+	#  - recropper la CharMatrix pour enlever les cases d'espaces environnantes.
+	# FUTURE : ça risque de merder à cause des diagonales. En fait, faudrait pas propager la transparence avec les diagonales.
+	# Et donc il faudrait une fonction get_chars_around qui ne prenne pas les diagonales. On fera ça plus tard.
+	arena_w, arena_h = cm_arena.dimensions()
+	# RECTODO : un constructeur qui crée une charmatrix fillée avec un char.
+	cm_brd_arena = CharMatrix([SYMB_TRANSPARENT * (arena_w+2)] * (arena_h+2))
+	cm_brd_arena.blit(cm_arena, (1, 1))
+	change_made = True
+	while change_made:
+		change_made = False
+		for pos_empty_tile in cm_brd_arena.get_char_positions(PS_SYMB_EMPTY):
+			chars_around = cm_brd_arena.get_chars_around(pos_empty_tile)
+			if SYMB_TRANSPARENT in chars_around:
+				change_made = True
+				# Du coup, on modifie l'arena alors qu'on est en train d'itérer dessus avec un filtre.
+				# C'est pas génial, mais ça posera pas de problème,
+				# vu qu'on modifie l'élément sur lequel on vient juste d'itérer.
+				cm_brd_arena.set_char(pos_empty_tile, SYMB_TRANSPARENT)
+	# RECTODO : le cropped devrait recopier l'info de transparent_char.
+	cm_arena_transparented = cm_brd_arena.cropped((1, 1), (arena_w, arena_h))
+	cm_arena_transparented.transparent_char = SYMB_TRANSPARENT
+	return cm_arena_transparented
+
+def build_ps_level(
+	kpjson_level_legendified,
+	ps_legend_from_atoli,
+	cm_background,
+	transparencify=False,
+):
 	"""
 	Renvoie un CharMatrix correspondant à la représentation dans PuzzleSalad du level d'atomix spécifié (kpjson_level_legendified).
 	RECTODO : docstring plus précise.
 	"""
 
 	atoms_legendified = kpjson_level_legendified["atoms"]
-	cm_arena = CharMatrix(kpjson_level_legendified["arena"], ' ')
+	cm_arena = CharMatrix(kpjson_level_legendified["arena"], SYMB_TRANSPARENT)
 	cm_model = CharMatrix(kpjson_level_legendified["molecule"])
 	cm_arena.verify_matrix()
 	cm_model.verify_matrix()
-	kpjson_atoms = ""
-	ps_legend_atoms = ""
-	for atom_key, atom_legendified in atoms_legendified.items():
-		kpjson_atoms += atom_key
-		ps_legend_atoms += ps_legend_from_atoli[atom_legendified[-1]]
 
-	# RECTODO : translater kpjson->PuzzleSalad les murs et les cases vides (même si ça sert à rien)
-	cm_arena.translate(kpjson_atoms, ps_legend_atoms)
-	cm_model.translate(kpjson_atoms, ps_legend_atoms)
+	kpjson_chars = ""
+	ps_legend_chars = ""
+	for atom_key, atom_legendified in atoms_legendified.items():
+		kpjson_chars += atom_key
+		ps_legend_chars += ps_legend_from_atoli[atom_legendified[-1]]
+	kpjson_chars += KPJSON_SYMB_WALL + KPJSON_SYMB_EMPTY
+	ps_legend_chars += PS_SYMB_WALL + PS_SYMB_EMPTY
+	cm_arena.translate(kpjson_chars, ps_legend_chars)
+	cm_model.translate(kpjson_chars, ps_legend_chars)
 
 	arena_w, arena_h = cm_arena.dimensions()
 	model_w, model_h = cm_model.dimensions()
@@ -187,18 +237,14 @@ def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background
 	global_h = 2 + max(model_h, arena_h) + 2
 	cm_background.in_dimensions((global_w-1, global_h-1), True)
 
-	# RECTODO : mettre des caractères espaces sur les cases extérieures. Algo (bourrin, mais osef) :
-	#  - créer un CharMatrix avec que des espaces dedans, de dimensions (arena+2)
-	#  - blitter l'arena dans ce CharMatrix
-	#  - parcourir les cases, plusieurs fois. changer en espace tous les '.' ayant au moins un espace autour.
-	#    À refaire sur toute la CharMatrix, tant qu'on a fait au moins une transformation.
-	#  - recropper la CharMatrix pour enlever les cases d'espaces environnantes.
+	if transparencify:
+		cm_arena = external_empty_tiles_transparented(cm_arena)
 
-	# RECTODO : mettre des espaces sur toutes les cases entourées de murs ou d'espace.
-	#  - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
+		# RECTODO : mettre des espaces sur toutes les cases entourées de murs ou d'espace.
+		#  - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
 
 	# Placement du joueur où on peut (là où y'a ni mur ni atome), en prenant plus ou moins le milieu de l'arena.
-	empty_tile_positions = tuple(cm_arena.get_char_positions('.')) # RECTODO : constant
+	empty_tile_positions = tuple(cm_arena.get_char_positions(PS_SYMB_EMPTY))
 	if not empty_tile_positions:
 		raise Exception(
 			"".join((
@@ -208,7 +254,7 @@ def build_ps_level(kpjson_level_legendified, ps_legend_from_atoli, cm_background
 			))
 		)
 	player_position = empty_tile_positions[len(empty_tile_positions) // 2]
-	cm_arena.set_char(player_position, '*') # RECTODO : constant
+	cm_arena.set_char(player_position, PS_SYMB_PLAYER)
 
 	model_pos_up_left = (2, global_h-model_h-2)
 	arena_pos_up_left = (2+model_w+2, 2)
