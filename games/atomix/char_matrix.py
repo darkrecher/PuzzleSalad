@@ -17,6 +17,10 @@ def _get_coords_around(coord):
 	yield (coord[0],   coord[1]+1)
 	yield (coord[0]+1, coord[1]+1)
 
+def filled_chars(fill_char, dimensions):
+	width, height = dimensions
+	return [ fill_char * width ] * height
+
 
 class CharMatrix():
 

@@ -6,8 +6,9 @@
 
 import json
 
+from char_matrix import CharMatrix, filled_chars
 from kpjson_to_puzzle import (
-	CM_BACKGROUND_WALLS,
+	PS_SYMB_WALL,
 	generator_ps_legend_characters, legendify_atoli,
 	str_ps_legend, build_ps_level,
 )
@@ -17,6 +18,7 @@ def test_kpjson_to_puzzle_on_walls():
 	Test de génération d'un seul level, sans les ajouts d'espaces, et sur le background de walls.
 	"""
 
+	CM_BACKGROUND_WALLS = CharMatrix(filled_chars(PS_SYMB_WALL, (100, 100)))
 	kplevel_str = """
 	{
 		"name": "Formaldehyde",
@@ -86,9 +88,10 @@ def test_kpjson_to_puzzle_on_walls():
 	RECTODO : c'est pas du tout fini.
 	"""
 
+	CM_BACKGROUND_WALLS_BLACK = CharMatrix(filled_chars(',', (100, 100)))
 	kplevel_str = """
 	{
-		"name": "Formaldehyde",
+		"name": "Dihydrogen",
 		"id": "1",
 		"atoms": {
 			"1": ["3", "B"],
@@ -124,21 +127,22 @@ def test_kpjson_to_puzzle_on_walls():
 	ps_level = build_ps_level(
 		kplevel_json,
 		ps_legend_from_atoli,
-		CM_BACKGROUND_WALLS,
+		CM_BACKGROUND_WALLS_BLACK,
 		True
 	)
 	assert str(ps_level) == '\n'.join((
-		"####################",
-		"####################",
-		"####################",
-		"##########..ba######",
-		"#########......#####",
-		"#######...####...###",
-		"#######...#..#*..###",
-		"#######...####...###",
-		"#########......#####",
-		"##########....######",
-		"##ab################",
-		"####################",
-		"####################",
+		",,,,,,,,,,,,,,,,,,,,",
+		",,,,,,,,,,,,,,,,,,,,",
+		",,,,,,,,,######,,,,,",
+		",,,,,,,,##..ba##,,,,",
+		",,,,,,###......###,,",
+		",,,,,,#...####...#,,",
+		",,,,,,#...#..#*..#,,",
+		",,,,,,#...####...#,,",
+		",,,,,,###......###,,",
+		",,,,,,,,##....##,,,,",
+		",,ab,,,,,######,,,,,",
+		",,,,,,,,,,,,,,,,,,,,",
+		",,,,,,,,,,,,,,,,,,,,",
 	))
+	print(str_ps_legend(ps_legend_from_atoli))

@@ -9,7 +9,7 @@ Conversion d'un fichier JSON contenant la description de niveaux "kp-atomix" ver
 import json
 
 from bat_belt import enum
-from char_matrix import CharMatrix
+from char_matrix import CharMatrix, filled_chars
 
 FILEPATH_KPATOMIC_JSON = "draknek_levels_json.js"
 
@@ -20,8 +20,6 @@ KPJSON_SYMB_EMPTY = '.'
 PS_SYMB_EMPTY = '.'
 PS_SYMB_PLAYER = '*'
 SYMB_TRANSPARENT = ' '
-
-CM_BACKGROUND_WALLS = CharMatrix([PS_SYMB_WALL * 100] * 100)
 
 ATOM = enum(
 	"ATOM",
@@ -185,8 +183,9 @@ def external_empty_tiles_transparented(cm_arena):
 	# FUTURE : ça risque de merder à cause des diagonales. En fait, faudrait pas propager la transparence avec les diagonales.
 	# Et donc il faudrait une fonction get_chars_around qui ne prenne pas les diagonales. On fera ça plus tard.
 	arena_w, arena_h = cm_arena.dimensions()
-	# RECTODO : un constructeur qui crée une charmatrix fillée avec un char.
-	cm_brd_arena = CharMatrix([SYMB_TRANSPARENT * (arena_w+2)] * (arena_h+2))
+	cm_brd_arena = CharMatrix(
+		filled_chars(SYMB_TRANSPARENT, (arena_w+2, arena_h+2))
+	)
 	cm_brd_arena.blit(cm_arena, (1, 1))
 	change_made = True
 	while change_made:
