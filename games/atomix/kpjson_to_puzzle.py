@@ -274,6 +274,7 @@ def build_ps_level(
 	ps_legend_from_atoli,
 	cm_background,
 	transparencify=False,
+	interesting_positions=None
 ):
 	"""
 	Renvoie un CharMatrix correspondant à la représentation dans PuzzleSalad du level d'atomix spécifié (kpjson_level_legendified).
@@ -319,10 +320,34 @@ def build_ps_level(
 	player_position = empty_tile_positions[len(empty_tile_positions) // 2]
 	cm_arena.set_char(player_position, PS_SYMB_PLAYER)
 
+	if interesting_positions is None:
+		# FUTURE : si le background est trop petit pour ce niveau, ça va raiser une exception plus tard
+		# (au moment du cropping). Ce serait plus gentil de la raiser un peu avant, avec un message plus explicite.
+		pos_crop_bg = (0, 0)
+	else:
+		# On croppe depuis un autre endroit que le coin sup gauche,
+		# pour avoir des backgrounds différents à chaque level.
+		background_w, background_h = cm_background.dimensions()
+		limit_x, limit_y = background_w-global_w, background_h-global_h
+		possible_pos = [
+			pos for pos in interesting_positions
+			if pos[0] <= limit_x and pos[1] <= limit_y
+		]
+		if not possible_pos:
+			raise Exception(
+				"".join((
+					"Niveau : ",
+					kpjson_level_legendified["name"],
+					"Le background est trop petit pour ce niveau.",
+				))
+			)
+		# RECTODO : choisir une pos parmi les possible_pos, en prenant un index pseudo-random,
+		# basé sur le nom du level. Si on utilise pas du vrai random, c'est pas grave.
+		pos_crop_bg = possible_pos[ len(possible_pos) // 2 ]
+
+	ps_level_map = cm_background.cropped(pos_crop_bg, (global_w, global_h))
 	model_pos_up_left = (2, global_h-model_h-2)
 	arena_pos_up_left = (2+model_w+2, 2)
-	# RECTODO : cropper depuis un autre endroit que le coin sup gauche, pour avoir des background différents selon les niveaux.
-	ps_level_map = cm_background.cropped((0, 0), (global_w, global_h))
 	ps_level_map.blit(cm_model, model_pos_up_left)
 	ps_level_map.blit(cm_arena, arena_pos_up_left)
 	return ps_level_map

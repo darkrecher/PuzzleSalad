@@ -7,7 +7,7 @@ import json
 
 from char_matrix import CharMatrix, filled_chars
 from kpjson_to_puzzle import (
-	PS_SYMB_WALL,
+	PS_SYMB_WALL, CM_BACKGROUND_DIAGONAL_BARS,
 	generator_ps_legend_characters, legendify_atoli,
 	get_positions_background_cropping,
 	str_ps_legend, build_ps_level,
@@ -99,7 +99,8 @@ def test_kpjson_to_puzzle_on_walls():
 
 def test_kpjson_to_puzzle_with_transparency():
 	"""
-	Test avec les ajouts d'espace, et sur un background de virgules.
+	un test avec les ajouts d'espace, et sur le background de barres obliques, avec le cropping positionné en semi-random.
+	RECTODO : finir ce test.
 	"""
 
 	CM_BACKGROUND_WALLS_BLACK = CharMatrix(filled_chars(',', (100, 100)))
@@ -160,3 +161,58 @@ def test_kpjson_to_puzzle_with_transparency():
 		",,,,,,,,,,,,,,,,,,,,",
 	))
 
+def test_kpjson_to_puzzle_with_pretty_background():
+	"""
+	Test avec les ajouts d'espace, et sur un background de virgules.
+	"""
+
+	CM_BACKGROUND_WALLS_BLACK = CharMatrix(filled_chars(',', (100, 100)))
+	kplevel_str = """
+	{
+		"name": "Dihydrogen",
+		"id": "1",
+		"atoms": {
+			"1": ["3", "B"],
+			"2": ["3", "D"]
+		},
+		"arena": [
+			"...######...",
+			"..##..21##..",
+			"###......###",
+			"#...####...#",
+			"#...####...#",
+			"#...####...#",
+			"###......###",
+			"..##....##..",
+			"...######..."
+		],
+		"molecule": [
+			"12"
+		]
+	}
+	"""
+
+	kplevel_json = json.loads(kplevel_str)
+	ps_legend_characters = generator_ps_legend_characters()
+	ps_legend_from_atoli = {}
+	for atom_key in sorted(kplevel_json["atoms"]):
+		kpjson_atom = kplevel_json["atoms"][atom_key]
+		legendify_atoli(
+			kpjson_atom,
+			ps_legend_from_atoli,
+			ps_legend_characters
+		)
+	interesting_positions = list(get_positions_background_cropping(
+		CM_BACKGROUND_DIAGONAL_BARS,
+		'-',
+		True
+	))
+	ps_level = build_ps_level(
+		kplevel_json,
+		ps_legend_from_atoli,
+		CM_BACKGROUND_DIAGONAL_BARS,
+		True,
+		interesting_positions
+	)
+	# RECTODO : faut faire l'assert. Mais tant que le pseudo-random est pas fait, on peut pô.
+	print(str(ps_level))
