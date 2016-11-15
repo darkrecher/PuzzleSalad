@@ -9,8 +9,24 @@ from char_matrix import CharMatrix, filled_chars
 from kpjson_to_puzzle import (
 	PS_SYMB_WALL,
 	generator_ps_legend_characters, legendify_atoli,
+	get_positions_background_cropping,
 	str_ps_legend, build_ps_level,
 )
+
+def test_get_positions_background_cropping():
+	cm_background = CharMatrix(["--....", ".-....", "......", ".....-"])
+	iter_pos = get_positions_background_cropping(cm_background, '-', True)
+	positions_data = list(iter_pos)
+	positions_reference = [
+		(0, 0), (1, 0), (2, 0),
+		(0, 1), (1, 1), (2, 1),
+		(0, 2), (1, 2), (2, 2),
+		(4, 2), (5, 2),
+		(4, 3), (5, 3),
+	]
+	# On trie avant de comparer, parce qu'on se fiche complètement de l'ordre dans lequel ça arrive,
+	# et on n'a pas envie de tester ça.
+	assert sorted(positions_data) == sorted(positions_reference)
 
 def test_kpjson_to_puzzle_on_walls():
 	"""
@@ -81,10 +97,9 @@ def test_kpjson_to_puzzle_on_walls():
 	))
 
 
-def test_kpjson_to_puzzle_on_walls():
+def test_kpjson_to_puzzle_with_transparency():
 	"""
 	Test avec les ajouts d'espace, et sur un background de virgules.
-	RECTODO : c'est pas du tout fini.
 	"""
 
 	CM_BACKGROUND_WALLS_BLACK = CharMatrix(filled_chars(',', (100, 100)))

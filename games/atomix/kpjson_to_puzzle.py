@@ -130,6 +130,38 @@ PS_NAME_FROM_LINK = {
 # Exemple d'atoli, présent dans le niveau 8 du pack de niveau de draknek (Ethylène) : =/\
 # (at.CARBON, (ld.LEFT, ls.DOUBLE), (ld.UP_RIGHT, ls.SIMPLE), (ld.DOWN_RIGHT, ls.SIMPLE))
 
+# Représentation, dans PuzzleSalad, du background d'un level.
+# Il comporte des barres obliques bleues, coupées à certains endroits, pour reproduire l'aspect du jeu Atomix original.
+# Du point de vue des règles de Atomix dans PuzzleSalad, ces barres obliques se comportent comme des objets "Walls".
+# Donc ça n'a aucune influence sur le jeu lui-même. (Pour plus de détails, voir fichier atomix.puz)
+CM_BACKGROUND_DIAGONAL_BARS = CharMatrix(
+	[
+		"/+,,,-\\,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%",
+		"%\\/+,/+,,,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\",
+		"\\/%\\/%\\/+,,,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/",
+		"/%\\/%\\/%\\,,,,/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%",
+		"%\\/%\\/%\\/+,,,-\\,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\",
+		"\\/%\\/%\\/%\\/+,/+,,,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/",
+		"/%\\/%\\/%\\/%\\/%\\/+,,,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%",
+		"%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\",
+		"\\/%\\/%\\/%\\/%\\/%\\/%\\,,,,/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/",
+		"/%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%",
+		"%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\,-\\/%\\/%\\/%\\/%\\/%\\/%\\",
+		"\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,/+,,,-\\/%\\/%\\/%\\/%\\/%\\/",
+		"/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\,,,,/%\\/%\\/%\\/%\\/%\\/%",
+		"%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\,-\\/%\\/%\\/%\\/%\\",
+		"\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,/+,,,-\\,-\\/%\\/%\\/",
+		"/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,,,,,/%\\/%\\/%",
+		"%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\/%\\/%\\",
+		"\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\/%\\/",
+		"/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\,,,,/%\\/%",
+		"%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,,,-\\,-\\",
+		"\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,/+,,,",
+		"/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/+,",
+		"%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/%\\/",
+	]
+)
+
 def atoli_from_kpjson(kpjson_atom):
 	# Ça va thrower des exception si le json contient un identifant d'atome ou de link inconnu.
 	# C'est ce qu'on veut. (Car on veut pas s'embêter à gérer un message d'erreur spécifique pour ça).
@@ -152,6 +184,26 @@ def generator_ps_legend_characters():
 	while PS_LEGEND_CHARACTERS:
 		yield(PS_LEGEND_CHARACTERS.pop(0))
 	raise Exception("Plus assez de caractères pour définir tous les atoli (combinaison atom + link) dans la partie 'légende' de PuzzleSalad.")
+
+def get_positions_background_cropping(cm_background, char_spot, enable_around):
+	"""
+	Itère sur un ensemble de positions dans cm_background.
+	Il s'agit de toutes les positions des cellules ayant le caractère char_spot,
+	ainsi que les positions adjacentes (diagonales comprises) à ces positions char_spot.
+	Chaque position n'est itérée qu'une seule fois, même si elle est adjacente à plusieurs char_spot.
+	Cette fonction est utilisé pour lister les positions intéressantes du background comportant les barres obliques bleues.
+	C'est intéressant aux endroits où les barres sont coupées (ça fait plus de diversité dans le background).
+	Chaque level sera ensuite blitté sur l'une des parties intéressantes de ce background.
+	"""
+	existing_positions = []
+	for pos in cm_background.get_char_positions(char_spot):
+		if pos not in existing_positions:
+			existing_positions.append(pos)
+			yield pos
+		for pos_around in cm_background.get_coords_around(pos):
+			if pos_around not in existing_positions:
+				existing_positions.append(pos_around)
+				yield pos_around
 
 # Correspondance entre un atoli et son caractère utilisé dans la légende de PuzzleSalad.
 # clé : un atoli. valeur : une string de un seul caractère.
