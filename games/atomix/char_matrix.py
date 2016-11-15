@@ -96,8 +96,6 @@ class CharMatrix():
 				return False
 		return True
 
-	# RECTODO : itérateur sur l'ensemble de la matrice, renvoyant la position et le char.
-
 	def get_char(self, coord, raise_exception=False):
 		"""
 		Renvoie le caractère aux coordonnées spécifiées. Contrôle les coordonnées par rapport au dimensions de la matrice.

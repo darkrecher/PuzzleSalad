@@ -1,7 +1,6 @@
 # coding: utf-8
 
-# RECTODO : faire un fichier pytest pour tous ce code.
-#  - un test avec les ajouts d'espace, et sur un background de virgules.
+# RECTODO : faire un fichier pytest pour tout ce code.
 #  - un test avec les ajouts d'espace, et sur le background de barres obliques, avec le cropping positionné en semi-random.
 
 import json

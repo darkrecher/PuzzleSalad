@@ -209,6 +209,8 @@ def transparencify_tiles_surrounded(cm_arena):
 	 - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
 	 # RECTODO : docstring plus précise.
 	"""
+	# FUTURE : c'est pas homogène avec la fonction précédente. Celle-ci modifie in-place.
+	# external_empty_tiles_transparented renvoie une CharMatrix modifiée.
 	wall_and_transp = {'#', ' '}
 	for pos_wall_tile in cm_arena.get_char_positions(PS_SYMB_WALL):
 		set_chars_around = set(cm_arena.get_chars_around(pos_wall_tile))
