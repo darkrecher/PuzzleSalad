@@ -101,7 +101,6 @@ def test_kpjson_to_puzzle_on_walls():
 def test_kpjson_to_puzzle_with_transparency():
 	"""
 	un test avec les ajouts d'espace, et sur le background de barres obliques, avec le cropping positionné en semi-random.
-	RECTODO : finir ce test.
 	"""
 
 	CM_BACKGROUND_WALLS_BLACK = CharMatrix(filled_chars(',', (100, 100)))

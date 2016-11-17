@@ -395,6 +395,17 @@ def read_json_file(filepath_json):
 
 def main():
 
+	# RECTODO : virer tout ce bastringue.
+	# mettre en dur l'ordre des levels dans un autre fichier json.
+	# itérer dans l'ordre spécifié, ou bien dans l'ordre simple si c'est pas spécifié
+	# paramètre de la commande : fichier des levels, fichier d'ordre des levels (facultatif), background mur/noir/barres (facultatif, barres).
+
+	# FUTURE : déterminer la longueur et hauteur max parmi les levels à faire, et générer le background mur ou noir selon ces dimensions max,
+	# afin qu'il n'y ait plus de limite de taille pour les background simple.
+	# Pour le background de barre obliques, la limite est toujours présentes.
+	# FUTURE : générer automatiquement un background de barre obliques selon les dimensions demandées.
+	# Pour ne plus avoir de limites même avec les barres obliques.
+
 	print("hellow")
 	first = True
 	kplevels_json = read_json_file(FILEPATH_KPATOMIC_JSON)
