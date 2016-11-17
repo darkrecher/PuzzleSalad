@@ -4,8 +4,6 @@
 Conversion d'un fichier JSON contenant la description de niveaux "kp-atomix" vers un fichier PuzzleSalad/PuzzleScript.
 """
 
-# RECTODO : remplacer les doubles guillemets par des simples, sur les chaînes simples ou vides.
-
 import json
 
 from bat_belt import enum
@@ -22,54 +20,54 @@ PS_SYMB_PLAYER = '*'
 SYMB_TRANSPARENT = ' '
 
 ATOM = enum(
-	"ATOM",
-	"HYDROGEN",
-	"CARBON",
-	"OXYGEN",
-	"NITROGEN",
-	"SULFUR",
-	"FLUORINE",
-	"CHLORINE",
-	"CRISTAL",
-	"PHOSPHORE",
-	"EMPTYATOM",
+	'ATOM',
+	'HYDROGEN',
+	'CARBON',
+	'OXYGEN',
+	'NITROGEN',
+	'SULFUR',
+	'FLUORINE',
+	'CHLORINE',
+	'CRISTAL',
+	'PHOSPHORE',
+	'EMPTYATOM',
 )
 at = ATOM
 
 LINK_DIR = enum(
-	"LINK_DIR",
-	"UP",
-	"DOWN",
-	"LEFT",
-	"RIGHT",
-	"UP_RIGHT",
-	"DOWN_RIGHT",
-	"UP_LEFT",
-	"DOWN_LEFT",
+	'LINK_DIR',
+	'UP',
+	'DOWN',
+	'LEFT',
+	'RIGHT',
+	'UP_RIGHT',
+	'DOWN_RIGHT',
+	'UP_LEFT',
+	'DOWN_LEFT',
 )
 ld = LINK_DIR
 
 LINK_STRENGTH = enum(
-	"LINK_STRENGTH",
-	"SIMPLE",
-	"DOUBLE",
-	"TRIPLE",
+	'LINK_STRENGTH',
+	'SIMPLE',
+	'DOUBLE',
+	'TRIPLE',
 )
 ls = LINK_STRENGTH
 
 # Correspondance. Clé : identifiant de l'atome dans les fichiers json de kp-atomix. Valeur : atome correspondant.
 ATOM_FROM_KP_JSON = {
-	"1" : at.HYDROGEN,
-	"2" : at.CARBON,
-	"3" : at.OXYGEN,
-	"4" : at.NITROGEN,
-	"5" : at.SULFUR,
-	"6" : at.FLUORINE,
-	"7" : at.CHLORINE,
+	'1' : at.HYDROGEN,
+	'2' : at.CARBON,
+	'3' : at.OXYGEN,
+	'4' : at.NITROGEN,
+	'5' : at.SULFUR,
+	'6' : at.FLUORINE,
+	'7' : at.CHLORINE,
 	# Y'a pas de 8. Je n'ai pas trouvé d'exemple dans les fichiers kpjson que je connais. (source : http://figlief.pythonanywhere.com/)
-	"9" : at.PHOSPHORE,
-	"o" : at.CRISTAL,
-	"A" : at.EMPTYATOM, # FUTURE : les EmptyAtom sont représentés bizarrement dans les fichiers kpjson. Ça n'a pas encore été testé.
+	'9' : at.PHOSPHORE,
+	'o' : at.CRISTAL,
+	'A' : at.EMPTYATOM, # FUTURE : les EmptyAtom sont représentés bizarrement dans les fichiers kpjson. Ça n'a pas encore été testé.
 }
 
 # Correspondance. Clé : identifiant du link dans les fichiers json de kp-atomix. Valeur : link correspondant.
@@ -86,54 +84,54 @@ ATOM_FROM_KP_JSON = {
 # H F
 #  G
 LINK_FROM_KP_JSON = {
-	"a" : (ld.UP, ls.SIMPLE),
-	"b" : (ld.UP_RIGHT, ls.SIMPLE),
-	"c" : (ld.RIGHT, ls.SIMPLE),
-	"d" : (ld.DOWN_RIGHT, ls.SIMPLE),
-	"e" : (ld.DOWN, ls.SIMPLE),
-	"f" : (ld.DOWN_LEFT, ls.SIMPLE),
-	"g" : (ld.LEFT, ls.SIMPLE),
-	"h" : (ld.UP_LEFT, ls.SIMPLE),
-	"A" : (ld.UP, ls.DOUBLE),
-	"B" : (ld.RIGHT, ls.DOUBLE),
-	"C" : (ld.DOWN, ls.DOUBLE),
-	"D" : (ld.LEFT, ls.DOUBLE),
-	"E" : (ld.UP, ls.TRIPLE),
-	"F" : (ld.RIGHT, ls.TRIPLE),
-	"G" : (ld.DOWN, ls.TRIPLE),
-	"H" : (ld.LEFT, ls.TRIPLE),
+	'a' : (ld.UP, ls.SIMPLE),
+	'b' : (ld.UP_RIGHT, ls.SIMPLE),
+	'c' : (ld.RIGHT, ls.SIMPLE),
+	'd' : (ld.DOWN_RIGHT, ls.SIMPLE),
+	'e' : (ld.DOWN, ls.SIMPLE),
+	'f' : (ld.DOWN_LEFT, ls.SIMPLE),
+	'g' : (ld.LEFT, ls.SIMPLE),
+	'h' : (ld.UP_LEFT, ls.SIMPLE),
+	'A' : (ld.UP, ls.DOUBLE),
+	'B' : (ld.RIGHT, ls.DOUBLE),
+	'C' : (ld.DOWN, ls.DOUBLE),
+	'D' : (ld.LEFT, ls.DOUBLE),
+	'E' : (ld.UP, ls.TRIPLE),
+	'F' : (ld.RIGHT, ls.TRIPLE),
+	'G' : (ld.DOWN, ls.TRIPLE),
+	'H' : (ld.LEFT, ls.TRIPLE),
 }
 
 PS_NAME_FROM_ATOM = {
-	at.HYDROGEN : "Hydrogen",
-	at.CARBON : "Carbon",
-	at.OXYGEN : "Oxygen",
-	at.NITROGEN : "Nitrogen",
-	at.SULFUR : "SULFUR",
-	at.FLUORINE : "FLUORINE",
-	at.CHLORINE : "CHLORINE",
-	at.PHOSPHORE : "PHOSPHORE",
-	at.CRISTAL : "CRISTAL",
-	at.EMPTYATOM : "EMPTYATOM",
+	at.HYDROGEN : 'Hydrogen',
+	at.CARBON : 'Carbon',
+	at.OXYGEN : 'Oxygen',
+	at.NITROGEN : 'Nitrogen',
+	at.SULFUR : 'Sulfur',
+	at.FLUORINE : 'Fluorine',
+	at.CHLORINE : 'Chlorine',
+	at.PHOSPHORE : 'Phosphore',
+	at.CRISTAL : 'Cristal',
+	at.EMPTYATOM : 'EmptyAtom',
 }
 
 PS_NAME_FROM_LINK = {
-	(ld.UP, ls.SIMPLE) : "LinkUpSimple",
-	(ld.UP_RIGHT, ls.SIMPLE) : "LinkUpRightSimple",
-	(ld.RIGHT, ls.SIMPLE) : "LinkRightSimple",
-	(ld.DOWN_RIGHT, ls.SIMPLE) : "LinkDownRightSimple",
-	(ld.DOWN, ls.SIMPLE) : "LinkDownSimple",
-	(ld.DOWN_LEFT, ls.SIMPLE) : "LinkDownLeftSimple",
-	(ld.LEFT, ls.SIMPLE) : "LinkLeftSimple",
-	(ld.UP_LEFT, ls.SIMPLE) : "LinkUpLeftSimple",
-	(ld.UP, ls.DOUBLE) : "LinkUpDouble",
-	(ld.RIGHT, ls.DOUBLE) : "LinkRightDouble",
-	(ld.DOWN, ls.DOUBLE) : "LinkDownDouble",
-	(ld.LEFT, ls.DOUBLE) : "LinkLeftDouble",
-	(ld.UP, ls.TRIPLE) : "LinkUpTriple",
-	(ld.RIGHT, ls.TRIPLE) : "LinkRightTriple",
-	(ld.DOWN, ls.TRIPLE) : "LinkDownTriple",
-	(ld.LEFT, ls.TRIPLE) : "LinkLeftTriple",
+	(ld.UP, ls.SIMPLE) : 'LinkUpSimple',
+	(ld.UP_RIGHT, ls.SIMPLE) : 'LinkUpRightSimple',
+	(ld.RIGHT, ls.SIMPLE) : 'LinkRightSimple',
+	(ld.DOWN_RIGHT, ls.SIMPLE) : 'LinkDownRightSimple',
+	(ld.DOWN, ls.SIMPLE) : 'LinkDownSimple',
+	(ld.DOWN_LEFT, ls.SIMPLE) : 'LinkDownLeftSimple',
+	(ld.LEFT, ls.SIMPLE) : 'LinkLeftSimple',
+	(ld.UP_LEFT, ls.SIMPLE) : 'LinkUpLeftSimple',
+	(ld.UP, ls.DOUBLE) : 'LinkUpDouble',
+	(ld.RIGHT, ls.DOUBLE) : 'LinkRightDouble',
+	(ld.DOWN, ls.DOUBLE) : 'LinkDownDouble',
+	(ld.LEFT, ls.DOUBLE) : 'LinkLeftDouble',
+	(ld.UP, ls.TRIPLE) : 'LinkUpTriple',
+	(ld.RIGHT, ls.TRIPLE) : 'LinkRightTriple',
+	(ld.DOWN, ls.TRIPLE) : 'LinkDownTriple',
+	(ld.LEFT, ls.TRIPLE) : 'LinkLeftTriple',
 }
 
 # Vocabulaire des structure de données
@@ -196,7 +194,7 @@ def generator_ps_legend_characters():
 	# Caractères interdits : #.*,/%\-+
 	# RECTODO : determiner les caractères interdit à partir de la ps_legend en dur (qui n'est pas encore faite).
 	# RECTODO : il faut aussi enlever les caractères présents dans le backround.
-	PS_LEGEND_CHARACTERS = list("abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&'\"")
+	PS_LEGEND_CHARACTERS = list('abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&\'"')
 	while PS_LEGEND_CHARACTERS:
 		yield(PS_LEGEND_CHARACTERS.pop(0))
 	raise Exception("Plus assez de caractères pour définir tous les atoli (combinaison atom + link) dans la partie 'légende' de PuzzleSalad.")
@@ -313,14 +311,14 @@ def build_ps_level(
 	RECTODO : docstring plus précise.
 	"""
 
-	atoms_legendified = kpjson_level_legendified["atoms"]
-	cm_arena = CharMatrix(kpjson_level_legendified["arena"], SYMB_TRANSPARENT)
-	cm_model = CharMatrix(kpjson_level_legendified["molecule"])
+	atoms_legendified = kpjson_level_legendified['atoms']
+	cm_arena = CharMatrix(kpjson_level_legendified['arena'], SYMB_TRANSPARENT)
+	cm_model = CharMatrix(kpjson_level_legendified['molecule'])
 	cm_arena.verify_matrix()
 	cm_model.verify_matrix()
 
-	kpjson_chars = ""
-	ps_legend_chars = ""
+	kpjson_chars = ''
+	ps_legend_chars = ''
 	for atom_key, atom_legendified in atoms_legendified.items():
 		kpjson_chars += atom_key
 		ps_legend_chars += ps_legend_from_atoli[atom_legendified[-1]]
@@ -342,13 +340,11 @@ def build_ps_level(
 	# Placement du joueur où on peut (là où y'a ni mur ni atome), en prenant plus ou moins le milieu de l'arena.
 	empty_tile_positions = tuple(cm_arena.get_char_positions(PS_SYMB_EMPTY))
 	if not empty_tile_positions:
-		raise Exception(
-			"".join((
-				"Niveau : ",
-				kpjson_level_legendified["name"],
-				"Il faut au moins une case vide pour placer le joueur.",
-			))
-		)
+		raise Exception(''.join((
+			"Niveau : ",
+			kpjson_level_legendified['name'],
+			"Il faut au moins une case vide pour placer le joueur.",
+		)))
 	player_position = empty_tile_positions[len(empty_tile_positions) // 2]
 	cm_arena.set_char(player_position, PS_SYMB_PLAYER)
 
@@ -366,17 +362,15 @@ def build_ps_level(
 			if pos[0] <= limit_x and pos[1] <= limit_y
 		]
 		if not possible_pos:
-			raise Exception(
-				"".join((
-					"Niveau : ",
-					kpjson_level_legendified["name"],
-					"Le background est trop petit pour ce niveau.",
-				))
-			)
+			raise Exception(''.join((
+				"Niveau : ",
+				kpjson_level_legendified['name'],
+				"Le background est trop petit pour ce niveau.",
+			)))
 		# Choix d'une pos parmi les possible_pos, en prenant un index pseudo-random, basé sur le nom du level.
 		# C'est pas du vrai random, mais c'est pas grave.
 		index_pos_crop_bg = almost_random(
-			kpjson_level_legendified["name"],
+			kpjson_level_legendified['name'],
 			len(possible_pos))
 		pos_crop_bg = possible_pos[index_pos_crop_bg]
 
@@ -391,11 +385,11 @@ def str_from_atoli(atoli):
 	atom, links = atoli
 	str_atom = PS_NAME_FROM_ATOM[atom]
 	str_links = [ PS_NAME_FROM_LINK[link] for link in links ]
-	return " and ".join([str_atom] + str_links)
+	return ' and '.join([str_atom] + str_links)
 
 def str_ps_legend(ps_legend_from_atoli):
 	str_ps_legend_atoms = [
-		"%s = %s" % (ps_legend_char, str_from_atoli(atoli))
+		'%s = %s' % (ps_legend_char, str_from_atoli(atoli))
 		for atoli, ps_legend_char
 		in ps_legend_from_atoli.items()
 	]
@@ -427,8 +421,8 @@ def main():
 	kplevels_json = read_json_file(FILEPATH_KPATOMIC_JSON)
 	ps_legend_characters = generator_ps_legend_characters()
 
-	for level in kplevels_json["levels"]:
-		for atom_key, kpjson_atom in level["atoms"].items():
+	for level in kplevels_json['levels']:
+		for atom_key, kpjson_atom in level['atoms'].items():
 			legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters)
 
 	print("")
@@ -438,12 +432,12 @@ def main():
 
 	print("")
 	print("Liste des atomes des levels, avec atoli correspondant")
-	for level in kplevels_json["levels"]:
-		for atom_key, kpjson_atom in level["atoms"].items():
+	for level in kplevels_json['levels']:
+		for atom_key, kpjson_atom in level['atoms'].items():
 			print(kpjson_atom, " : ", ps_legend_from_atoli[kpjson_atom[2]])
 
 	ps_level = build_ps_level(
-		kplevels_json["levels"][0],
+		kplevels_json['levels'][0],
 		ps_legend_from_atoli,
 		CM_BACKGROUND_WALLS
 	)

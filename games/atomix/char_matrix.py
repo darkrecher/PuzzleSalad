@@ -53,10 +53,10 @@ class CharMatrix():
 		supposed_width = len(self.char_matrix[0])
 		for line in self.char_matrix:
 			if len(line) != supposed_width:
-				raise Exception("".join((
+				raise Exception(''.join((
 					"La ligne suivante n'a pas la bonne longueur : ",
-					 str(line))
-				))
+					 str(line)
+				)))
 
 	def dimensions(self):
 		"""
@@ -83,15 +83,13 @@ class CharMatrix():
 		dim = self.dimensions()
 		if not(0 <= coord[0] < dim[0] and 0 <= coord[1] < dim[1]):
 			if raise_exception:
-				raise Exception(
-					"".join((
-						"Les coordonnées ",
-						str(coord),
-						" sont en dehors de la CharMatrix ",
-						str(dim),
-						"."
-					))
-				)
+				raise Exception(''.join((
+					"Les coordonnées ",
+					str(coord),
+					" sont en dehors de la CharMatrix ",
+					str(dim),
+					"."
+				)))
 			else:
 				return False
 		return True
