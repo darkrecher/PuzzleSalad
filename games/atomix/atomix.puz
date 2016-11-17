@@ -2,6 +2,10 @@ title Atomix demake
 author Recher
 homepage recher.wordpress.com
 
+(# RECTODO : documenter dans atomix.puz que le Cyclobutane est un exemple de molécule pas faisable dans PuzzleSalad.)
+
+(# RECTODO : documenter dans atomix.puz que les doubles liaisons diagonales ne sont pas définies. Pourtant il peut y en avoir dans les fichiers kpjson. level pack : mystery. level 48 : Kai - Benzol)
+
 (HOW TO MAKE LEVELS)
 
 (Condition 1 : a level must have two zones : )
