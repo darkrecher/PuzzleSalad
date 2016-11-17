@@ -269,6 +269,22 @@ def transparencify_tiles_surrounded(cm_arena):
 		if set.union(wall_and_transp, set_chars_around) == wall_and_transp:
 			cm_arena.set_char(pos_wall_tile, SYMB_TRANSPARENT)
 
+def almost_random(str_seed, max):
+	"""
+	Génère un nombre "à peu près" aléatoire, mais pas tant que ça. (Il est "aléatoirement" aléatoire).
+	La génération aléatoire est faite à partir de str_seed uniquement.
+	Si on exécute plusieurs fois la fonction avec les mêmes paramètres, on récupère à chaque fois le même nombre aléatoire.
+	:param str_seed: texte quelconque utilisé pour générer le nombre aléatoire.
+	:param max: le nombre aléatoire sera compris entre 0 et max-1.
+	:type str_seed: string.
+	:type max: entier.
+	:return: le nombre aléatoire.
+	:rtype: entier.
+	"""
+	# Broumf broumf... "Aléatoire". On va dire que ça l'est...
+	random_value = sum((ord(char) for char in str_seed))
+	return random_value % max
+
 def build_ps_level(
 	kpjson_level_legendified,
 	ps_legend_from_atoli,
@@ -341,9 +357,12 @@ def build_ps_level(
 					"Le background est trop petit pour ce niveau.",
 				))
 			)
-		# RECTODO : choisir une pos parmi les possible_pos, en prenant un index pseudo-random,
-		# basé sur le nom du level. Si on utilise pas du vrai random, c'est pas grave.
-		pos_crop_bg = possible_pos[ len(possible_pos) // 2 ]
+		# Choix d'une pos parmi les possible_pos, en prenant un index pseudo-random, basé sur le nom du level.
+		# C'est pas du vrai random, mais c'est pas grave.
+		index_pos_crop_bg = almost_random(
+			kpjson_level_legendified["name"],
+			len(possible_pos))
+		pos_crop_bg = possible_pos[index_pos_crop_bg]
 
 	ps_level_map = cm_background.cropped(pos_crop_bg, (global_w, global_h))
 	model_pos_up_left = (2, global_h-model_h-2)

@@ -1,15 +1,12 @@
 # coding: utf-8
 
-# RECTODO : faire un fichier pytest pour tout ce code.
-#  - un test avec les ajouts d'espace, et sur le background de barres obliques, avec le cropping positionné en semi-random.
-
 import json
 
 from char_matrix import CharMatrix, filled_chars
 from kpjson_to_puzzle import (
 	PS_SYMB_WALL, CM_BACKGROUND_DIAGONAL_BARS,
 	generator_ps_legend_characters, legendify_atoli,
-	get_positions_background_cropping,
+	get_positions_background_cropping, almost_random,
 	str_ps_legend, build_ps_level,
 )
 
@@ -27,6 +24,10 @@ def test_get_positions_background_cropping():
 	# On trie avant de comparer, parce qu'on se fiche complètement de l'ordre dans lequel ça arrive,
 	# et on n'a pas envie de tester ça.
 	assert sorted(positions_data) == sorted(positions_reference)
+
+def test_almost_random():
+	assert almost_random("Blarg", 50) == 38
+	assert almost_random("Blarg", 10000) == 488
 
 def test_kpjson_to_puzzle_on_walls():
 	"""
@@ -214,5 +215,18 @@ def test_kpjson_to_puzzle_with_pretty_background():
 		True,
 		interesting_positions
 	)
-	# RECTODO : faut faire l'assert. Mais tant que le pseudo-random est pas fait, on peut pô.
-	print(str(ps_level))
+	assert str(ps_level) == '\n'.join((
+		",,/%\\/%\\/%\\/%\\/%\\/%\\",
+		",,-\\,-\\/%\\/%\\/%\\/%\\/",
+		"+,/+,,,-\\######/%\\/%",
+		"\\/%\\/+,,##..ba##\\/%\\",
+		"/%\\/%\\###......###\\/",
+		"%\\/%\\/#...####...#/%",
+		"\\/%\\/%#...#,-#.*.#%\\",
+		"/%\\/%\\#...####...#\\/",
+		"%\\/%\\/###......###,-",
+		"\\/%\\/%\\/##....##,,,,",
+		"/%ab%\\/%\\######/+,,,",
+		"%\\/%\\/%\\/%\\/%\\/%\\/+,",
+		"\\/%\\/%\\/%\\/%\\/%\\/%\\/",
+	))
