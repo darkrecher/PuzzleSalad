@@ -27,7 +27,12 @@ ATOM = enum(
 	"CARBON",
 	"OXYGEN",
 	"NITROGEN",
-	# RECTODO : ajouter les autres atomes
+	"SULFUR",
+	"FLUORINE",
+	"CHLORINE",
+	"CRISTAL",
+	"PHOSPHORE",
+	"EMPTYATOM",
 )
 at = ATOM
 
@@ -58,7 +63,13 @@ ATOM_FROM_KP_JSON = {
 	"2" : at.CARBON,
 	"3" : at.OXYGEN,
 	"4" : at.NITROGEN,
-	# RECTODO : ajouter les autres atomes ici aussi
+	"5" : at.SULFUR,
+	"6" : at.FLUORINE,
+	"7" : at.CHLORINE,
+	# Y'a pas de 8. Je n'ai pas trouvé d'exemple dans les fichiers kpjson que je connais. (source : http://figlief.pythonanywhere.com/)
+	"9" : at.PHOSPHORE,
+	"o" : at.CRISTAL,
+	"A" : at.EMPTYATOM, # FUTURE : les EmptyAtom sont représentés bizarrement dans les fichiers kpjson. Ça n'a pas encore été testé.
 }
 
 # Correspondance. Clé : identifiant du link dans les fichiers json de kp-atomix. Valeur : link correspondant.
@@ -94,11 +105,16 @@ LINK_FROM_KP_JSON = {
 }
 
 PS_NAME_FROM_ATOM = {
-	# RECTODO : faut les ajouter ici aussi les autres atomes.
 	at.HYDROGEN : "Hydrogen",
 	at.CARBON : "Carbon",
 	at.OXYGEN : "Oxygen",
 	at.NITROGEN : "Nitrogen",
+	at.SULFUR : "SULFUR",
+	at.FLUORINE : "FLUORINE",
+	at.CHLORINE : "CHLORINE",
+	at.PHOSPHORE : "PHOSPHORE",
+	at.CRISTAL : "CRISTAL",
+	at.EMPTYATOM : "EMPTYATOM",
 }
 
 PS_NAME_FROM_LINK = {
