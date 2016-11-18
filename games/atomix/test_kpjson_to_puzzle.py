@@ -10,6 +10,10 @@ from kpjson_to_puzzle import (
 	str_ps_legend, build_ps_level,
 )
 
+# FUTURE : simple quotes là où il le faudrait.
+# FUTURE : tester generator_ps_legend_characters, avec des cas spécifiques pour vérifier que les chars signalés comme forbidden
+# sont bien absents des chars renvoyés.
+
 def test_get_positions_background_cropping():
 	cm_background = CharMatrix(["--....", ".-....", "......", ".....-"])
 	iter_pos = get_positions_background_cropping(cm_background, '-', True)

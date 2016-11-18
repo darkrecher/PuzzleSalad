@@ -196,9 +196,7 @@ def get_forbidden_chars(cm_background):
 	(c'est expliqué dans le mauvais sens)
 	"""
 	unique_chars = list(cm_background.get_unique_chars())
-	unique_chars.append(PS_SYMB_WALL)
-	unique_chars.append(PS_SYMB_EMPTY)
-	unique_chars.append(PS_SYMB_PLAYER)
+	unique_chars.extend([PS_SYMB_WALL, PS_SYMB_EMPTY, PS_SYMB_PLAYER])
 	return unique_chars
 
 def generator_ps_legend_characters(forbidden_chars):
@@ -209,7 +207,9 @@ def generator_ps_legend_characters(forbidden_chars):
 	# []() =<>-V^
 	# La lettre "V" toute seule (minuscule ou majuscule) est interdite car elle représente la flèche vers le bas.
 	# Ces caractères ne sont pas présents dans PS_LEGEND_CHARS.
-	PS_LEGEND_CHARS = list('abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&\'"#.*,/%\-+')
+	PS_LEGEND_CHARS = list(
+		'abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&\'"#.*,/%\-+'
+	)
 	# FUTURE. C'est vilain de précalculer la liste des chars autorisés.
 	# Ce serait plus "lazy-pythonien" de vérifier à chaque fois qu'il faut sortir le prochain caractère.
 	ps_legend_chars_filtered = [

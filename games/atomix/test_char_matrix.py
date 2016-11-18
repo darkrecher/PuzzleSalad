@@ -3,13 +3,14 @@
 
 from char_matrix import CharMatrix
 
+# FUTURE : simple quotes là où il le faudrait.
 
 def test_init():
 	cm = CharMatrix( ["ab", "cd"])
 	cm.verify_matrix()
 	assert str(cm) == "ab\ncd"
 
-# RECTODO : tester le verify_matrix qui raise une Exception
+# FUTURE : tester le verify_matrix qui raise une Exception
 
 def test_dimensions():
 	cm = CharMatrix( ["0123456", "abcdefg", "-------"])
