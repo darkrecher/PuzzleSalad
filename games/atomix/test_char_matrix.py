@@ -55,6 +55,11 @@ def test_set_char():
 	))
 	assert str(cm) == str_cm_set
 
+def test_get_unique_chars():
+	cm = CharMatrix( ["-------", "0122456", "abcdaag", "*******"])
+	unique_chars = cm.get_unique_chars()
+	assert sorted(unique_chars) == sorted(list('-012456abcdg*'))
+
 def test_get_coords_around():
 	cm = CharMatrix( ["0123456", "abcdefg", "-------", "*******"])
 	assert tuple(cm.get_coords_around((2, 2))) == (

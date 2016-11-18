@@ -187,16 +187,37 @@ def atoli_from_kpjson(kpjson_atom):
 	)
 	return (atom, links)
 
-def generator_ps_legend_characters():
-	# Caractères interdits par PuzzleScript, car faisant partie de la syntaxe du langage :
+def get_forbidden_chars(cm_background):
+	"""
+	RECTODO : docstring
+	Exemple de caractères interdits () : #.*,/%\-+
+	Détermine les caractères interdit à partir de la ps_legend en dur.
+	Enlève aussi les caractères présents dans le backround.
+	(c'est expliqué dans le mauvais sens)
+	"""
+	unique_chars = list(cm_background.get_unique_chars())
+	unique_chars.append(PS_SYMB_WALL)
+	unique_chars.append(PS_SYMB_EMPTY)
+	unique_chars.append(PS_SYMB_PLAYER)
+	return unique_chars
+
+def generator_ps_legend_characters(forbidden_chars):
+	"""
+	RECTODO : docstring
+	"""
+	# Caractères systématiquement interdits par PuzzleSalad, car faisant partie de la syntaxe du langage :
 	# []() =<>-V^
 	# La lettre "V" toute seule (minuscule ou majuscule) est interdite car elle représente la flèche vers le bas.
-	# Caractères interdits : #.*,/%\-+
-	# RECTODO : determiner les caractères interdit à partir de la ps_legend en dur (qui n'est pas encore faite).
-	# RECTODO : il faut aussi enlever les caractères présents dans le backround.
-	PS_LEGEND_CHARACTERS = list('abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&\'"')
-	while PS_LEGEND_CHARACTERS:
-		yield(PS_LEGEND_CHARACTERS.pop(0))
+	# Ces caractères ne sont pas présents dans PS_LEGEND_CHARS.
+	PS_LEGEND_CHARS = list('abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&\'"#.*,/%\-+')
+	# FUTURE. C'est vilain de précalculer la liste des chars autorisés.
+	# Ce serait plus "lazy-pythonien" de vérifier à chaque fois qu'il faut sortir le prochain caractère.
+	ps_legend_chars_filtered = [
+		char for char in PS_LEGEND_CHARS
+		if char not in forbidden_chars
+	]
+	while ps_legend_chars_filtered:
+		yield(ps_legend_chars_filtered.pop(0))
 	raise Exception("Plus assez de caractères pour définir tous les atoli (combinaison atom + link) dans la partie 'légende' de PuzzleSalad.")
 
 def get_positions_background_cropping(cm_background, char_spot, enable_around):

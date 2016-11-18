@@ -129,7 +129,17 @@ class CharMatrix():
 			line = line[:x] + new_char + line[x+1:]
 			self.char_matrix[y] = line
 
-	# RECTODO : renvoie (sous forme d'itérateur of course), tous les chars différents de la matrice.
+	def get_unique_chars(self):
+		"""
+		Renvoie (sous forme d'itérateur of course), tous les chars différents de la matrice.
+		RECTODO : docstring
+		"""
+		existing_chars = set()
+		for line in self.char_matrix:
+			for char in line:
+				if char not in existing_chars:
+					existing_chars.add(char)
+					yield char
 
 	def get_coords_around(self, coord):
 		"""

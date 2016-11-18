@@ -5,7 +5,7 @@ import json
 from char_matrix import CharMatrix, filled_chars
 from kpjson_to_puzzle import (
 	PS_SYMB_WALL, CM_BACKGROUND_DIAGONAL_BARS,
-	generator_ps_legend_characters, legendify_atoli,
+	get_forbidden_chars, generator_ps_legend_characters, legendify_atoli,
 	get_positions_background_cropping, almost_random,
 	str_ps_legend, build_ps_level,
 )
@@ -63,7 +63,9 @@ def test_kpjson_to_puzzle_on_walls():
 	"""
 
 	kplevel_json = json.loads(kplevel_str)
-	ps_legend_characters = generator_ps_legend_characters()
+	ps_legend_characters = generator_ps_legend_characters(
+		get_forbidden_chars(CM_BACKGROUND_WALLS)
+	)
 	ps_legend_from_atoli = {}
 	for atom_key in sorted(kplevel_json["atoms"]):
 		kpjson_atom = kplevel_json["atoms"][atom_key]
@@ -130,7 +132,9 @@ def test_kpjson_to_puzzle_with_transparency():
 	"""
 
 	kplevel_json = json.loads(kplevel_str)
-	ps_legend_characters = generator_ps_legend_characters()
+	ps_legend_characters = generator_ps_legend_characters(
+		get_forbidden_chars(CM_BACKGROUND_WALLS_BLACK)
+	)
 	ps_legend_from_atoli = {}
 	for atom_key in sorted(kplevel_json["atoms"]):
 		kpjson_atom = kplevel_json["atoms"][atom_key]
@@ -166,7 +170,6 @@ def test_kpjson_to_puzzle_with_pretty_background():
 	Test avec les ajouts d'espace, et sur un background de virgules.
 	"""
 
-	CM_BACKGROUND_WALLS_BLACK = CharMatrix(filled_chars(',', (100, 100)))
 	kplevel_str = """
 	{
 		"name": "Dihydrogen",
@@ -193,7 +196,9 @@ def test_kpjson_to_puzzle_with_pretty_background():
 	"""
 
 	kplevel_json = json.loads(kplevel_str)
-	ps_legend_characters = generator_ps_legend_characters()
+	ps_legend_characters = generator_ps_legend_characters(
+		get_forbidden_chars(CM_BACKGROUND_DIAGONAL_BARS)
+	)
 	ps_legend_from_atoli = {}
 	for atom_key in sorted(kplevel_json["atoms"]):
 		kpjson_atom = kplevel_json["atoms"][atom_key]
