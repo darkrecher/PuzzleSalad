@@ -271,7 +271,8 @@ def external_empty_tiles_transparented(cm_arena):
 	# Et donc il faudrait une fonction get_chars_around qui ne prenne pas les diagonales. On fera ça plus tard.
 	arena_w, arena_h = cm_arena.dimensions()
 	cm_brd_arena = CharMatrix(
-		filled_chars(SYMB_TRANSPARENT, (arena_w+2, arena_h+2))
+		filled_chars(SYMB_TRANSPARENT, (arena_w+2, arena_h+2)),
+		SYMB_TRANSPARENT
 	)
 	cm_brd_arena.blit(cm_arena, (1, 1))
 	change_made = True
@@ -285,9 +286,7 @@ def external_empty_tiles_transparented(cm_arena):
 				# C'est pas génial, mais ça posera pas de problème,
 				# vu qu'on modifie l'élément sur lequel on vient juste d'itérer.
 				cm_brd_arena.set_char(pos_empty_tile, SYMB_TRANSPARENT)
-	# RECTODO : le cropped devrait recopier l'info de transparent_char.
 	cm_arena_transparented = cm_brd_arena.cropped((1, 1), (arena_w, arena_h))
-	cm_arena_transparented.transparent_char = SYMB_TRANSPARENT
 	return cm_arena_transparented
 
 def transparencify_tiles_surrounded(cm_arena):

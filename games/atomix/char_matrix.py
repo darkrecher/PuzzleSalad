@@ -186,6 +186,7 @@ class CharMatrix():
 	def cropped(self, corner_up_left, dimensions):
 		"""
 		Renvoie une partie de la matrice. Génère une exception si les paramètres spécifiés sont hors limite de la matrice.
+		Le transparent_char est transmis à la matrice croppée.
 		:param corner_up_left: cordonnées (x, y) du coin haut gauche de la partie de matrice demandée.
 		:param dimensions: taille (largeur, hauteur) de la partie de matrice demandée.
 		:type corner_up_left: tuple de deux entiers.
@@ -207,7 +208,7 @@ class CharMatrix():
 			for line
 			in self.char_matrix[y1:y2+1]
 		]
-		return CharMatrix(str_cropped)
+		return CharMatrix(str_cropped, self.transparent_char)
 
 	def blit(self, source_matrix, corner_up_left):
 		"""

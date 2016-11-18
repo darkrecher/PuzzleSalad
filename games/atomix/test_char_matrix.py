@@ -102,15 +102,17 @@ def test_translate():
 	assert str(cm) == str_cm_final
 
 def test_cropped():
-	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"])
+	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"], '%')
 	cm_cropped = cm.cropped((1, 2), (4, 2))
 	str_cm_cropped_final = '\n'.join((
 		"uvwx",
 		"*-+,",
 	))
 	assert str(cm_cropped) == str_cm_cropped_final
+	assert cm_cropped.transparent_char == '%'
 	cm_cropped_all = cm.cropped((0, 0), cm.dimensions())
 	assert str(cm_cropped_all) == str(cm)
+	assert cm_cropped_all.transparent_char == '%'
 
 def test_blit():
 	cm = CharMatrix( ["0123456", "abcdefg", "tuvwxyz", "/*-+,.!"])
