@@ -13,11 +13,22 @@ Récupéré le 2016-11-07
 ## Fichier `draknek_levels_json.js`
 
 Contient la description des niveaux, mais pas l'ordre.
+Ce fichier est une donnée d'entrée pour le script python `kpjson_to_puzzle.py`.
 
 Source : https://github.com/figlief/kp-atomix/blob/master/levels/draknek.json
 Commit a842917870ab54428c6195c2c42d5a983cd450d8, le 2015-08-12.
 
 Récupéré le 2016-11-07
+
+
+## Fichier `draknek_levels_sequence_json.js`
+
+Contient uniquement l'ordre des niveaux.
+Ce fichier est une donnée d'entrée pour le script python `kpjson_to_puzzle.py`.
+
+Créé à partir de `draknek_levels_js.js`.
+
+Source : ici. (https://github.com/darkrecher/PuzzleSalad).
 
 
 ## License
