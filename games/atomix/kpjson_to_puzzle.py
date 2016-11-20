@@ -331,6 +331,8 @@ def build_ps_level(
 	RECTODO : docstring plus précise.
 	"""
 
+	# RECTODO : marge plus petite sur les bords (une seule case, et pas 2).
+
 	atoms_legendified = kpjson_level_legendified['atoms']
 	cm_arena = CharMatrix(kpjson_level_legendified['arena'], SYMB_TRANSPARENT)
 	cm_model = CharMatrix(kpjson_level_legendified['molecule'])
@@ -436,10 +438,8 @@ def sequenced_levels_json(kplevels_json, levels_sequence_json=None):
 
 def main():
 
-	# RECTODO : virer tout ce bastringue.
-	# mettre en dur l'ordre des levels dans un autre fichier json.
-	# itérer dans l'ordre spécifié, ou bien dans l'ordre simple si c'est pas spécifié
-	# paramètre de la commande : fichier des levels, fichier d'ordre des levels (facultatif), background mur/noir/barres (facultatif, barres).
+	# RECTODO : paramètre de la commande :
+	# fichier des levels, fichier d'ordre des levels (facultatif), background mur/noir/barres (facultatif, barres).
 
 	# FUTURE : déterminer la longueur et hauteur max parmi les levels à faire, et générer le background mur ou noir selon ces dimensions max,
 	# afin qu'il n'y ait plus de limite de taille pour les background simple.
