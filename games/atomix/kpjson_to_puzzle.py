@@ -422,6 +422,17 @@ def read_json_file(filepath_json):
 	data_json = json.loads(str_json)
 	return data_json
 
+def sequenced_levels_json(kplevels_json, levels_sequence_json=None):
+	if levels_sequence_json is None:
+		for level in kplevels_json['levels']:
+			yield level
+	else:
+		for level_name in levels_sequence_json['levels_sequence']:
+			# Si deux niveaux ont le même nom, ils seront yieldés tous les deux, l'un après l'autre.
+			# C'est un peu bizarre, mais pourquoi pas.
+			for level in kplevels_json['levels']:
+				if level['name'] == level_name:
+					yield level
 
 def main():
 
@@ -436,34 +447,52 @@ def main():
 	# FUTURE : générer automatiquement un background de barre obliques selon les dimensions demandées.
 	# Pour ne plus avoir de limites même avec les barres obliques.
 
-	print("hellow")
-	first = True
 	kplevels_json = read_json_file(FILEPATH_KPATOMIC_JSON)
-	ps_legend_characters = generator_ps_legend_characters()
-
-	for level in kplevels_json['levels']:
-		for atom_key, kpjson_atom in level['atoms'].items():
-			legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters)
-
-	print("")
-	print("Légende des atoli")
-	for atoli, ps_legend_char in ps_legend_from_atoli.items():
-		print(ps_legend_char, ":", atoli)
-
-	print("")
-	print("Liste des atomes des levels, avec atoli correspondant")
-	for level in kplevels_json['levels']:
-		for atom_key, kpjson_atom in level['atoms'].items():
-			print(kpjson_atom, " : ", ps_legend_from_atoli[kpjson_atom[2]])
-
-	ps_level = build_ps_level(
-		kplevels_json['levels'][0],
-		ps_legend_from_atoli,
-		CM_BACKGROUND_WALLS
+	levels_sequence_json = read_json_file("draknek_levels_sequence_json.js")
+	ps_legend_characters = generator_ps_legend_characters(
+		get_forbidden_chars(CM_BACKGROUND_DIAGONAL_BARS)
 	)
+	ps_legend_from_atoli = {}
+
+	for level in sequenced_levels_json(kplevels_json, levels_sequence_json):
+		for atom_key in sorted(level['atoms']):
+			kpjson_atom = level['atoms'][atom_key]
+			legendify_atoli(
+				kpjson_atom,
+				ps_legend_from_atoli,
+				ps_legend_characters
+			)
+
+	print('-' * 10)
+	print('LEGEND')
+	print('-' * 10)
 	print(str_ps_legend(ps_legend_from_atoli))
-	print("")
-	print(ps_level)
+	print('')
+
+	interesting_positions = list(get_positions_background_cropping(
+		CM_BACKGROUND_DIAGONAL_BARS,
+		'-',
+		True
+	))
+
+	print('-' * 10)
+	print('LEVELS')
+	print('-' * 10)
+	print('')
+
+	for level in sequenced_levels_json(kplevels_json, levels_sequence_json):
+		ps_level = build_ps_level(
+			level,
+			ps_legend_from_atoli,
+			CM_BACKGROUND_DIAGONAL_BARS,
+			True,
+			interesting_positions
+		)
+		print ('')
+		print("message %s" % (level['name'], ))
+		print ('')
+		print(str(ps_level))
+		print ('')
 
 
 if __name__ == '__main__':
