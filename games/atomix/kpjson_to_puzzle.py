@@ -4,16 +4,16 @@
 Conversion d'un fichier JSON contenant la description de niveaux "kp-atomix" vers un fichier PuzzleSalad/PuzzleScript.
 """
 
+import sys
 import json
 
 from bat_belt import enum
 from char_matrix import CharMatrix, filled_chars
 
-FILEPATH_KPATOMIC_JSON = "draknek_levels_json.js"
-
 # Tous les symboles de bases, dans kpjson et PuzzleSalad.
 KPJSON_SYMB_WALL = '#'
 PS_SYMB_WALL = '#'
+PS_SYMB_BLACK_WALL = ','
 KPJSON_SYMB_EMPTY = '.'
 PS_SYMB_EMPTY = '.'
 PS_SYMB_PLAYER = '*'
@@ -438,19 +438,46 @@ def sequenced_levels_json(kplevels_json, levels_sequence_json=None):
 
 def main():
 
-	# RECTODO : paramètre de la commande :
-	# fichier des levels, fichier d'ordre des levels (facultatif), background mur/noir/barres (facultatif, barres).
+	if len(sys.argv) <= 1:
+		print("RECTODO : usage")
+		# fichier des levels, fichier d'ordre des levels (facultatif), background mur/noir/barres (facultatif, barres).
+		print("python kpjson_to_puzzle.py draknek_levels_json.js BARS draknek_levels_sequence_json.js")
+		return
+
+	if len(sys.argv) >= 4:
+		levels_sequence_json = read_json_file(sys.argv[3])
+	else:
+		levels_sequence_json = None
+
+	if len(sys.argv) >= 3:
+		background_type = sys.argv[2]
+	else:
+		background_type = "BARS"
+
+	kplevels_json = read_json_file(sys.argv[1])
+
+	if background_type == "WALLS":
+		cm_bakground = CharMatrix(filled_chars(PS_SYMB_WALL, (100, 100)))
+		interesting_positions = None
+	elif background_type == "BLACKWALLS":
+		cm_bakground = CharMatrix(filled_chars(PS_SYMB_BLACK_WALL, (100, 100)))
+		interesting_positions = None
+	else:
+		cm_bakground = CM_BACKGROUND_DIAGONAL_BARS
+		interesting_positions = list(get_positions_background_cropping(
+			cm_bakground,
+			'-',
+			True
+		))
 
 	# FUTURE : déterminer la longueur et hauteur max parmi les levels à faire, et générer le background mur ou noir selon ces dimensions max,
 	# afin qu'il n'y ait plus de limite de taille pour les background simple.
-	# Pour le background de barre obliques, la limite est toujours présentes.
+	# Pour le background de barre obliques, la limite est toujours présente.
 	# FUTURE : générer automatiquement un background de barre obliques selon les dimensions demandées.
 	# Pour ne plus avoir de limites même avec les barres obliques.
 
-	kplevels_json = read_json_file(FILEPATH_KPATOMIC_JSON)
-	levels_sequence_json = read_json_file("draknek_levels_sequence_json.js")
 	ps_legend_characters = generator_ps_legend_characters(
-		get_forbidden_chars(CM_BACKGROUND_DIAGONAL_BARS)
+		get_forbidden_chars(cm_bakground)
 	)
 	ps_legend_from_atoli = {}
 
@@ -469,12 +496,6 @@ def main():
 	print(str_ps_legend(ps_legend_from_atoli))
 	print('')
 
-	interesting_positions = list(get_positions_background_cropping(
-		CM_BACKGROUND_DIAGONAL_BARS,
-		'-',
-		True
-	))
-
 	print('-' * 10)
 	print('LEVELS')
 	print('-' * 10)
@@ -484,7 +505,7 @@ def main():
 		ps_level = build_ps_level(
 			level,
 			ps_legend_from_atoli,
-			CM_BACKGROUND_DIAGONAL_BARS,
+			cm_bakground,
 			True,
 			interesting_positions
 		)
