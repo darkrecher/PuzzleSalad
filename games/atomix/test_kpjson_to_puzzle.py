@@ -90,17 +90,15 @@ def test_kpjson_to_puzzle_on_walls():
 		CM_BACKGROUND_WALLS
 	)
 	assert str(ps_level) == '\n'.join((
-		"################",
-		"################",
-		"#######...######",
-		"#######...#.c###",
-		"###########..###",
-		"########.*b.a###",
-		"##..c######..###",
-		"##ab.##...#.d###",
-		"##..d##...######",
-		"################",
-		"################",
+		"##############",
+		"######...#####",
+		"######...#.c##",
+		"##########..##",
+		"#######.*b.a##",
+		"#..c######..##",
+		"#ab.##...#.d##",
+		"#..d##...#####",
+		"##############",
 	))
 
 
@@ -147,11 +145,34 @@ def test_kpjson_to_puzzle_with_transparency():
 			ps_legend_from_atoli,
 			ps_legend_characters
 		)
+
 	ps_level = build_ps_level(
 		kplevel_json,
 		ps_legend_from_atoli,
 		CM_BACKGROUND_WALLS_BLACK,
-		True
+		True,
+	)
+	assert str(ps_level) == '\n'.join((
+		",,,,,,,,,,,,,,,,,,",
+		",,,,,,,,######,,,,",
+		",,,,,,,##..ba##,,,",
+		",,,,,###......###,",
+		",,,,,#...####...#,",
+		",,,,,#...#,,#.*.#,",
+		",,,,,#...####...#,",
+		",,,,,###......###,",
+		",,,,,,,##....##,,,",
+		",ab,,,,,######,,,,",
+		",,,,,,,,,,,,,,,,,,",
+	))
+
+	ps_level = build_ps_level(
+		kplevel_json,
+		ps_legend_from_atoli,
+		CM_BACKGROUND_WALLS_BLACK,
+		True,
+		None,
+		2
 	)
 	assert str(ps_level) == '\n'.join((
 		",,,,,,,,,,,,,,,,,,,,",
@@ -221,7 +242,8 @@ def test_kpjson_to_puzzle_with_pretty_background():
 		ps_legend_from_atoli,
 		CM_BACKGROUND_DIAGONAL_BARS,
 		True,
-		interesting_positions
+		interesting_positions,
+		2
 	)
 	assert str(ps_level) == '\n'.join((
 		",,/%\\/%\\/%\\/%\\/%\\/%\\",

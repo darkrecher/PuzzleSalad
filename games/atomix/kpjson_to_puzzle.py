@@ -324,14 +324,13 @@ def build_ps_level(
 	ps_legend_from_atoli,
 	cm_background,
 	transparencify=False,
-	interesting_positions=None
+	interesting_positions=None,
+	border_size=1
 ):
 	"""
 	Renvoie un CharMatrix correspondant à la représentation dans PuzzleSalad du level d'atomix spécifié (kpjson_level_legendified).
 	RECTODO : docstring plus précise.
 	"""
-
-	# RECTODO : marge plus petite sur les bords (une seule case, et pas 2).
 
 	atoms_legendified = kpjson_level_legendified['atoms']
 	cm_arena = CharMatrix(kpjson_level_legendified['arena'], SYMB_TRANSPARENT)
@@ -351,8 +350,9 @@ def build_ps_level(
 
 	arena_w, arena_h = cm_arena.dimensions()
 	model_w, model_h = cm_model.dimensions()
-	global_w = 2 + model_w + 2 + arena_w + 2
-	global_h = 2 + max(model_h, arena_h) + 2
+	# FUTURE : le "+2" au milieu (écart entre la zone modèle et la zone arène) devrait être configurable.
+	global_w = border_size + model_w + 2 + arena_w + border_size
+	global_h = border_size + max(model_h, arena_h) + border_size
 	cm_background.in_dimensions((global_w-1, global_h-1), True)
 
 	if transparencify:
@@ -397,8 +397,12 @@ def build_ps_level(
 		pos_crop_bg = possible_pos[index_pos_crop_bg]
 
 	ps_level_map = cm_background.cropped(pos_crop_bg, (global_w, global_h))
-	model_pos_up_left = (2, global_h-model_h-2)
-	arena_pos_up_left = (2+model_w+2, 2)
+	model_pos_up_left = (
+		border_size,
+		global_h - model_h - border_size)
+	arena_pos_up_left = (
+		border_size + model_w + 2,
+		border_size)
 	ps_level_map.blit(cm_model, model_pos_up_left)
 	ps_level_map.blit(cm_arena, arena_pos_up_left)
 	return ps_level_map
@@ -526,7 +530,8 @@ def main():
 			ps_legend_from_atoli,
 			cm_bakground,
 			True,
-			interesting_positions
+			interesting_positions,
+			1
 		)
 		print ('')
 		print("message %s" % (level['name'], ))
