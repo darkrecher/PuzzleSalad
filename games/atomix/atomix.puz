@@ -6,6 +6,11 @@ homepage recher.wordpress.com
 
 (# RECTODO : documenter dans atomix.puz que les doubles liaisons diagonales ne sont pas définies. Pourtant il peut y en avoir dans les fichiers kpjson. level pack : mystery. level 48 : Kai - Benzol)
 
+(# RECTODO : L'issue indiquée dans git. https://github.com/darkrecher/PuzzleSalad/issues/1)
+
+(# RECTODO : Mettre un pixel noir en plus de marge pour les bordure délimitant la ModelZone.)
+
+
 (HOW TO MAKE LEVELS)
 
 (Condition 1 : a level must have two zones : )
