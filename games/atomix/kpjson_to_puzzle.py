@@ -439,9 +439,28 @@ def sequenced_levels_json(kplevels_json, levels_sequence_json=None):
 def main():
 
 	if len(sys.argv) <= 1:
-		print("RECTODO : usage")
-		# fichier des levels, fichier d'ordre des levels (facultatif), background mur/noir/barres (facultatif, barres).
-		print("python kpjson_to_puzzle.py draknek_levels_json.js BARS draknek_levels_sequence_json.js")
+		TEXT_USAGE = '\n'.join((
+			"Usage :",
+			"python kpjson_to_puzzle.py levels_file [background_type] [levels_sequence_file]",
+			"",
+			"levels_file : path to a json file describing atomix levels.",
+			"Data structure is similar to the .json files in ",
+			"https://github.com/figlief/kp-atomix/tree/master/levels",
+			"",
+			"background_type : a value among : WALLS, BLACKWALLS, BARS.",
+			"Defines the game background where the arena will be drawn.",
+			"Optional. Default = BARS.",
+			"",
+			"levels_sequence_file : path to a json file describing the order",
+			"in whiche the levels must be sequenced.",
+			"Data structure : { \"levels_sequence\" : [ \"name_1\", \"name_2\", ... ] }",
+			"with 'name_1', 'name_2', ... : references to level names in levels_file.",
+			"Optional. When not specified, the order is taken from levels_file.",
+			"",
+			"Exemple :",
+			"python kpjson_to_puzzle.py draknek_levels_json.js BARS draknek_levels_sequence_json.js",
+		))
+		print(TEXT_USAGE)
 		return
 
 	if len(sys.argv) >= 4:
