@@ -6,8 +6,6 @@ homepage recher.wordpress.com
 
 (# RECTODO : documenter dans atomix.puz que les doubles liaisons diagonales ne sont pas définies. Pourtant il peut y en avoir dans les fichiers kpjson. level pack : mystery. level 48 : Kai - Benzol)
 
-(# RECTODO : L'issue indiquée dans git. https://github.com/darkrecher/PuzzleSalad/issues/1)
-
 (# RECTODO : Mettre un pixel noir en plus de marge pour les bordure délimitant la ModelZone.)
 
 
@@ -19,9 +17,17 @@ homepage recher.wordpress.com
 (The game automatically detects the two zones from the Player initial position. The "arena" zone is where the Player is.)
 (The arena zone and the model zone MUST be separated by a vertical or horizontal line of wall that passes through the whole level.)
 ()
-(If this condition is not fullfilled, an error message will be written at the beginning of the level, and the Player will disappear)
+(If this condition is not fulfilled, an error message will be written at the beginning of the level, and the Player will disappear)
 
-(Condition 2 : a level must have at least one unique element)
+(Condition 2 : there must have at least one square not in any zone.)
+(After the "arena" and the "model" zones are determined, there must be at least one "no-zone" square left.)
+(This square will be used to put the GlobalTags.)
+(Be aware that the "arena" zone, after it has been determined, is extended of one tile at every border, and diagonally of one tile at every corner.)
+(To make sure this condition is fulfilled, just add one more tile line at the top of the level.)
+()
+(If this condition is not fulfilled, an error message will be written at the beginning of the level, and the Player will disappear)
+
+(Condition 3 : a level must have at least one unique element)
 (An "element" = the atom and the links on one single square)
 (In order to perform the pattern comparrison between the model and the arena, the game must have a unique element from where to start.)
 (This element is automatically detected at the beginning of the level. But there MUST have one at least.)
@@ -784,6 +790,14 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 [ PropagateVertical ] -> [ ]
 [ PropagateHorizontal ] -> [ ]
 
+(Extend the ArenaZone of one tile at every border and diagonally)
+VERTICAL [ Player PlayerTagMustDoInit ][ ArenaZone | no ArenaZone ] -> [ Player PlayerTagMustDoInit ][ ArenaZone | PropagateVertical ]
+HORIZONTAL [ Player PlayerTagMustDoInit ][ ArenaZone | no ArenaZone ] -> [ Player PlayerTagMustDoInit ][ ArenaZone | PropagateHorizontal ]
+HORIZONTAL [ Player PlayerTagMustDoInit ][ PropagateVertical | no PropagateVertical ] -> [ Player PlayerTagMustDoInit ][ PropagateVertical | PropagateDiagonalHalfWay ]
+[ Player PlayerTagMustDoInit ][ PropagateVertical ] -> [ Player PlayerTagMustDoInit ][ ArenaZone ]
+[ Player PlayerTagMustDoInit ][ PropagateHorizontal ] -> [ Player PlayerTagMustDoInit ][ ArenaZone ]
+[ Player PlayerTagMustDoInit ][ PropagateDiagonalHalfWay ] -> [ Player PlayerTagMustDoInit ][ ArenaZone ]
+
 
 ( --- Detects the ModelZone ---)
 
@@ -814,11 +828,11 @@ HORIZONTAL [ PropagateHorizontal | ] -> [ PropagateHorizontal | PropagateHorizon
 
 (Raises exception if the global tag was not created.)
 (It never happens when there is a line of wall, because this line is not a model zone nor an arean zone.)
-[ Player PlayerTagMustDoInit ] -> [ ] message ERROR : no line of wall. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level
+[ Player PlayerTagMustDoInit ] -> [ ] message ERROR : unable to find a "no-zone" square. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level, and there must have an empty line of wall on top of the level.
 
 (Raises exception if there is no ModelZone)
 [ GlobalTags ][ ModelZone ] -> [ GlobalTags GlobalTagModelZoneExists ][ ModelZone ]
-[ GlobalTags no GlobalTagModelZoneExists ][ Player ] -> [ GlobalTags ][ ] message ERROR : no model zone. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level
+[ GlobalTags no GlobalTagModelZoneExists ][ Player ] -> [ GlobalTags ][ ] message ERROR : no model zone. The model zone and the arena zone must be separated by a horizontal or vertical line of wall passing through the whole level, and there must have an empty line of wall on top of the level.
 
 
 ( --- Adds Borders around the ModelZone --- )
