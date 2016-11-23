@@ -2,10 +2,6 @@ title Atomix demake
 author Recher
 homepage recher.wordpress.com
 
-(# RECTODO : documenter dans atomix.puz que le Cyclobutane est un exemple de molécule pas faisable dans PuzzleSalad.)
-
-(# RECTODO : documenter dans atomix.puz que les doubles liaisons diagonales ne sont pas définies. Pourtant il peut y en avoir dans les fichiers kpjson. level pack : mystery. level 48 : Kai - Benzol)
-
 (# RECTODO : Mettre un pixel noir en plus de marge pour les bordure délimitant la ModelZone.)
 
 
@@ -50,7 +46,16 @@ homepage recher.wordpress.com
 (There are 4 elements : two of them are consisted of a Hydrogen with a link on the left, one is a Hydrogen with a link on the right and a link to the up, one last is a Hydrogen with a link on the right and a link to the bottom)
 (This model has 2 unique elements. It is usable. It would still be usable even with only one unique element.)
 ()
+(Real-word example of a model with no unique element :)
+(https://en.wikipedia.org/wiki/Cyclobutane)
+(used in a level of the "katomic" pack : https://github.com/figlief/kp-atomix/blob/master/levels/katomic.json , Cyclobutane, id 42)
+()
 (If this condition is not fullfilled, an error message will be written at the beginning of the level, and the Player will disappear)
+
+(Info : the double & diagonal links and the triple & diagonal links do not exist in this demake.)
+(I was just too lazy to add them, and it would be hard to represent them on a 5x5 pixel square.)
+(Some level need them, and thus can not be integrated in this demake.)
+(https://github.com/figlief/kp-atomix/blob/master/levels/mystery.json, Kai - Benzol, id 48)
 
 (Info : no check is made on link coherency)
 (Your model can have something like this :)
