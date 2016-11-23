@@ -2,8 +2,6 @@ title Atomix demake
 author Recher
 homepage recher.wordpress.com
 
-(# RECTODO : Mettre un pixel noir en plus de marge pour les bordure délimitant la ModelZone.)
-
 
 (HOW TO MAKE LEVELS)
 
@@ -551,68 +549,68 @@ WinStar4
 transparent
 
 BorderModelLeft
-transparent white gray
-00012
-00012
-00012
-00012
-00012
+transparent white gray #cccccc black
+00124
+00124
+00124
+00124
+00124
 
 BorderModelRight
-transparent white gray
-12000
-12000
-12000
-12000
-12000
+transparent white gray #cccccc black
+41200
+41200
+41200
+41200
+41200
 
 BorderModelUp
-transparent white gray
-00000
+transparent white gray #cccccc black
 00000
 00000
 11111
 22222
+44444
 
 BorderModelDown
-transparent white gray
+transparent white gray #cccccc black
+44444
 11111
 22222
-00000
 00000
 00000
 
 BorderModelUpRight
-transparent white gray #cccccc
+transparent white gray #cccccc black
 00000
 00000
-00000
-13000
-22000
+11300
+22200
+41200
 
 BorderModelDownRight
-transparent white gray
-12000
-22000
-00000
+transparent white gray #cccccc black
+41200
+11200
+22200
 00000
 00000
 
 BorderModelDownLeft
-transparent white gray #cccccc
-00012
-00032
-00000
+transparent white gray #cccccc black
+00124
+00121
+00322
 00000
 00000
 
 BorderModelUpLeft
-transparent white gray
+transparent white gray #cccccc black
 00000
 00000
-00000
-00011
-00012
+00111
+00122
+00124
 
 
 =======
