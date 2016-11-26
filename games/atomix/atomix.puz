@@ -934,7 +934,7 @@ startLoop
     [ GlobalTags no GlobalTagFoundUniqueAtom ][ no LoopIterationCurrent ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTags no GlobalTagFoundUniqueAtom GlobalTagSearchUniqueFail ][ ModelZone AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ]
 
     (If this loop iteration is not a fail, declares the current atom as unique.)
-    (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
+    (The following rule is executed twice : once in the ModelZone, once in the ArenaZone.)
     (So that the position of the unique atom is known in both zones.)
     [ GlobalTags no GlobalTagFoundUniqueAtom no GlobalTagSearchUniqueFail ][ AtomTagged LinkLeftTagged LinkRightTagged LinkUpTagged LinkDownTagged LinkUpRightTagged LinkDownRightTagged LinkDownLeftTagged LinkUpLeftTagged ] -> [ GlobalTags ][ UniqueAtomStartCheck ]
 
@@ -1179,6 +1179,8 @@ LEVELS
 (#######)
 
 (Test to validate the detection of lack of model zone)
+(FUTURE : this level raises an exception, but not the good one.)
+(Need to find where is the problem : in the code or in the test.)
 (#######)
 (#....A#)
 (#.#####)
@@ -1275,9 +1277,7 @@ message Level pack made by Draknek.
 
 message http://blog.draknek.org/post/93360531842/if-i-wanted-to-clone-atomix-this-is-where-id
 
-message Let's start !!
-
-message Carbon Dioxide
+message Let's start with "Carbon Dioxide".
 
 ,,,-\,-\/%\/%\
 /+,/+,,,###%\/
@@ -1450,4 +1450,4 @@ message Methane 2
 /l.f%\#######,
 %\/%\/%\/%\/+,
 
-message Congratulations ! You won !
+message Congratulations ! You won !!
