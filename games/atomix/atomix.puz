@@ -1192,12 +1192,16 @@ LEVELS
 (#######)
 
 (Test to validate the detection of lack of global tag)
+(FUTURE : this test fails too.)
+(It wins instantly. And does not raise any error message)
 (..A#..)
 (..##.*)
 (..#...)
 (B.##AB)
 
 (Test to validate the detection of lack of unique element)
+(FUTURE : this test semi-fails.)
+(An error message is raised, but the level is won just after.)
 (#######)
 (#..#.*#)
 (#AB#AA#)
