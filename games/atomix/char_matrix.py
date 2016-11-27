@@ -131,8 +131,9 @@ class CharMatrix():
 
 	def get_unique_chars(self):
 		"""
-		Renvoie (sous forme d'itérateur of course), tous les chars différents de la matrice.
-		RECTODO : docstring
+		Itère sur tous les chars différents de la matrice. (Comme un "select distinct" en SQL).
+		:return: tous les chars uniques.
+		:rtype: des chars, les uns après les autres.
 		"""
 		existing_chars = set()
 		for line in self.char_matrix:

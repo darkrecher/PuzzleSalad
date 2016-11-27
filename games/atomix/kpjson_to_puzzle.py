@@ -189,11 +189,14 @@ def atoli_from_kpjson(kpjson_atom):
 
 def get_forbidden_chars(cm_background):
 	"""
-	RECTODO : docstring
-	Exemple de caractères interdits () : #.*,/%\-+
-	Détermine les caractères interdit à partir de la ps_legend en dur.
-	Enlève aussi les caractères présents dans le backround.
-	(c'est expliqué dans le mauvais sens)
+	Renvoie tous les caractères interdits de la ps_legend.
+	C'est à dire ceux qu'on pourrait définir dans un jeu PuzzleSalad,
+	mais qu'on ne peut pas utiliser pour définir les atoli dans le jeu Atomix,
+	car ces caractères sont déjà utilisés.
+	Exemple de caractères spécifiquement interdits : #.*,/%\-+
+	Ils représentent les murs, la position du joueur, le background, ...
+	:return: tous les caractères interdits
+	:rtype: une liste de chars.
 	"""
 	unique_chars = list(cm_background.get_unique_chars())
 	unique_chars.extend([PS_SYMB_WALL, PS_SYMB_EMPTY, PS_SYMB_PLAYER])
@@ -201,12 +204,20 @@ def get_forbidden_chars(cm_background):
 
 def generator_ps_legend_characters(forbidden_chars):
 	"""
-	RECTODO : docstring
+	Itère sur les chars utilisable dans la partie "légende" du script PuzzleSalad.
+	À chaque fois qu'on veut un nouvel atoli dans le jeu, il faut exécuter cette fonction pour obtenir
+	son char de légende.
+	Génère une exception lorsqu'il n'y a plus de caractère disponible. C'est fait exprès, ça permet de signaler
+	qu'on ne peut pas créer un niveau avec tous les atolis nécessaire.
+	:param forbidden_chars: les chars ne pouvant pas être utilisé pour définir un atoli dans la légende.
+	:type forbidden_chars: liste de string de un seul caractère chacun.
+	:return: les chars de la légende.
+	:rtype: des chars (string de un seul caractère), les uns après les autres.
 	"""
 	# Caractères systématiquement interdits par PuzzleSalad, car faisant partie de la syntaxe du langage :
 	# []() =<>-V^
 	# La lettre "V" toute seule (minuscule ou majuscule) est interdite car elle représente la flèche vers le bas.
-	# Ces caractères ne sont pas présents dans PS_LEGEND_CHARS.
+	# Ces caractères ne sont donc pas présents dans PS_LEGEND_CHARS.
 	PS_LEGEND_CHARS = list(
 		'abcdefghijklmnopqrstuwxyz0123456789{}_;:?!$&\'"#.*,/%\-+'
 	)
@@ -241,7 +252,7 @@ def get_positions_background_cropping(cm_background, char_spot, enable_around):
 				yield pos_around
 
 # Correspondance entre un atoli et son caractère utilisé dans la légende de PuzzleSalad.
-# clé : un atoli. valeur : une string de un seul caractère.
+# Clé : un atoli. Valeur : une string de un seul caractère.
 ps_legend_from_atoli = {}
 
 def legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters):
@@ -259,7 +270,14 @@ def legendify_atoli(kpjson_atom, ps_legend_from_atoli, ps_legend_characters):
 def external_empty_tiles_transparented(cm_arena):
 	"""
 	Remplace les caractères de cases vides '.' qui sont à l'extérieur de l'arène, par des caractères de transparence ' '.
-	RECTODO : docstring plus précise.
+	Ça permettra ensuite d'afficher le background là où sont les caractères de transparence.
+	Exemple : CharMatrix initiale : [".##", "###", "#.#", "###", "..."] -> finale : [" ##", "###", "#.#", "###", "   "]
+	Attention, le résultat renvoyé est une nouvelle CharMatrix créé à partir de l'initiale.
+	Ce n'est pas une transformation "in-place".
+	:param cm_arena: L'arène sur laquelle on veut appliquer la transparentisation des cases vides externes.
+	:type cm_arena: CharMatrix
+	:return: Une CharMatrix de même taille que cm_arena, avec des cases transparente.
+	:rtype: CharMatrix
 	"""
 	# Algo (bourrin, mais osef) :
 	#  - créer un CharMatrix avec que des espaces dedans, de dimensions (arena+2)
@@ -291,12 +309,16 @@ def external_empty_tiles_transparented(cm_arena):
 
 def transparencify_tiles_surrounded(cm_arena):
 	"""
-	mettre des espaces sur toutes les cases entourées de murs ou d'espace.
-	 - parcourir l'arena (une seule fois). Tous les murs entourés uniquement de murs et d'espaces deviennent des espaces.
-	 # RECTODO : docstring plus précise.
+	Remplace les caractères de murs '#' qui sont entièrement entourés de murs/espace, par un espace ' '
+	(espace = caractère de transparence).
+	Ça permet de "trouer" les gros blocs de murs à l'intérieur de l'arène, pour y faire afficher le background.
+	Exemple : CharMatrix initiale : ["###", "###", "###" ] -> finale : ["###", "# #", "###"]
+	Attention, c'est pas homogène avec la fonction "external_empty_tiles_transparented".
+	Cette fonction modifie in-place la CharMatrix passée en paramètre.
+	:param cm_arena: l'arène sur laquelle on veut appliquer la transparentisation des murs enclavés.
+	:type cm_arena: CharMatrix
 	"""
-	# FUTURE : c'est pas homogène avec la fonction précédente. Celle-ci modifie in-place.
-	# external_empty_tiles_transparented renvoie une CharMatrix modifiée.
+	# FUTURE : rendre cette fonction homogène avec la fonction external_empty_tiles_transparented.
 	wall_and_transp = {'#', ' '}
 	for pos_wall_tile in cm_arena.get_char_positions(PS_SYMB_WALL):
 		set_chars_around = set(cm_arena.get_chars_around(pos_wall_tile))
@@ -328,8 +350,49 @@ def build_ps_level(
 	border_size=1
 ):
 	"""
-	Renvoie un CharMatrix correspondant à la représentation dans PuzzleSalad du level d'atomix spécifié (kpjson_level_legendified).
-	RECTODO : docstring plus précise.
+	Convertit un level au format kp-atomix vers le même level au format PuzzleSalad.
+	(La légende des atolis doit avoir été préalablement construite).
+
+	:param kpjson_level_legendified:
+		Level au format kp-atomix, "presque" tel que récupérée depuis le fichier json.
+		Le "presque" se situant dans la liste des atoms du level. Ces atoms doivent avoir été légendifié.
+		C'est à dire qu'un élément a été ajouté à la fin de chaque atom : un char correspondant à l'atoli dans PuzzleSalad.
+	:param ps_legend_from_atoli:
+		Correspondance entre un atoli et son caractère utilisé dans la légende de PuzzleSalad.
+		Cette légende doit avoir déjà été construite, en parcourant au moins tous les atolis de ce level et en leur attribuant
+		un char. (On peut avoir éventuellement d'autres atolis dans cette légende, provenant d'autres levels).
+	:param cm_background:
+		décor de fond sur lequel sera dessiné le level de PuzzleSalad. Ce décor doit obligatoirement pouvoir contenir
+		le level de PuzzleSalad (bords, légende, spacing et arena compris). Si ce n'est pas le cas, une exception est levée,
+		mais elle n'est pas forcément très explicite (levée par des fonctions internes).
+		Ce décor peut être plus grand que le level de PuzzleSalad. Dans ce cas, une partie du background sera extraite pour
+		être utilisée comme le réel background du level.
+	:param transparencify:
+		Indique si on veut ou pas rendre transparent l'extérieur de l'arena, ainsi que les murs enclavés, afin de laisser
+		apparaître plus de background. Facultatif, par défaut : pas de transparentisation.
+	:param interesting_positions:
+		Permet éventuellement d'indiquer des "positions intéressantes" du cm_background. Il s'agit de positions
+		du coin supérieur gauche à partir duquel il peut être intéressant d'extraire la partie du background à utiliser
+		pour le level. La fonction prendra l'une de ses positions au (pseudo-)hasard, en tenant compte de la taille du level.
+		(Les positions qui sont trop en bas à droite pour extraire une partie de taille suffisante seront exclues).
+		Facultatif, par défaut : None, ce qui correspond à la position (0, 0).
+	:param border_size:
+		Taille (en tiles) ajoutée aux 4 bords du level, ne contenant rien d'autre que du background.
+		C'est pour faire joli (dans le cas où le background est joli).
+		Facultatif, par défaut : 1 tile.
+
+	:type kpjson_level_legendified: donnée au format json. Dictionnaire avec "name", "atoms", "arena", "molecule".
+	:type ps_legend_from_atoli: Dictionnaire. Clé : un atoli. Valeur : une string de un seul caractère.
+	:type cm_background: CharMatrix.
+	:type transparencify: booléen.
+	:type interesting_positions: liste de tuple de deux ints (coordonnées X, Y) ou None pour ne rien spécifier.
+	:type border_size: int.
+
+	:return:
+		Le level au format PuzzleSalad, avec la zone modèle en bas à gauche (contenant la molécule finale à créer),
+		ainsi que la zone d'arena en haut à droite (contenant les atolis à déplacer). Il y a un "spacing" de 2 tiles
+		entre la zone modèle et la zone d'arena. Ce spacing est non configurable.
+	:rtype: CharMatrix.
 	"""
 
 	atoms_legendified = kpjson_level_legendified['atoms']
