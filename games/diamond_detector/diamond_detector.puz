@@ -2,6 +2,9 @@ title Entrainement au detecteur de diamants
 author Recher
 homepage https://github.com/darkrecher/PuzzleSalad
 
+(Reprise de 'MindSweeper', un mini-jeu de 'Anti-Idle The Game'.)
+(Pour savoir comment configurer les niveaux, aller dans le chapitre 'LEVELS')
+
 run_rules_on_level_start
 
 (debug)
@@ -90,7 +93,7 @@ transparent Blue
 01010
 10001
 
-(
+( # code python
 
 img_map = """
 f0g0h
@@ -477,19 +480,25 @@ LEGEND
 
 temp_diag = temp_diag_up_right or temp_diag_up_left or temp_diag_down_right or temp_diag_down_left
 arrow = arrow_up or arrow_right or arrow_down or arrow_left or arrow_diag
+
 dist = dist_01 or dist_02 or dist_03 or dist_04 or dist_05 or dist_06 or dist_07 or dist_08 or dist_09 or dist_10 or dist_11 or dist_12 or dist_13 or dist_14 or dist_15 or dist_16 or dist_17
+
 select_clue = select_clue_00 or select_clue_01 or select_clue_02 or select_clue_03 or select_clue_04 or select_clue_05 or select_clue_06 or select_clue_07 or select_clue_08 or select_clue_09
+
 . = area_game
 x = area_not_game
 I = init and area_game
 P = player and area_game
-(TODO : pas comme ça)
+
+(TODO : On est obligé d'avoir une probabilité d'indice de type 'arrow' de au moins 1/10. Faudrait essayer de régler ça)
 @ = select_arrow and select_cursor_clue_start and area_not_game
 A = select_arrow and area_not_game
 D = select_dist and area_not_game
 N = select_nothing and area_not_game
+
 C = charge and area_not_game
 * = stored_diamond
+
 ground = ground_01 or ground_02 or ground_03 or ground_04 or ground_05 or ground_06 or ground_07 or ground_08 or ground_09 or ground_10 or ground_11 or ground_12 or ground_13 or ground_14 or ground_15 or ground_16
 
 
@@ -506,16 +515,20 @@ background
 area_game
 diamond, stored_diamond
 init
+
 temp_diag_up_right, temp_diag_up_left, temp_diag_down_right, temp_diag_down_left
 temp_diag_up_right_up
 temp_diag_up_left_up
 temp_diag_down_right_down
 temp_diag_down_left_down
 arrow
+
 dist
+
 select_cursor_map, select_cursor_clue
 select_cursor_clue_start
 select_clue, select_arrow, select_dist, select_nothing
+
 charge
 ground
 player, area_not_game
@@ -525,7 +538,18 @@ player, area_not_game
 RULES
 ======
 
+(-------------- Tout ce code s'exécute une seule fois au début, pour générer aléatoirement le niveau -------------------)
+(le fait d'exécuter une seule fois au début est garantie par la présence (puis l'absence) de l'objet "init". )
+
+(placement aléatoire du diamant)
 random [ init no diamond ][ area_game ] -> [ ][ area_game diamond init ]
+
+(-------- Indices de type "arrow" et indices de type "croix bleue" --------)
+
+(traçage des 4 diagonales qui partent du diamant)
+(on est obligé, à chaque fois, d'utiliser des objets temporaires, car un déplacement en diagonale se fait en deux fois)
+(C'est pourquoi on a 4 groupes de règles, contenant 2 règles chacun)
+(Et avant ça, on a deux mini-règles pour placer les deux premiers objets temporaires.)
 
 UP [ diamond init | area_game ] -> [ diamond init | area_game temp_diag_up_right_up temp_diag_up_left_up ]
 DOWN [ diamond init | area_game ] -> [ diamond init | area_game temp_diag_down_right_down temp_diag_down_left_down ]
@@ -542,10 +566,14 @@ RIGHT [ temp_diag_down_right_down | area_game ] -> [ temp_diag_down_right_down |
 LEFT [ temp_diag_down_left_down | area_game ] -> [ temp_diag_down_left_down | area_game temp_diag_down_left ]
 + DOWN [ temp_diag_down_left | area_game ] -> [ temp_diag_down_left | area_game temp_diag_down_left_down ]
 
+(Suppression des objets temporaires de traçage de diagonale.)
+
 [ temp_diag_up_right_up ] -> [ ]
 [ temp_diag_up_left_up ] -> [ ]
 [ temp_diag_down_right_down ] -> [ ]
 [ temp_diag_down_left_down ] -> [ ]
+
+(Placement des indices de types "arrow", en se basant sur les diagonales tracées précédemment)
 
 UP [ temp_diag_up_right | ... | area_game ] -> [ temp_diag_up_right | ... | area_game arrow_down ]
 UP [ temp_diag_up_left | ... | area_game ] -> [ temp_diag_up_left | ... | area_game arrow_down ]
@@ -556,22 +584,29 @@ DOWN [ temp_diag_down_left | ... | area_game ] -> [ temp_diag_down_left | ... | 
 LEFT [ temp_diag_up_left | ... | area_game ] -> [ temp_diag_up_left | ... | area_game arrow_right ]
 LEFT [ temp_diag_down_left | ... | area_game ] -> [ temp_diag_down_left | ... | area_game arrow_right ]
 
+(Placement des derniers indices de types "arrow", en partant du diamant)
+
 UP [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_down ]
 RIGHT [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_left ]
 DOWN [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_up ]
 LEFT [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_right ]
 
+(Remplacement des cases de diagonales par les indices de type "arrow" représentant une croix bleue)
+
 [ temp_diag ] -> [ arrow_diag ]
 
-(ligne de debug, pour y voir plus clair. À virer après)
-([ arrow ] -> [ ])
+(-------- Indices de type "distance" --------)
 
 (relou, pas mieux)
-(
+( # code python
 for x in range(2, 18):
     print("[ init ][ dist_%02d | area_game no dist ] -> [ init ][ dist_%02d | area_game dist_%02d ]" % (x, x, x+1))
 )
 
+(On part du diamant, et on place sur les cases adjacentes des indices "distance 01")
+(Puis, on part de chaque case d'indice "distance 01", et on place sur les cases adjacentes n'ayant pas déjà un indice, )
+(des indices de type "distance 02". )
+(Et ainsi de suite, on se propage en plaçant des indices avec une distance de plus en plus grande.)
 [ diamond init | area_game ] -> [ diamond init | area_game dist_01 ]
 [ init ][ dist_01 | area_game no dist no diamond ] -> [ init ][ dist_01 | area_game dist_02 ]
 [ init ][ dist_02 | area_game no dist ] -> [ init ][ dist_02 | area_game dist_03 ]
@@ -590,7 +625,28 @@ for x in range(2, 18):
 [ init ][ dist_15 | area_game no dist ] -> [ init ][ dist_15 | area_game dist_16 ]
 [ init ][ dist_16 | area_game no dist ] -> [ init ][ dist_15 | area_game dist_17 ]
 
+(-------- Sélection aléatoire du type d'indice pour chaque case --------)
+
+(Ajout des objets de sélection d'indice.)
+(Dans chaque case de l'aire de jeu, on aura maintenant )
+(un objet select_clue_00, ou bien select_clue_01, ... ou bien select_clue_10)
+(Le choix est pris au hasard, pour chaque case.)
 [ init ][ area_game no diamond no select_clue ] -> [ init ][ area_game random select_clue ]
+
+(Énorme groupe de règles qui déduit, pour chaque case de l'aire de jeu, quel est le type d'indice à conserver.)
+(Au départ, chaque case possède les deux types d'indice, il faut en supprimer un, voire les deux.)
+
+(Le groupe de règles effectue les actions suivantes : )
+( - Sélection de la première case dont l'indice n'a pas encore été déterminé. Ajout de l'objet select_cursor_map dedans )
+( - Ajout de l'objet select_cursor_clue au début de la ligne de définition des probas. C'est à dire la ligne '@AADDDNNNN'. )
+( - pour chaque valeur de select_clue, on la diminue de 1 et on décale select_cursor_clue de une case vers la droite. )
+(   par exemple, si l'objet select_cursor_map est placée sur une case ayant un select_cursor_map_03, )
+(   alors on déplacera select_cursor_clue de 3 cases vers la droite. )
+( - Selon l'endroit où se retrouve select_cursor_clue, )
+(   c'est à dire sur une case contenant un select_arrow, ou bien un select_dist, ou bien un select_nothing : )
+( - suppression du ou des indices de type arrow ou dist de la case sur laquelle se trouve select_cursor_map, )
+(   et en même temps, suppression de select_cursor_clue. )
+( - on revient au début du groupe, pour sélectionner la case suivante, sur laquelle on placera un select_cursor_map, etc.)
 
 [ init no select_cursor_map ][ select_clue no select_cursor_map ] -> [ init select_cursor_map ][ select_clue select_cursor_map ]
 + [ init ] [ select_cursor_clue_start ] -> [ init ][ select_cursor_clue_start select_cursor_clue ]
@@ -612,13 +668,34 @@ for x in range(2, 18):
 
 + [ init select_cursor_map ][ select_cursor_map select_clue_00 ][ select_cursor_clue ] -> [ init ][ ][ ]
 
+(-------- Sélection aléatoire du type de case "ground" pour chaque case --------)
+
+( C'est juste pour l'aspect visuel. )
+(Le jeu fonctionnerait pareil si toutes les cases de l'aire de jeu avaient l'objet ground_01. )
 [ init ][ area_game no ground ] -> [ init ][ area_game random ground ]
 
+(-------- Suppression de l'objet init. --------)
+
+(Afin que tout le code s'exécutant une seule fois au début s'exécute vraiment une seule fois au début. )
 [ diamond init ] -> [ diamond ]
 
-(------------------------- Les règles pendant le jeu -------------------------)
+(-------------- Fin du code qui s'exécute une seule fois au début --------------)
 
+(-------------- Début du code qui s'exécute pendant le jeu --------------)
+(Y'a pas besoin de grand chose)
+
+(Lorsque le joueur appuie sur la touche d'action (la touche "X"), )
+( - et qu'il lui reste une charge de détecteur, )
+( - et qu'il est positionné sur une case possédant encore son objet "ground", )
+(alors on supprime une charge (celle qui est tout à droite), )
+(et on supprime l'objet "ground" sur lequel il se trouve. )
 RIGHT [ ACTION player ground ][ charge | no charge ] -> [ player ][ | ]
+
+(Lorsque le joueur appuie sur la touche d'action, )
+( - et qu'il se trouve sur la case possédant le diamant, )
+( - et que cette case ne possède plus son objet "ground", )
+( - (pas de contrainte spécifique concernant les charges) )
+(alors on supprime le diamant, c'est à dire que le joueur prend le diamant. )
 [ ACTION player diamond no ground ] -> [ player ]
 
 
@@ -626,12 +703,69 @@ RIGHT [ ACTION player ground ][ charge | no charge ] -> [ player ][ | ]
 WINCONDITIONS
 ==============
 
+(Quand il n'y a plus de diamant, c'est à dire quand on a pris le seul diamant présent dans l'aire de jeu,)
+(on passe au niveau suivant.)
 no diamond
 
 
 =======
 LEVELS
 =======
+
+(
+Structure d'un niveau :
+
+Un niveau doit avoir une largeur d'exactement 10 cases.
+Sinon, la répartition aléatoire des indices ne marchera pas bien.
+On peut définir une aire de jeu plus petite en mettant des colonnes de x à droite.
+
+La hauteur peut être changée. Cependant, les indices de distance ne s'affichent que
+jusqu'à une distance de 17. Si l'aire de jeu est trop grande, les zones éloignées
+du diamant n'afficheront pas les distances, ce qui peut être gênant.
+
+La première ligne du niveau doit contenir des "C", puis des "x".
+Le nombre de "C" correspond au nombre de charges de détecteur disponibles.
+
+La seconde ligne devrait être uniquement des "x". Ce n'est pas obligé, mais ça fait joli.
+
+Les lignes suivantes définissent l'aire de jeu. Il faut mettre des ".".
+Son contenu exact, c'est à dire la position du diamant et des indices, est déterminé aléatoirement.
+
+Pour avoir une aire de jeu moins large que 10 cases, il faut indiquer des "x" à la fin des lignes.
+Pas au début, ça risque de planter à cause du "I" (j'ai pas testé).
+
+On doit pouvoir créer des aires de jeu non rectangulaires, mais je n'ai pas testé non plus.
+
+Dans le rectangle de l'aire de jeu, représenté par les caractères ".", il faut ajouter un "P"
+quelque part, n'importe où. Cela représente le joueur.
+
+Toujours dans le rectangle de l'aire de jeu, en bas à gauche, il faut indiquer un "I". C'est la case
+spéciale permettant de déclencher tout le code d'initialisation du niveau
+(placement du diamant, définition des indices, ...).
+
+La ligne juste en-dessous de l'aire de jeu doit obligatoirement commencer par "@",
+et les 9 caractères suivants doivent être uniquement des "A", "D" ou "N".
+Cette ligne définit la probabilité d'apparition des indices sur chaque case.
+
+ - @ : indique le début de la ligne, et augmente la probabilité d'apparition des indices de type "arrow"
+ - A : probabilité d'apparition des indices de type "arrow" (les flèches bleues et la croix bleue).
+ - D : probabilité d'apparition des indices de type "distance" (les points bleu-violets).
+ - N : probabilité de n'avoir aucun indice.
+
+Par exemple, si la ligne est : "@AADDDDDNN", alors pour chaque case de l'aire de jeu :
+ - il y a 3 chances sur 10 qu'elle contienne un indice "arrow" (1 * "@" + 2 * "A")
+ - il y a 5 chances sur 10 qu'elle contienne un indice "dist" (5 * "D")
+ - il y a 2 chances sur 10 qu'elle ne contienne aucun indice (2 * "N").
+
+La dernière ligne de l'aire de jeu doit contenir des "x" et des "*" (étoile).
+Chaque étoile correspond à un "diamant décoratif".
+Ces diamants n'ont aucune incidence sur le fonctionnement du jeu.
+Ils servent juste à indiquer au joueur où il en est dans sa progression.
+Pour plus de clarté, il est conseillé de mettre autant de diamants décoratifs que
+le numéro du niveau (0 pour le premier, 1 pour le deuxième, etc.)
+Mais ce n'est pas obligé.
+
+)
 
 CCCCCCCCCx
 xxxxxxxxxx
@@ -763,7 +897,7 @@ xxxxxxxxxx
 ..........
 I.........
 @DNNNNNNNN
-******xxxx
+*******xxx
 
 message Dernier niveau. Tout a la chance !!
 
@@ -772,6 +906,6 @@ xxxxxxxxxx
 .Pxxxxxxxx
 I.xxxxxxxx
 @DNNNNNNNN
-******xxxx
+********xx
 
 message Bravo, tu as fini le jeu. Tu peux maintenant utiliser le vrai detecteur pour trouver le vrai diamant.
