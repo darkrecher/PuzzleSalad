@@ -497,6 +497,7 @@ ground = ground_01 or ground_02 or ground_03 or ground_04 or ground_05 or ground
 SOUNDS
 =======
 
+
 ================
 COLLISIONLAYERS
 ================
@@ -620,6 +621,7 @@ for x in range(2, 18):
 RIGHT [ ACTION player ground ][ charge | no charge ] -> [ player ][ | ]
 [ ACTION player diamond no ground ] -> [ player ]
 
+
 ==============
 WINCONDITIONS
 ==============
@@ -631,8 +633,37 @@ no diamond
 LEVELS
 =======
 
+CCCCCCCCCx
+xxxxxxxxxx
+........xx
+........xx
+.....P..xx
+........xx
+........xx
+........xx
+I.......xx
+@AAAADDDDD
+xxxxxxxxxx
 
-CCCCCCxxxx
+message Bravo, vous avez obtenu le premier diamant !!!
+
+CCCCCCCCxx
+xxxxxxxxxx
+.........x
+.........x
+.........x
+.....P...x
+.........x
+.........x
+.........x
+.........x
+I........x
+@AAAADDDDD
+*xxxxxxxxx
+
+message Encore bravo !!!
+
+CCCCCCCxxx
 xxxxxxxxxx
 ..........
 ..........
@@ -645,10 +676,26 @@ xxxxxxxxxx
 ..........
 I.........
 @AAAADDDDD
+**xxxxxxxx
+
+message Maintenant, plus difficile : certaines cases ne donnent pas d'indice.
+
+CCCCCCCxxx
 xxxxxxxxxx
+..........
+..........
+..........
+.......P..
+..........
+..........
+..........
+..........
+..........
+I.........
+@AAADDDDNN
+***xxxxxxx
 
-message Bravo !!!
-
+message Re plus difficile. Encore moins d'indice.
 
 CCCCCCCxxx
 xxxxxxxxxx
@@ -663,5 +710,68 @@ xxxxxxxxxx
 ..........
 I.........
 @AADDDNNNN
-*xxxxxxxxx
+****xxxxxx
 
+message Plus plus difficile. Moins de charge de detecteur.
+
+CCCCCCxxxx
+xxxxxxxxxx
+..........
+..........
+..........
+.......P..
+..........
+..........
+..........
+..........
+..........
+I.........
+@AADDDNNNN
+*****xxxxx
+
+message Tellement difficile que c'est plus de la chance que de la recherche.
+
+message (Tu as le droit de t'arreter a ce niveau).
+
+CCCCCxxxxx
+xxxxxxxxxx
+..........
+..........
+..........
+.......P..
+..........
+..........
+..........
+..........
+..........
+I.........
+@ADDNNNNNN
+******xxxx
+
+message Plein de charge, mais tres peu d'indices
+
+CCCCCCCCCx
+xxxxxxxxxx
+..........
+..........
+..........
+.......P..
+..........
+..........
+..........
+..........
+..........
+I.........
+@DNNNNNNNN
+******xxxx
+
+message Dernier niveau. Tout a la chance !!
+
+Cxxxxxxxxx
+xxxxxxxxxx
+.Pxxxxxxxx
+I.xxxxxxxx
+@DNNNNNNNN
+******xxxx
+
+message Bravo, tu as fini le jeu. Tu peux maintenant utiliser le vrai detecteur pour trouver le vrai diamant.
