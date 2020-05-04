@@ -264,7 +264,12 @@ init
 Transparent
 
 player
-white
+Transparent #ff3030
+10101
+00000
+10001
+00000
+10101
 
 select_clue_00
 Transparent
@@ -314,6 +319,22 @@ Transparent
 select_cursor_clue_start
 Transparent
 
+ground
+#a03d00 #511f00
+00010
+00000
+01000
+00001
+00100
+
+charge
+transparent #7c0000 #be0000 #ff2828
+01210
+02320
+02320
+02320
+01210
+
 
 =======
 LEGEND
@@ -332,6 +353,7 @@ P = player and area_game
 A = select_arrow and area_not_game
 D = select_dist and area_not_game
 N = select_nothing and area_not_game
+C = charge and area_not_game
 
 
 =======
@@ -356,7 +378,8 @@ dist
 select_cursor_map, select_cursor_clue
 select_cursor_clue_start
 select_clue, select_arrow, select_dist, select_nothing
-
+charge
+ground
 player, area_not_game
 
 
@@ -451,13 +474,20 @@ for x in range(2, 18):
 
 + [ init select_cursor_map ][ select_cursor_map select_clue_00 ][ select_cursor_clue ] -> [ init ][ ][ ]
 
+[ init ][ area_game ] -> [ init ][ area_game ground ]
 
 [ diamond init ] -> [ diamond ]
+
+(------------------------- Les règles pendant le jeu -------------------------)
+
+RIGHT [ ACTION player ground ][ charge | no charge ] -> [ player ][ | ]
+[ ACTION player diamond no ground ] -> [ player ]
 
 ==============
 WINCONDITIONS
 ==============
 
+no diamond
 
 
 =======
@@ -465,7 +495,7 @@ LEVELS
 =======
 
 
-
+CCCCCCxxxx
 xxxxxxxxxx
 ..........
 ..........
@@ -474,9 +504,24 @@ xxxxxxxxxx
 ..........
 ..........
 ..........
+..........
+..........
 I.........
-*AAADDNNNN
+*AAADDDDNN
+
+message Bravo !!!
 
 
-
-
+CCCCCCCxxx
+xxxxxxxxxx
+..........
+..........
+..........
+.......P..
+..........
+..........
+..........
+..........
+..........
+I.........
+*AADDDNNNN
