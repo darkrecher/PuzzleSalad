@@ -1,14 +1,11 @@
-title My Game
-author My Name Here
-homepage www.puzzlescript.net
+title Entrainement au detecteur de diamants
+author Recher
+homepage https://github.com/darkrecher/PuzzleSalad
 
 run_rules_on_level_start
 
 (debug)
-
 (verbose_logging)
-
-
 
 
 ========
@@ -19,7 +16,12 @@ background
 Black
 
 area_game
-#303030
+#301100 #0A0300
+00100
+10000
+00000
+01000
+00001
 
 area_not_game
 Transparent
@@ -122,7 +124,7 @@ while letters_0:
 )
 
 dist_01
-transparent #30FF30
+transparent #7577ff
 00000
 00000
 00100
@@ -130,7 +132,7 @@ transparent #30FF30
 00000
 
 dist_02
-transparent #30FF30
+transparent #7577ff
 00000
 01000
 00100
@@ -138,7 +140,7 @@ transparent #30FF30
 00000
 
 dist_03
-transparent #30FF30
+transparent #7577ff
 00000
 01010
 00100
@@ -146,7 +148,7 @@ transparent #30FF30
 00000
 
 dist_04
-transparent #30FF30
+transparent #7577ff
 00000
 01010
 00100
@@ -154,7 +156,7 @@ transparent #30FF30
 00000
 
 dist_05
-transparent #30FF30
+transparent #7577ff
 00000
 01010
 00100
@@ -162,7 +164,7 @@ transparent #30FF30
 00000
 
 dist_06
-transparent #30FF30
+transparent #7577ff
 10000
 01010
 00100
@@ -170,7 +172,7 @@ transparent #30FF30
 00000
 
 dist_07
-transparent #30FF30
+transparent #7577ff
 10100
 01010
 00100
@@ -178,7 +180,7 @@ transparent #30FF30
 00000
 
 dist_08
-transparent #30FF30
+transparent #7577ff
 10101
 01010
 00100
@@ -186,7 +188,7 @@ transparent #30FF30
 00000
 
 dist_09
-transparent #30FF30
+transparent #7577ff
 10101
 01010
 00101
@@ -194,7 +196,7 @@ transparent #30FF30
 00000
 
 dist_10
-transparent #30FF30
+transparent #7577ff
 10101
 01010
 00101
@@ -202,7 +204,7 @@ transparent #30FF30
 00001
 
 dist_11
-transparent #30FF30
+transparent #7577ff
 10101
 01010
 00101
@@ -210,7 +212,7 @@ transparent #30FF30
 00101
 
 dist_12
-transparent #30FF30
+transparent #7577ff
 10101
 01010
 00101
@@ -218,7 +220,7 @@ transparent #30FF30
 10101
 
 dist_13
-transparent #30FF30
+transparent #7577ff
 10101
 01010
 10101
@@ -226,7 +228,7 @@ transparent #30FF30
 10101
 
 dist_14
-transparent #30FF30
+transparent #7577ff
 10101
 01110
 10101
@@ -234,7 +236,7 @@ transparent #30FF30
 10101
 
 dist_15
-transparent #30FF30
+transparent #7577ff
 10101
 01110
 10111
@@ -242,7 +244,7 @@ transparent #30FF30
 10101
 
 dist_16
-transparent #30FF30
+transparent #7577ff
 10101
 01110
 10111
@@ -250,7 +252,7 @@ transparent #30FF30
 10101
 
 dist_17
-transparent #30FF30
+transparent #7577ff
 10101
 01110
 11111
@@ -258,18 +260,31 @@ transparent #30FF30
 10101
 
 diamond
-#00C0FF
+transparent #d1ffff #8cffff #00ffff
+00000
+01230
+12233
+02230
+00200
+
+stored_diamond
+transparent #d1ffff #8cffff #00ffff
+00000
+01230
+12233
+02230
+00200
 
 init
 Transparent
 
 player
 Transparent #ff3030
-10101
-00000
+01010
 10001
 00000
-10101
+10001
+01010
 
 select_clue_00
 Transparent
@@ -319,13 +334,133 @@ Transparent
 select_cursor_clue_start
 Transparent
 
-ground
-#a03d00 #511f00
-00010
-00000
-01000
-00001
+ground_01
+#1aac47 #a3831a #ba8e1a #d1971a #d1ad1a
+14322
+33233
+24321
+30242
+24332
+
+ground_02
+#a3831a #ba8e1a #d1971a #d1ad1a
+30221
+21123
+21321
+32122
+23232
+
+ground_03
+#a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+12432
+21222
+12111
+01222
+22232
+
+ground_04
+#a3831a #ba8e1a #d1971a #d1ad1a
+22313
+21222
+22221
+10121
+11122
+
+ground_05
+#a3831a #ba8e1a #d1971a #d1ad1a
+21322
+01122
+22232
+21222
+12222
+
+ground_06
+#a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+32113
+34221
+12202
+22322
+21112
+
+ground_07
+#1a9040 #1aac47 #a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+25444
+34644
+54102
+53434
+24444
+
+ground_08
+#1a9040 #a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+21443
+33253
+22343
+20234
+42432
+
+ground_09
+#1a9040 #1aac47 #ba8e1a #d1971a #d1ad1a #d1c536
+33233
+32424
+53333
+22313
+32304
+
+ground_10
+#1aac47 #ba8e1a #d1971a #d1ad1a #d1c536
+11221
+23202
+24322
+12211
+12222
+
+ground_11
+#a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+11322
+01123
+33421
+23120
+11131
+
+ground_12
+#a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+22131
+10133
+32243
+11112
+23321
+
+ground_13
+#ba8e1a #d1971a #d1ad1a #d1c536
+11110
 00100
+22110
+30100
+20000
+
+ground_14
+#1a9040 #a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+34412
+34243
+30323
+35233
+24314
+
+ground_15
+#1a9040 #a3831a #ba8e1a #d1971a #d1ad1a #d1c536
+23321
+32323
+13333
+34533
+32430
+
+ground_16
+#1aac47 #ba8e1a #d1971a #d1ad1a #d1c536
+33132
+32222
+21102
+23242
+22122
 
 charge
 transparent #7c0000 #be0000 #ff2828
@@ -349,11 +484,13 @@ x = area_not_game
 I = init and area_game
 P = player and area_game
 (TODO : pas comme ça)
-* = select_arrow and select_cursor_clue_start and area_not_game
+@ = select_arrow and select_cursor_clue_start and area_not_game
 A = select_arrow and area_not_game
 D = select_dist and area_not_game
 N = select_nothing and area_not_game
 C = charge and area_not_game
+* = stored_diamond
+ground = ground_01 or ground_02 or ground_03 or ground_04 or ground_05 or ground_06 or ground_07 or ground_08 or ground_09 or ground_10 or ground_11 or ground_12 or ground_13 or ground_14 or ground_15 or ground_16
 
 
 =======
@@ -366,7 +503,7 @@ COLLISIONLAYERS
 
 background
 area_game
-diamond
+diamond, stored_diamond
 init
 temp_diag_up_right, temp_diag_up_left, temp_diag_down_right, temp_diag_down_left
 temp_diag_up_right_up
@@ -474,7 +611,7 @@ for x in range(2, 18):
 
 + [ init select_cursor_map ][ select_cursor_map select_clue_00 ][ select_cursor_clue ] -> [ init ][ ][ ]
 
-[ init ][ area_game ] -> [ init ][ area_game ground ]
+[ init ][ area_game no ground ] -> [ init ][ area_game random ground ]
 
 [ diamond init ] -> [ diamond ]
 
@@ -507,7 +644,8 @@ xxxxxxxxxx
 ..........
 ..........
 I.........
-*AAADDDDNN
+@AAAADDDDD
+xxxxxxxxxx
 
 message Bravo !!!
 
@@ -524,4 +662,6 @@ xxxxxxxxxx
 ..........
 ..........
 I.........
-*AADDDNNNN
+@AADDDNNNN
+*xxxxxxxxx
+
