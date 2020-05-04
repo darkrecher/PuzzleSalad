@@ -1,0 +1,470 @@
+title My Game
+author My Name Here
+homepage www.puzzlescript.net
+
+run_rules_on_level_start
+
+========
+OBJECTS
+========
+
+background
+Black
+
+temp_diag_up_right_up
+Red
+
+temp_diag_up_left_up
+Red
+
+temp_diag_down_right_down
+Red
+
+temp_diag_down_left_down
+Red
+
+temp_diag_up_right
+#0000FF
+
+temp_diag_up_left
+#0000B0
+
+temp_diag_down_right
+#000090
+
+temp_diag_down_left
+#000070
+
+arrow_up
+transparent Blue
+00100
+01110
+10101
+00100
+00100
+
+arrow_right
+transparent Blue
+00100
+00010
+11111
+00010
+00100
+
+arrow_down
+transparent Blue
+00100
+00100
+10101
+01110
+00100
+
+arrow_left
+transparent Blue
+00100
+01000
+11111
+01000
+00100
+
+arrow_diag
+transparent Blue
+10001
+01010
+00100
+01010
+10001
+
+(
+
+img_map = """
+f0g0h
+0bnc0
+mqaoi
+0dpe0
+l0k0j
+"""
+
+img_map = img_map.strip()
+
+letters = "abcdefghijklmnopq"
+
+letters_0 = list(letters)
+letters_1 = []
+dist = 0
+
+while letters_0:
+    letters_1.append(letters_0.pop(0))
+    dist += 1
+    current = img_map
+    for char in letters_0:
+        current = current.replace(char, "0")
+    for char in letters_1:
+        current = current.replace(char, "1")
+    print("dist_" + str(dist).rjust(2, "0"))
+    print("transparent #30FF30")
+    print(current)
+    print()
+
+)
+
+dist_01
+transparent #30FF30
+00000
+00000
+00100
+00000
+00000
+
+dist_02
+transparent #30FF30
+00000
+01000
+00100
+00000
+00000
+
+dist_03
+transparent #30FF30
+00000
+01010
+00100
+00000
+00000
+
+dist_04
+transparent #30FF30
+00000
+01010
+00100
+01000
+00000
+
+dist_05
+transparent #30FF30
+00000
+01010
+00100
+01010
+00000
+
+dist_06
+transparent #30FF30
+10000
+01010
+00100
+01010
+00000
+
+dist_07
+transparent #30FF30
+10100
+01010
+00100
+01010
+00000
+
+dist_08
+transparent #30FF30
+10101
+01010
+00100
+01010
+00000
+
+dist_09
+transparent #30FF30
+10101
+01010
+00101
+01010
+00000
+
+dist_10
+transparent #30FF30
+10101
+01010
+00101
+01010
+00001
+
+dist_11
+transparent #30FF30
+10101
+01010
+00101
+01010
+00101
+
+dist_12
+transparent #30FF30
+10101
+01010
+00101
+01010
+10101
+
+dist_13
+transparent #30FF30
+10101
+01010
+10101
+01010
+10101
+
+dist_14
+transparent #30FF30
+10101
+01110
+10101
+01010
+10101
+
+dist_15
+transparent #30FF30
+10101
+01110
+10111
+01010
+10101
+
+dist_16
+transparent #30FF30
+10101
+01110
+10111
+01110
+10101
+
+dist_17
+transparent #30FF30
+10101
+01110
+11111
+01110
+10101
+
+
+diamond
+#00C0FF
+
+init
+Transparent
+
+player
+white
+
+select_clue_00
+#000000
+(Transparent)
+
+select_clue_01
+#100000
+(Transparent)
+
+select_clue_02
+#400000
+(Transparent)
+
+select_clue_03
+#700000
+(Transparent)
+
+select_clue_04
+#A00000
+(Transparent)
+
+select_arrow
+Transparent
+
+select_dist
+Transparent
+
+select_nothing
+Transparent
+
+select_cursor_map
+Transparent
+
+select_cursor_clue
+Transparent
+
+select_cursor_clue_start
+Transparent
+
+=======
+LEGEND
+=======
+
+temp_diag = temp_diag_up_right or temp_diag_up_left or temp_diag_down_right or temp_diag_down_left
+arrow = arrow_up or arrow_right or arrow_down or arrow_left or arrow_diag
+dist = dist_01 or dist_02 or dist_03 or dist_04 or dist_05 or dist_06 or dist_07 or dist_08 or dist_09 or dist_10 or dist_11 or dist_12 or dist_13 or dist_14 or dist_15 or dist_16 or dist_17
+select_clue = select_clue_00 or select_clue_01 or select_clue_02 or select_clue_03 or select_clue_04
+. = background
+I = init
+P = player
+(TODO : pas comme ça)
+* = select_arrow and select_cursor_clue_start
+A = select_arrow
+D = select_dist
+N = select_nothing
+
+
+=======
+SOUNDS
+=======
+
+================
+COLLISIONLAYERS
+================
+
+background
+diamond
+init
+temp_diag_up_right, temp_diag_up_left, temp_diag_down_right, temp_diag_down_left
+temp_diag_up_right_up
+temp_diag_up_left_up
+temp_diag_down_right_down
+temp_diag_down_left_down
+arrow
+dist
+select_cursor_map, select_cursor_clue
+select_cursor_clue_start
+select_clue, select_arrow, select_dist, select_nothing
+
+player
+
+======
+RULES
+======
+
+random [ init no diamond ][ ] -> [ ][ diamond init ]
+
+UP [ diamond init |  ] -> [ diamond init | temp_diag_up_right_up temp_diag_up_left_up ]
+DOWN [ diamond init |  ] -> [ diamond init | temp_diag_down_right_down temp_diag_down_left_down ]
+
+RIGHT [ temp_diag_up_right_up |  ] -> [ temp_diag_up_right_up | temp_diag_up_right ]
++ UP [ temp_diag_up_right |  ] -> [ temp_diag_up_right | temp_diag_up_right_up ]
+
+LEFT [ temp_diag_up_left_up |  ] -> [ temp_diag_up_left_up | temp_diag_up_left ]
++ UP [ temp_diag_up_left |  ] -> [ temp_diag_up_left | temp_diag_up_left_up ]
+
+RIGHT [ temp_diag_down_right_down |  ] -> [ temp_diag_down_right_down | temp_diag_down_right ]
++ DOWN [ temp_diag_down_right |  ] -> [ temp_diag_down_right | temp_diag_down_right_down ]
+
+LEFT [ temp_diag_down_left_down |  ] -> [ temp_diag_down_left_down | temp_diag_down_left ]
++ DOWN [ temp_diag_down_left |  ] -> [ temp_diag_down_left | temp_diag_down_left_down ]
+
+[ temp_diag_up_right_up ] -> [ ]
+[ temp_diag_up_left_up ] -> [ ]
+[ temp_diag_down_right_down ] -> [ ]
+[ temp_diag_down_left_down ] -> [ ]
+
+UP [ temp_diag_up_right | ... | ] -> [ temp_diag_up_right | ... | arrow_down ]
+UP [ temp_diag_up_left | ... | ] -> [ temp_diag_up_left | ... | arrow_down ]
+RIGHT [ temp_diag_up_right | ... | ] -> [ temp_diag_up_right | ... | arrow_left ]
+RIGHT [ temp_diag_down_right | ... | ] -> [ temp_diag_down_right | ... | arrow_left ]
+DOWN [ temp_diag_down_right | ... | ] -> [ temp_diag_down_right | ... | arrow_up ]
+DOWN [ temp_diag_down_left | ... | ] -> [ temp_diag_down_left | ... | arrow_up ]
+LEFT [ temp_diag_up_left | ... | ] -> [ temp_diag_up_left | ... | arrow_right ]
+LEFT [ temp_diag_down_left | ... | ] -> [ temp_diag_down_left | ... | arrow_right ]
+
+UP [ diamond init | ... | ] -> [ diamond init | ... | arrow_down ]
+RIGHT [ diamond init | ... | ] -> [ diamond init | ... | arrow_left ]
+DOWN [ diamond init | ... | ] -> [ diamond init | ... | arrow_up ]
+LEFT [ diamond init | ... | ] -> [ diamond init | ... | arrow_right ]
+
+[ temp_diag ] -> [ arrow_diag ]
+
+(ligne de debug, pour y voir plus clair. À virer après)
+([ arrow ] -> [ ])
+
+(relou, pas mieux)
+(
+for x in range(2, 16):
+    print("[ init ][ dist_%02d | no dist ] -> [ init ][ dist_%02d | dist_%02d ]" % (x, x, x+1))
+)
+
+[ diamond init | ] -> [ diamond init | dist_01 ]
+[ init ][ dist_01 | no dist no diamond ] -> [ init ][ dist_01 | dist_02 ]
+[ init ][ dist_02 | no dist ] -> [ init ][ dist_02 | dist_03 ]
+[ init ][ dist_03 | no dist ] -> [ init ][ dist_03 | dist_04 ]
+[ init ][ dist_04 | no dist ] -> [ init ][ dist_04 | dist_05 ]
+[ init ][ dist_05 | no dist ] -> [ init ][ dist_05 | dist_06 ]
+[ init ][ dist_06 | no dist ] -> [ init ][ dist_06 | dist_07 ]
+[ init ][ dist_07 | no dist ] -> [ init ][ dist_07 | dist_08 ]
+[ init ][ dist_08 | no dist ] -> [ init ][ dist_08 | dist_09 ]
+[ init ][ dist_09 | no dist ] -> [ init ][ dist_09 | dist_10 ]
+[ init ][ dist_10 | no dist ] -> [ init ][ dist_10 | dist_11 ]
+[ init ][ dist_11 | no dist ] -> [ init ][ dist_11 | dist_12 ]
+[ init ][ dist_12 | no dist ] -> [ init ][ dist_12 | dist_13 ]
+[ init ][ dist_13 | no dist ] -> [ init ][ dist_13 | dist_14 ]
+[ init ][ dist_14 | no dist ] -> [ init ][ dist_14 | dist_15 ]
+[ init ][ dist_15 | no dist ] -> [ init ][ dist_15 | dist_16 ]
+
+[ init ][ no select_clue ] -> [ init ][ random select_clue ]
+
+(TODO : virer les NO ??)
+[ init no select_cursor_map ][ select_clue no select_cursor_map ] -> [ init select_cursor_map ][ select_clue select_cursor_map ]
+[ init ] [ select_cursor_clue_start ] -> [ init ][ select_cursor_clue_start select_cursor_clue ]
+(TODO : virer les NO ??)
+[ select_cursor_map select_clue_04 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_03 ][ no select_cursor_clue | select_cursor_clue ]
+[ select_cursor_map select_clue_03 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_02 ][ no select_cursor_clue | select_cursor_clue ]
+[ select_cursor_map select_clue_02 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_01 ][ no select_cursor_clue | select_cursor_clue ]
+[ select_cursor_map select_clue_01 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_00 ][ no select_cursor_clue | select_cursor_clue ]
+
+[ select_cursor_map arrow ][ select_cursor_clue select_dist ] -> [ select_cursor_map ][ select_cursor_clue select_dist ]
+[ select_cursor_map dist ][ select_cursor_clue select_arrow ] -> [ select_cursor_map ][ select_cursor_clue select_arrow ]
+[ select_cursor_map arrow ][ select_cursor_clue select_nothing ] -> [ select_cursor_map ][ select_cursor_clue select_nothing ]
+[ select_cursor_map dist ][ select_cursor_clue select_nothing ] -> [ select_cursor_map ][ select_cursor_clue select_nothing ]
+
+[ init select_cursor_map ][ select_cursor_map select_clue_00 ][ select_cursor_clue ] -> [ init ][ ][ ]
+
+( duplicate pour test)
+
+(TODO : virer les NO ??)
+[ init no select_cursor_map ][ select_clue no select_cursor_map ] -> [ init select_cursor_map ][ select_clue select_cursor_map ]
+[ init ] [ select_cursor_clue_start ] -> [ init ][ select_cursor_clue_start select_cursor_clue ]
+(TODO : virer les NO ??)
+[ select_cursor_map select_clue_04 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_03 ][ no select_cursor_clue | select_cursor_clue ]
+[ select_cursor_map select_clue_03 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_02 ][ no select_cursor_clue | select_cursor_clue ]
+[ select_cursor_map select_clue_02 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_01 ][ no select_cursor_clue | select_cursor_clue ]
+[ select_cursor_map select_clue_01 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_00 ][ no select_cursor_clue | select_cursor_clue ]
+
+[ select_cursor_map arrow ][ select_cursor_clue select_dist ] -> [ select_cursor_map ][ select_cursor_clue select_dist ]
+[ select_cursor_map dist ][ select_cursor_clue select_arrow ] -> [ select_cursor_map ][ select_cursor_clue select_arrow ]
+[ select_cursor_map arrow ][ select_cursor_clue select_nothing ] -> [ select_cursor_map ][ select_cursor_clue select_nothing ]
+[ select_cursor_map dist ][ select_cursor_clue select_nothing ] -> [ select_cursor_map ][ select_cursor_clue select_nothing ]
+
+[ init select_cursor_map ][ select_cursor_map select_clue_00 ][ select_cursor_clue ] -> [ init ][ ][ ]
+
+( fin duplicate pour test)
+
+[ diamond init ] -> [ diamond ]
+
+==============
+WINCONDITIONS
+==============
+
+
+
+=======
+LEVELS
+=======
+
+
+
+I.........
+..........
+..........
+..........
+.......P..
+..........
+..........
+..........
+..........
+*DDDDDDDNN
+
+
+
+
