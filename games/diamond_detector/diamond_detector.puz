@@ -4,12 +4,25 @@ homepage www.puzzlescript.net
 
 run_rules_on_level_start
 
+(debug)
+
+verbose_logging
+
+
+
+
 ========
 OBJECTS
 ========
 
 background
 Black
+
+area_game
+#303030
+
+area_not_game
+Transparent
 
 temp_diag_up_right_up
 Red
@@ -244,7 +257,6 @@ transparent #30FF30
 01110
 10101
 
-
 diamond
 #00C0FF
 
@@ -292,6 +304,7 @@ Transparent
 select_cursor_clue_start
 Transparent
 
+
 =======
 LEGEND
 =======
@@ -300,14 +313,15 @@ temp_diag = temp_diag_up_right or temp_diag_up_left or temp_diag_down_right or t
 arrow = arrow_up or arrow_right or arrow_down or arrow_left or arrow_diag
 dist = dist_01 or dist_02 or dist_03 or dist_04 or dist_05 or dist_06 or dist_07 or dist_08 or dist_09 or dist_10 or dist_11 or dist_12 or dist_13 or dist_14 or dist_15 or dist_16 or dist_17
 select_clue = select_clue_00 or select_clue_01 or select_clue_02 or select_clue_03 or select_clue_04
-. = background
-I = init
-P = player
+. = area_game
+x = area_not_game
+I = init and area_game
+P = player and area_game
 (TODO : pas comme ça)
-* = select_arrow and select_cursor_clue_start
-A = select_arrow
-D = select_dist
-N = select_nothing
+* = select_arrow and select_cursor_clue_start and area_not_game
+A = select_arrow and area_not_game
+D = select_dist and area_not_game
+N = select_nothing and area_not_game
 
 
 =======
@@ -319,6 +333,7 @@ COLLISIONLAYERS
 ================
 
 background
+area_game
 diamond
 init
 temp_diag_up_right, temp_diag_up_left, temp_diag_down_right, temp_diag_down_left
@@ -332,47 +347,48 @@ select_cursor_map, select_cursor_clue
 select_cursor_clue_start
 select_clue, select_arrow, select_dist, select_nothing
 
-player
+player, area_not_game
+
 
 ======
 RULES
 ======
 
-random [ init no diamond ][ ] -> [ ][ diamond init ]
+random [ init no diamond ][ area_game ] -> [ ][ area_game diamond init ]
 
-UP [ diamond init |  ] -> [ diamond init | temp_diag_up_right_up temp_diag_up_left_up ]
-DOWN [ diamond init |  ] -> [ diamond init | temp_diag_down_right_down temp_diag_down_left_down ]
+UP [ diamond init | area_game ] -> [ diamond init | area_game temp_diag_up_right_up temp_diag_up_left_up ]
+DOWN [ diamond init | area_game ] -> [ diamond init | area_game temp_diag_down_right_down temp_diag_down_left_down ]
 
-RIGHT [ temp_diag_up_right_up |  ] -> [ temp_diag_up_right_up | temp_diag_up_right ]
-+ UP [ temp_diag_up_right |  ] -> [ temp_diag_up_right | temp_diag_up_right_up ]
+RIGHT [ temp_diag_up_right_up | area_game ] -> [ temp_diag_up_right_up | area_game temp_diag_up_right ]
++ UP [ temp_diag_up_right | area_game ] -> [ temp_diag_up_right | area_game temp_diag_up_right_up ]
 
-LEFT [ temp_diag_up_left_up |  ] -> [ temp_diag_up_left_up | temp_diag_up_left ]
-+ UP [ temp_diag_up_left |  ] -> [ temp_diag_up_left | temp_diag_up_left_up ]
+LEFT [ temp_diag_up_left_up | area_game ] -> [ temp_diag_up_left_up | area_game temp_diag_up_left ]
++ UP [ temp_diag_up_left | area_game ] -> [ temp_diag_up_left | area_game temp_diag_up_left_up ]
 
-RIGHT [ temp_diag_down_right_down |  ] -> [ temp_diag_down_right_down | temp_diag_down_right ]
-+ DOWN [ temp_diag_down_right |  ] -> [ temp_diag_down_right | temp_diag_down_right_down ]
+RIGHT [ temp_diag_down_right_down | area_game ] -> [ temp_diag_down_right_down | area_game temp_diag_down_right ]
++ DOWN [ temp_diag_down_right | area_game ] -> [ temp_diag_down_right | area_game temp_diag_down_right_down ]
 
-LEFT [ temp_diag_down_left_down |  ] -> [ temp_diag_down_left_down | temp_diag_down_left ]
-+ DOWN [ temp_diag_down_left |  ] -> [ temp_diag_down_left | temp_diag_down_left_down ]
+LEFT [ temp_diag_down_left_down | area_game ] -> [ temp_diag_down_left_down | area_game temp_diag_down_left ]
++ DOWN [ temp_diag_down_left | area_game ] -> [ temp_diag_down_left | area_game temp_diag_down_left_down ]
 
 [ temp_diag_up_right_up ] -> [ ]
 [ temp_diag_up_left_up ] -> [ ]
 [ temp_diag_down_right_down ] -> [ ]
 [ temp_diag_down_left_down ] -> [ ]
 
-UP [ temp_diag_up_right | ... | ] -> [ temp_diag_up_right | ... | arrow_down ]
-UP [ temp_diag_up_left | ... | ] -> [ temp_diag_up_left | ... | arrow_down ]
-RIGHT [ temp_diag_up_right | ... | ] -> [ temp_diag_up_right | ... | arrow_left ]
-RIGHT [ temp_diag_down_right | ... | ] -> [ temp_diag_down_right | ... | arrow_left ]
-DOWN [ temp_diag_down_right | ... | ] -> [ temp_diag_down_right | ... | arrow_up ]
-DOWN [ temp_diag_down_left | ... | ] -> [ temp_diag_down_left | ... | arrow_up ]
-LEFT [ temp_diag_up_left | ... | ] -> [ temp_diag_up_left | ... | arrow_right ]
-LEFT [ temp_diag_down_left | ... | ] -> [ temp_diag_down_left | ... | arrow_right ]
+UP [ temp_diag_up_right | ... | area_game ] -> [ temp_diag_up_right | ... | area_game arrow_down ]
+UP [ temp_diag_up_left | ... | area_game ] -> [ temp_diag_up_left | ... | area_game arrow_down ]
+RIGHT [ temp_diag_up_right | ... | area_game ] -> [ temp_diag_up_right | ... | area_game arrow_left ]
+RIGHT [ temp_diag_down_right | ... | area_game ] -> [ temp_diag_down_right | ... | area_game arrow_left ]
+DOWN [ temp_diag_down_right | ... | area_game ] -> [ temp_diag_down_right | ... | area_game arrow_up ]
+DOWN [ temp_diag_down_left | ... | area_game ] -> [ temp_diag_down_left | ... | area_game arrow_up ]
+LEFT [ temp_diag_up_left | ... | area_game ] -> [ temp_diag_up_left | ... | area_game arrow_right ]
+LEFT [ temp_diag_down_left | ... | area_game ] -> [ temp_diag_down_left | ... | area_game arrow_right ]
 
-UP [ diamond init | ... | ] -> [ diamond init | ... | arrow_down ]
-RIGHT [ diamond init | ... | ] -> [ diamond init | ... | arrow_left ]
-DOWN [ diamond init | ... | ] -> [ diamond init | ... | arrow_up ]
-LEFT [ diamond init | ... | ] -> [ diamond init | ... | arrow_right ]
+UP [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_down ]
+RIGHT [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_left ]
+DOWN [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_up ]
+LEFT [ diamond init | ... | area_game ] -> [ diamond init | ... | area_game arrow_right ]
 
 [ temp_diag ] -> [ arrow_diag ]
 
@@ -381,37 +397,38 @@ LEFT [ diamond init | ... | ] -> [ diamond init | ... | arrow_right ]
 
 (relou, pas mieux)
 (
-for x in range(2, 16):
-    print("[ init ][ dist_%02d | no dist ] -> [ init ][ dist_%02d | dist_%02d ]" % (x, x, x+1))
+for x in range(2, 18):
+    print("[ init ][ dist_%02d | area_game no dist ] -> [ init ][ dist_%02d | area_game dist_%02d ]" % (x, x, x+1))
 )
 
-[ diamond init | ] -> [ diamond init | dist_01 ]
-[ init ][ dist_01 | no dist no diamond ] -> [ init ][ dist_01 | dist_02 ]
-[ init ][ dist_02 | no dist ] -> [ init ][ dist_02 | dist_03 ]
-[ init ][ dist_03 | no dist ] -> [ init ][ dist_03 | dist_04 ]
-[ init ][ dist_04 | no dist ] -> [ init ][ dist_04 | dist_05 ]
-[ init ][ dist_05 | no dist ] -> [ init ][ dist_05 | dist_06 ]
-[ init ][ dist_06 | no dist ] -> [ init ][ dist_06 | dist_07 ]
-[ init ][ dist_07 | no dist ] -> [ init ][ dist_07 | dist_08 ]
-[ init ][ dist_08 | no dist ] -> [ init ][ dist_08 | dist_09 ]
-[ init ][ dist_09 | no dist ] -> [ init ][ dist_09 | dist_10 ]
-[ init ][ dist_10 | no dist ] -> [ init ][ dist_10 | dist_11 ]
-[ init ][ dist_11 | no dist ] -> [ init ][ dist_11 | dist_12 ]
-[ init ][ dist_12 | no dist ] -> [ init ][ dist_12 | dist_13 ]
-[ init ][ dist_13 | no dist ] -> [ init ][ dist_13 | dist_14 ]
-[ init ][ dist_14 | no dist ] -> [ init ][ dist_14 | dist_15 ]
-[ init ][ dist_15 | no dist ] -> [ init ][ dist_15 | dist_16 ]
+[ diamond init | area_game ] -> [ diamond init | area_game dist_01 ]
+[ init ][ dist_01 | area_game no dist no diamond ] -> [ init ][ dist_01 | area_game dist_02 ]
+[ init ][ dist_02 | area_game no dist ] -> [ init ][ dist_02 | area_game dist_03 ]
+[ init ][ dist_03 | area_game no dist ] -> [ init ][ dist_03 | area_game dist_04 ]
+[ init ][ dist_04 | area_game no dist ] -> [ init ][ dist_04 | area_game dist_05 ]
+[ init ][ dist_05 | area_game no dist ] -> [ init ][ dist_05 | area_game dist_06 ]
+[ init ][ dist_06 | area_game no dist ] -> [ init ][ dist_06 | area_game dist_07 ]
+[ init ][ dist_07 | area_game no dist ] -> [ init ][ dist_07 | area_game dist_08 ]
+[ init ][ dist_08 | area_game no dist ] -> [ init ][ dist_08 | area_game dist_09 ]
+[ init ][ dist_09 | area_game no dist ] -> [ init ][ dist_09 | area_game dist_10 ]
+[ init ][ dist_10 | area_game no dist ] -> [ init ][ dist_10 | area_game dist_11 ]
+[ init ][ dist_11 | area_game no dist ] -> [ init ][ dist_11 | area_game dist_12 ]
+[ init ][ dist_12 | area_game no dist ] -> [ init ][ dist_12 | area_game dist_13 ]
+[ init ][ dist_13 | area_game no dist ] -> [ init ][ dist_13 | area_game dist_14 ]
+[ init ][ dist_14 | area_game no dist ] -> [ init ][ dist_14 | area_game dist_15 ]
+[ init ][ dist_15 | area_game no dist ] -> [ init ][ dist_15 | area_game dist_16 ]
+[ init ][ dist_16 | area_game no dist ] -> [ init ][ dist_15 | area_game dist_17 ]
 
-[ init ][ no select_clue ] -> [ init ][ random select_clue ]
+[ init ][ area_game no select_clue ] -> [ init ][ area_game random select_clue ]
 
 (TODO : virer les NO ??)
 [ init no select_cursor_map ][ select_clue no select_cursor_map ] -> [ init select_cursor_map ][ select_clue select_cursor_map ]
 [ init ] [ select_cursor_clue_start ] -> [ init ][ select_cursor_clue_start select_cursor_clue ]
 (TODO : virer les NO ??)
-[ select_cursor_map select_clue_04 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_03 ][ no select_cursor_clue | select_cursor_clue ]
-[ select_cursor_map select_clue_03 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_02 ][ no select_cursor_clue | select_cursor_clue ]
-[ select_cursor_map select_clue_02 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_01 ][ no select_cursor_clue | select_cursor_clue ]
-[ select_cursor_map select_clue_01 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_00 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_04 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_03 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_03 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_02 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_02 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_01 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_01 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_00 ][ no select_cursor_clue | select_cursor_clue ]
 
 [ select_cursor_map arrow ][ select_cursor_clue select_dist ] -> [ select_cursor_map ][ select_cursor_clue select_dist ]
 [ select_cursor_map dist ][ select_cursor_clue select_arrow ] -> [ select_cursor_map ][ select_cursor_clue select_arrow ]
@@ -426,10 +443,10 @@ for x in range(2, 16):
 [ init no select_cursor_map ][ select_clue no select_cursor_map ] -> [ init select_cursor_map ][ select_clue select_cursor_map ]
 [ init ] [ select_cursor_clue_start ] -> [ init ][ select_cursor_clue_start select_cursor_clue ]
 (TODO : virer les NO ??)
-[ select_cursor_map select_clue_04 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_03 ][ no select_cursor_clue | select_cursor_clue ]
-[ select_cursor_map select_clue_03 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_02 ][ no select_cursor_clue | select_cursor_clue ]
-[ select_cursor_map select_clue_02 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_01 ][ no select_cursor_clue | select_cursor_clue ]
-[ select_cursor_map select_clue_01 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_00 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_04 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_03 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_03 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_02 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_02 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_01 ][ no select_cursor_clue | select_cursor_clue ]
+RIGHT [ select_cursor_map select_clue_01 ][ select_cursor_clue | ] -> [ select_cursor_map select_clue_00 ][ no select_cursor_clue | select_cursor_clue ]
 
 [ select_cursor_map arrow ][ select_cursor_clue select_dist ] -> [ select_cursor_map ][ select_cursor_clue select_dist ]
 [ select_cursor_map dist ][ select_cursor_clue select_arrow ] -> [ select_cursor_map ][ select_cursor_clue select_arrow ]
@@ -454,7 +471,7 @@ LEVELS
 
 
 
-I.........
+xxxxxxxxxx
 ..........
 ..........
 ..........
@@ -462,8 +479,8 @@ I.........
 ..........
 ..........
 ..........
-..........
-*DDDDDDDNN
+I.........
+*DAAAAAAAA
 
 
 
