@@ -15,6 +15,8 @@ run_rules_on_level_start
 OBJECTS
 ========
 
+(TODO : utiliser le "." pour les pixels transparents, plutôt que d'ajouter la couleur dans la légende)
+
 background
 Black
 
@@ -263,12 +265,12 @@ transparent #7577ff
 10101
 
 diamond
-transparent #d1ffff #8cffff #00ffff
-00000
-01230
-12233
-02230
-00200
+#d1ffff #8cffff #00ffff
+.....
+.012.
+01122
+.112.
+..1..
 
 stored_diamond
 transparent #d1ffff #8cffff #00ffff
